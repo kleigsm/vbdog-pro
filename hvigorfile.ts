@@ -1,2 +1,6 @@
-﻿export { hvigorPlugin } from "@ohos/hvigor-ohos-plugin"
-export default { system: hvigorPlugin, plugins: [] }
+﻿import { appTasks } from "@ohos/hvigor-ohos-plugin"
+
+export default {
+  system: appTasks,
+  plugins: []
+}
