@@ -1,6 +1,5 @@
 ﻿/**
  * Index — 主容器
- * 未登录显示 LoginPage，已登录显示 Tab 导航
  */
 
 import { UserManager } from "../common/UserManager"
@@ -33,20 +32,14 @@ struct Index {
       Tabs({ index: $$this.currentTab }) {
         TabContent() {
           FeedPage({ isLoggedIn: $isLoggedIn })
-        }.tabBar(this.tabLabel("发现", "🔍"))
+        }.tabBar(this.tabLabel("发现", "🔥"))
 
         TabContent() {
-          Column() { Text("搜索").fontSize(16) }
-            .width("100%").height("100%")
-            .justifyContent(FlexAlign.Center)
-            .backgroundColor(COLORS.background)
-        }.tabBar(this.tabLabel("搜索", "🔎"))
+          SearchPage()
+        }.tabBar(this.tabLabel("搜索", "🔍"))
 
         TabContent() {
-          Column() { Text("发布").fontSize(16) }
-            .width("100%").height("100%")
-            .justifyContent(FlexAlign.Center)
-            .backgroundColor(COLORS.background)
+          CreatePage()
         }.tabBar(this.tabLabel("发布", "✏️"))
 
         TabContent() {
@@ -57,23 +50,15 @@ struct Index {
         }.tabBar(this.tabLabel("消息", "💬"))
 
         TabContent() {
-          Column() { Text("我的").fontSize(16) }
-            .width("100%").height("100%")
-            .justifyContent(FlexAlign.Center)
-            .backgroundColor(COLORS.background)
+          ProfilePage({ isLoggedIn: $isLoggedIn })
         }.tabBar(this.tabLabel("我的", "👤"))
       }
-      .barMode(BarMode.Fixed)
-      .barHeight(56)
+      .barMode(BarMode.Fixed).barHeight(56)
       .backgroundColor(COLORS.background)
     }
   }
 
   @Builder tabLabel(label: string, icon: string) {
-    Column({ space: 2 }) {
-      Text(icon).fontSize(20)
-      Text(label).fontSize(10)
-    }
-    .width("100%")
+    Column({ space: 2 }) { Text(icon).fontSize(20); Text(label).fontSize(10) }.width("100%")
   }
 }

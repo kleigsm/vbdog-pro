@@ -1,0 +1,144 @@
+﻿/**
+ * SearchPage — 搜索页
+ */
+
+import { getApi } from "../common/ApiProvider"
+import { Post } from "../common/Models"
+import { COLORS } from "../common/Constants"
+import { router } from "@kit.ArkUI"
+import { preferences } from "@kit.ArkData"
+
+const SEARCH_HISTORY_KEY = "search_history"
+const MAX_HISTORY = 20
+
+@Component
+struct SearchResultCard {
+  @Prop post: Post
+
+  build() {
+    Row({ space: 12 }) {
+      Text(this.getCategoryIcon(this.post.category)).fontSize(28)
+      Column({ space: 4 }) {
+        Text(this.post.title).fontSize(15).fontWeight(FontWeight.Medium).fontColor(COLORS.text).maxLines(1)
+        Text(this.post.content).fontSize(12).fontColor(COLORS.textSecondary).maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        Row({ space: 8 }) {
+          Text(this.post.author?.nickname ?? "").fontSize(11).fontColor(COLORS.textSecondary)
+          Text("❤️ " + this.post.likeCount).fontSize(11).fontColor(COLORS.textSecondary)
+          Text("💬 " + this.post.commentCount).fontSize(11).fontColor(COLORS.textSecondary)
+        }
+      }.alignItems(HorizontalAlign.Start).layoutWeight(1)
+    }
+    .width("100%").padding(12)
+    .onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: this.post.id } }))
+  }
+
+  getCategoryIcon(cat: string): string {
+    const m: Record<string, string> = { "Prompt": "💬", "Skill": "🛠", "VibeCoding": "⚡", "Tutorial": "📖", "Tool": "🔧" }
+    return m[cat] ?? "📝"
+  }
+}
+
+@Entry
+@Component
+struct SearchPage {
+  @State query: string = ""
+  @State results: Post[] = []
+  @State history: string[] = []
+  @State searching: boolean = false
+  @State hasSearched: boolean = false
+
+  aboutToAppear(): void { this.loadHistory() }
+
+  build() {
+    Column() {
+      // 搜索栏
+      Row({ space: 8 }) {
+        TextInput({ placeholder: "搜索 Prompt、标题、作者...", text: this.query })
+          .layoutWeight(1).height(40).fontSize(15)
+          .backgroundColor("#F0F0F5").borderRadius(20)
+          .padding({ left: 16, right: 16 })
+          .onChange((v: string) => { this.query = v })
+          .onSubmit(() => this.doSearch())
+
+        Button("搜索")
+          .fontSize(14).height(36)
+          .backgroundColor(this.query.trim() ? COLORS.primary : "#CCC")
+          .borderRadius(18)
+          .enabled(this.query.trim().length > 0)
+          .onClick(() => this.doSearch())
+      }
+      .width("100%").padding(12)
+
+      if (this.searching) {
+        LoadingProgress().width(32).height(32).margin({ top: 80 })
+      } else if (this.hasSearched && this.results.length === 0) {
+        Column({ space: 12 }) {
+          Text("🔍").fontSize(48)
+          Text("没有找到相关帖子").fontSize(14).fontColor(COLORS.textSecondary)
+        }.width("100%").margin({ top: 80 })
+      } else if (this.hasSearched) {
+        // 搜索结果
+        List() {
+          ForEach(this.results, (post: Post) => {
+            ListItem() { SearchResultCard({ post: post }) }
+          })
+        }.layoutWeight(1)
+      } else {
+        // 搜索历史
+        Column() {
+          if (this.history.length > 0) {
+            Row() {
+              Text("搜索历史").fontSize(14).fontWeight(FontWeight.Medium).fontColor(COLORS.text)
+              Blank()
+              Text("清空").fontSize(12).fontColor(COLORS.textSecondary)
+                .onClick(() => { this.history = []; this.saveHistory() })
+            }.width("100%").padding({ left: 16, right: 16, top: 12, bottom: 8 })
+
+            Wrap({ spacing: 8 }) {
+              ForEach(this.history, (h: string) => {
+                Text(h)
+                  .fontSize(12).fontColor(COLORS.textSecondary)
+                  .backgroundColor("#F0F0F5").borderRadius(14)
+                  .padding({ left: 12, right: 12, top: 6, bottom: 6 })
+                  .onClick(() => { this.query = h; this.doSearch() })
+              })
+            }.padding({ left: 16, right: 16 })
+          } else {
+            Text("输入关键词搜索 Prompt 和帖子").fontSize(13).fontColor(COLORS.textSecondary).margin({ top: 60 })
+          }
+        }.width("100%")
+      }
+    }
+    .width("100%").height("100%").backgroundColor(COLORS.background)
+  }
+
+  async doSearch() {
+    const q = this.query.trim()
+    if (!q) return
+    this.searching = true
+    this.hasSearched = true
+    try {
+      this.results = await getApi().search(q)
+      // 保存到历史
+      this.history = [q, ...this.history.filter(h => h !== q)].slice(0, MAX_HISTORY)
+      this.saveHistory()
+    } catch (e) { this.results = [] }
+    finally { this.searching = false }
+  }
+
+  loadHistory() {
+    try {
+      const s = preferences.getPreferencesSync(getContext(), { name: "vbdog_search" })
+      const raw = s.getSync(SEARCH_HISTORY_KEY, "[]") as string
+      this.history = JSON.parse(raw) as string[]
+    } catch { this.history = [] }
+  }
+
+  saveHistory() {
+    try {
+      const s = preferences.getPreferencesSync(getContext(), { name: "vbdog_search" })
+      s.putSync(SEARCH_HISTORY_KEY, JSON.stringify(this.history))
+      s.flush()
+    } catch { /* ignore */ }
+  }
+}
