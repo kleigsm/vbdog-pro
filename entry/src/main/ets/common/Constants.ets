@@ -3,9 +3,8 @@
  */
 
 // ========== Supabase 配置 ==========
-// 部署前替换为你的实际 Supabase 项目 URL 和 anon key
-export const SUPABASE_URL: string = "https://YOUR_PROJECT_ID.supabase.co"
-export const SUPABASE_ANON_KEY: string = "YOUR_ANON_KEY"
+export const SUPABASE_URL: string = "https://bxecdhlbnpwahwswnqzr.supabase.co"
+export const SUPABASE_ANON_KEY: string = "sb_publishable_UkKBNurH0MXBStUtXjlCeg_5NxQBaJU"
 
 // ========== 应用配置 ==========
 export const APP_NAME: string = "VBDog Pro"
