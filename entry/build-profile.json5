@@ -1,12 +1,25 @@
 ﻿{
   "apiType": "stageMode",
-  "buildOption": { "resOptions": { "copyCodeResource": { "enable": false } } },
-  "buildOptionSet": [{
-    "name": "release",
-    "arkOptions": { "obfuscation": { "ruleOptions": { "enable": false, "files": ["./obfuscation-rules.txt"] } } }
-  }, {
-    "name": "debug",
-    "arkOptions": { "buildOption": { "sourceMap": true } }
-  }],
-  "targets": [{ "name": "default" }, { "name": "ohosTest" }]
+  "buildOption": {
+    "resOptions": {
+      "copyCodeResource": { "enable": false }
+    }
+  },
+  "buildOptionSet": [
+    {
+      "name": "release",
+      "arkOptions": {
+        "obfuscation": {
+          "ruleOptions": {
+            "enable": false,
+            "files": ["./obfuscation-rules.txt"]
+          }
+        }
+      }
+    }
+  ],
+  "targets": [
+    { "name": "default" },
+    { "name": "ohosTest" }
+  ]
 }

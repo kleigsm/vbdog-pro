@@ -1,33 +1,36 @@
 ﻿{
   "app": {
-    "signingConfigs": [
-      {
-        "name": "default",
-        "type": "HarmonyOS",
-        "material": {
-          "certpath": "C:\\Users\\lenovo\\.ohos\\config\\default_vbdog-pro_AUTO_SIGNING_123456\\debug.p7b",
-          "storePassword": "0000001B41BC4A4D8F9BA84B19A71323C98831576E57266CF34C5DFDFDBDE783A5F9C24F80E868CC27",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001BB5A8620D042597FF7E04ED77CBE02F1975328C1450A17823F0E23171D4FAB3FA3BF1820C0A",
-          "profile": "C:\\Users\\lenovo\\.ohos\\config\\default_vbdog-pro_AUTO_SIGNING_123456\\debug.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\lenovo\\.ohos\\config\\default_vbdog-pro_AUTO_SIGNING_123456\\debug.p12"
-        }
-      }
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.0(12)",
-        "targetSdkVersion": "6.0.0(17)",
+        "targetSdkVersion": "6.0.0(20)",
+        "compatibleSdkVersion": "6.0.0(20)",
         "runtimeOS": "HarmonyOS",
-        "buildOption": { "strictMode": { "useNormalizedOHMUrl": true } }
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
       }
     ],
     "buildModeSet": [
       { "name": "debug" },
       { "name": "release" }
     ]
-  }
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": ["default"]
+        }
+      ]
+    }
+  ]
 }
