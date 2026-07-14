@@ -95,7 +95,7 @@ struct PostDetailPage {
       Row({ space: 4 }) { Text(this.liked ? "❤️" : "🤍").fontSize(20).scale({ x: this.likeAnimScale, y: this.likeAnimScale }).onClick(() => this.toggleLike()); Text(this.formatCount(this.post!.likeCount)).fontSize(13).fontColor(COLORS.textSecondary) }
       Row({ space: 4 }) { Text(this.collected ? "⭐" : "☆").fontSize(20).scale({ x: this.collectAnimScale, y: this.collectAnimScale }).onClick(() => this.toggleCollect()); Text(this.formatCount(this.post!.collectCount)).fontSize(13).fontColor(COLORS.textSecondary) }
       Row({ space: 4 }) { Text("💬").fontSize(18); Text(this.formatCount(this.post!.commentCount)).fontSize(13).fontColor(COLORS.textSecondary) }
-      Text("↗").fontSize(18).onClick(() => { const pboard = pasteboard.getSystemPasteboard(); pboard.setData(pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.post!.title + "\n\n" + this.post!.prompt) })
+      Text("↗").fontSize(18).onClick(() => { const pboard = pasteboard.getSystemPasteboard(); pboard.setData(pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.post!.title + "\n\n" + this.post!.prompt)) })
     }.width("100%").justifyContent(FlexAlign.SpaceEvenly).padding({ top: 12, bottom: 12 })
   }
 
