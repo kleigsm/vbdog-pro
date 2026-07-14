@@ -51,7 +51,7 @@ struct PostDetailPage {
                 Row() {
                   Text("Prompt").fontSize(11).fontColor("#FFB800").backgroundColor("#FFB80020").borderRadius(4).padding({ left: 6, right: 6, top: 2, bottom: 2 })
                   Blank()
-                  Text("复制").fontSize(11).fontColor(COLORS.primary).onClick(() => { const pboard = pasteboard.getSystemPasteboard(); pboard.setData(this.post!.prompt) })
+                  Text("复制").fontSize(11).fontColor(COLORS.primary).onClick(() => { const pboard = pasteboard.getSystemPasteboard(); pboard.setData(pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.post!.prompt)) })
                 }.width("100%").margin({ bottom: 10 })
                 Text(this.post!.prompt).fontSize(13).fontColor("#E5E5EA").fontFamily("monospace").lineHeight(22).width("100%")
               }.width("100%").padding(14).margin({ left: 16, right: 16, bottom: 16 }).backgroundColor("#1D1D1F").borderRadius(12)
@@ -95,7 +95,7 @@ struct PostDetailPage {
       Row({ space: 4 }) { Text(this.liked ? "❤️" : "🤍").fontSize(20).scale({ x: this.likeAnimScale, y: this.likeAnimScale }).onClick(() => this.toggleLike()); Text(this.formatCount(this.post!.likeCount)).fontSize(13).fontColor(COLORS.textSecondary) }
       Row({ space: 4 }) { Text(this.collected ? "⭐" : "☆").fontSize(20).scale({ x: this.collectAnimScale, y: this.collectAnimScale }).onClick(() => this.toggleCollect()); Text(this.formatCount(this.post!.collectCount)).fontSize(13).fontColor(COLORS.textSecondary) }
       Row({ space: 4 }) { Text("💬").fontSize(18); Text(this.formatCount(this.post!.commentCount)).fontSize(13).fontColor(COLORS.textSecondary) }
-      Text("↗").fontSize(18).onClick(() => { const pboard = pasteboard.getSystemPasteboard(); pboard.setData(this.post!.title + "\n\n" + this.post!.prompt) })
+      Text("↗").fontSize(18).onClick(() => { const pboard = pasteboard.getSystemPasteboard(); pboard.setData(pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.post!.title + "\n\n" + this.post!.prompt) })
     }.width("100%").justifyContent(FlexAlign.SpaceEvenly).padding({ top: 12, bottom: 12 })
   }
 

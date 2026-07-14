@@ -1,6 +1,6 @@
 ﻿import { router } from "@kit.ArkUI"
 import { getApi } from "../common/ApiProvider"
-import { Post, CATEGORIES, CategoryItem } from "../common/Models"
+import { Post, CATEGORIES, CategoryItem, FeedFilter } from "../common/Models"
 import { COLORS } from "../common/Constants"
 
 @Component
