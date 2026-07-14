@@ -6,7 +6,7 @@ import { router } from "@kit.ArkUI"
 
 @Entry
 @Component
-struct ProfilePage {
+export struct ProfilePage {
   @State posts: Post[] = []
   @State loading: boolean = true
   @State activeTab: number = 0

@@ -9,7 +9,7 @@ import { router } from "@kit.ArkUI"
 
 @Entry
 @Component
-struct NotificationsPage {
+export struct NotificationsPage {
   @State notifications: VNotification[] = []
   @State loading: boolean = true
 

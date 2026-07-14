@@ -9,7 +9,7 @@ const DRAFT_KEY: string = "create_draft"
 
 @Entry
 @Component
-struct CreatePage {
+export struct CreatePage {
   @State title: string = ""
   @State content: string = ""
   @State prompt: string = ""
@@ -31,7 +31,7 @@ struct CreatePage {
           TextArea({ placeholder: "Prompt 原文（可选）", text: this.prompt }).width("100%").height(120).fontSize(13).fontFamily("monospace").backgroundColor("#F0F0F5").borderRadius(10).onChange((v: string) => { this.prompt = v })
           Text("分类").fontSize(13).fontWeight(FontWeight.Medium).fontColor(COLORS.text).width("100%")
           Row({ space: 6 }) {
-            ForEach(CATEGORIES.filter((c: { key: string; label: string; icon: string }) => c.key !== ""), (cat: { key: string; label: string; icon: string }) => {
+            ForEach(CATEGORIES.filter((cat: CategoryItem) => c.key !== ""), (cat: { key: string; label: string; icon: string }) => {
               Text(cat.icon + " " + cat.label).fontSize(12).fontColor(this.category === cat.key ? COLORS.primary : COLORS.textSecondary).backgroundColor(this.category === cat.key ? COLORS.primary + "14" : "#F0F0F5").borderRadius(8).padding({ left: 10, right: 10, top: 6, bottom: 6 }).onClick(() => { this.category = cat.key })
             })
           }

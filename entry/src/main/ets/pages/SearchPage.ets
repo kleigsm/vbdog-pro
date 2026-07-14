@@ -31,7 +31,7 @@ struct SearchResultCard {
 
 @Entry
 @Component
-struct SearchPage {
+export struct SearchPage {
   @State query: string = ""
   @State results: Post[] = []
   @State history: string[] = []

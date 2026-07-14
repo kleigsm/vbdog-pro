@@ -9,7 +9,7 @@ import { UserManager } from "../common/UserManager"
 
 @Entry
 @Component
-struct MessagesPage {
+export struct MessagesPage {
   @State conversations: Conversation[] = []
   @State messages: Message[] = []
   @State newMsg: string = ""
