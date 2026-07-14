@@ -30,31 +30,22 @@ struct Index {
       LoginPage({ isLoggedIn: $isLoggedIn })
     } else {
       Tabs({ index: $$this.currentTab }) {
-        TabContent() {
-          FeedPage({ isLoggedIn: $isLoggedIn })
-        }.tabBar(this.tabLabel("发现", "🔥"))
-
-        TabContent() {
-          SearchPage()
-        }.tabBar(this.tabLabel("搜索", "🔍"))
-
-        TabContent() {
-          CreatePage()
-        }.tabBar(this.tabLabel("发布", "✏️"))
-
-        TabContent() {
-          Column() { Text("消息").fontSize(16) }
-            .width("100%").height("100%")
-            .justifyContent(FlexAlign.Center)
-            .backgroundColor(COLORS.background)
-        }.tabBar(this.tabLabel("消息", "💬"))
-
-        TabContent() {
-          ProfilePage({ isLoggedIn: $isLoggedIn })
-        }.tabBar(this.tabLabel("我的", "👤"))
+        TabContent() { FeedPage({ isLoggedIn: $isLoggedIn }) }.tabBar(this.tabLabel("发现", "🔥"))
+        TabContent() { SearchPage() }.tabBar(this.tabLabel("搜索", "🔍"))
+        TabContent() { CreatePage() }.tabBar(this.tabLabel("发布", "✏️"))
+        TabContent() { this.messageCombined() }.tabBar(this.tabLabel("消息", "💬"))
+        TabContent() { ProfilePage({ isLoggedIn: $isLoggedIn }) }.tabBar(this.tabLabel("我的", "👤"))
       }
       .barMode(BarMode.Fixed).barHeight(56)
       .backgroundColor(COLORS.background)
+    }
+  }
+
+  @Builder messageCombined() {
+    // 消息 Tab 内嵌通知 + 私信双 Tab
+    Tabs() {
+      TabContent() { NotificationsPage() }.tabBar("通知")
+      TabContent() { MessagesPage() }.tabBar("私信")
     }
   }
 
