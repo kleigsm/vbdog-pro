@@ -1,4 +1,4 @@
-﻿/**
+/**
  * NotificationsPage — 通知中心
  */
 

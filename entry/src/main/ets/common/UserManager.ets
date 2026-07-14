@@ -1,4 +1,4 @@
-﻿/**
+/**
  * UserManager — 用户状态管理（DataStore 持久化）
  */
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Models — 数据模型定义
  * 与 Supabase PostgreSQL 表结构对齐
  */

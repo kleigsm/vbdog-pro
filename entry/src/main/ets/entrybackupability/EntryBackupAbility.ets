@@ -1,3 +1,3 @@
-﻿import { UIAbility } from "@kit.AbilityKit"
+import { UIAbility } from "@kit.AbilityKit"
 
 export default class EntryBackupAbility extends UIAbility {}
