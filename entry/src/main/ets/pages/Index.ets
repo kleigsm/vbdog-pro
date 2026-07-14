@@ -11,11 +11,13 @@ import { NotificationsPage } from "./NotificationsPage"
 import { MessagesPage } from "./MessagesPage"
 
 AppStorage.setOrCreate("isLoggedIn", false)
+AppStorage.setOrCreate("isDark", false)
 
 @Entry
 @Component
 struct Index {
   @StorageLink("isLoggedIn") isLoggedIn: boolean = false
+  @StorageLink("isDark") isDark: boolean = false
   @State currentTab: number = 0
 
   aboutToAppear(): void {
@@ -42,7 +44,8 @@ struct Index {
         TabContent() { ProfilePage() }.tabBar(this.tabLabel("我的", "👤"))
       }
       .barMode(BarMode.Fixed).barHeight(56)
-      .backgroundColor(COLORS.background)
+      .barPosition(BarPosition.End)
+      .backgroundColor(this.isDark ? COLORS.backgroundDark : COLORS.background)
     }
   }
 
