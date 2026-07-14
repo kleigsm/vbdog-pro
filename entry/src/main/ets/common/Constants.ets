@@ -1,28 +1,15 @@
 ﻿export const SUPABASE_URL: string = "https://bxecdhlbnpwahwswnqzr.supabase.co"
 export const SUPABASE_ANON_KEY: string = "sb_publishable_UkKBNurH0MXBStUtXjlCeg_5NxQBaJU"
 
-export class ColorConstants {
-  static readonly primary: string = "#FF6B35"
-  static readonly primaryLight: string = "#FF8C5A"
-  static readonly secondary: string = "#2D2D3F"
-  static readonly background: string = "#F8F9FA"
-  static readonly backgroundDark: string = "#1A1A2E"
-  static readonly card: string = "#FFFFFF"
-  static readonly cardDark: string = "#2D2D3F"
-  static readonly text: string = "#1A1A2E"
-  static readonly textDark: string = "#F0F0F5"
-  static readonly textSecondary: string = "#8E8E93"
-  static readonly textSecondaryDark: string = "#AEAEB2"
-  static readonly border: string = "#E5E5EA"
-  static readonly borderDark: string = "#3A3A4A"
-  static readonly success: string = "#34C759"
-  static readonly warning: string = "#FF9500"
-  static readonly error: string = "#FF3B30"
-  static readonly like: string = "#FF3B30"
-  static readonly collect: string = "#FFB800"
+export const COLORS = {
+  primary: "#FF6B35", primaryLight: "#FF8C5A", secondary: "#2D2D3F",
+  background: "#F8F9FA", backgroundDark: "#1A1A2E", card: "#FFFFFF",
+  cardDark: "#2D2D3F", text: "#1A1A2E", textDark: "#F0F0F5",
+  textSecondary: "#8E8E93", textSecondaryDark: "#AEAEB2",
+  border: "#E5E5EA", borderDark: "#3A3A4A",
+  success: "#34C759", warning: "#FF9500", error: "#FF3B30",
+  like: "#FF3B30", collect: "#FFB800",
 }
-
-export const COLORS = ColorConstants
 
 export const AVATAR_COLORS: string[] = [
   "#FF6B35", "#FF3B30", "#FF9500", "#FFCC00",
