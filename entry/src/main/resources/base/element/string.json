@@ -1,0 +1,8 @@
+﻿{
+  "string": [
+    { "name": "module_desc", "value": "VBDog Pro 主模块" },
+    { "name": "EntryAbility_desc", "value": "VBDog Pro 入口" },
+    { "name": "EntryAbility_label", "value": "VBDog Pro" },
+    { "name": "app_name", "value": "VBDog Pro" }
+  ]
+}

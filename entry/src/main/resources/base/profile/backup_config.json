@@ -1,0 +1,7 @@
+﻿{
+  "allowToBackupRestore": true,
+  "includes": ["data/preferences/vbdog_pro_user"],
+  "excludes": ["data/storage/el2/base/cache"],
+  "fullBackupOnly": false,
+  "restoreDependency": []
+}

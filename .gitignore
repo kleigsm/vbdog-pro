@@ -1,0 +1,5 @@
+﻿node_modules/
+.hvigor/
+**/Build/
+**/.preview/
+*.log
