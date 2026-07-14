@@ -1,0 +1,9 @@
+﻿{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "VBDog Pro main module",
+  "main": "Index.ets",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

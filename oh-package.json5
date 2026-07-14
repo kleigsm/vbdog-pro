@@ -1,6 +1,7 @@
 ﻿{
   "modelVersion": "6.0.0",
-  "description": "VBDog Pro - AI Prompt community with independent backend",
+  "name": "vbdog-pro",
+  "description": "VBDog Pro - AI Prompt Community",
   "dependencies": {},
   "devDependencies": {
     "@ohos/hypium": "1.0.24",
