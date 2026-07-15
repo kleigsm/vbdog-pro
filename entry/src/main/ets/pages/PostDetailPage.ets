@@ -61,7 +61,7 @@ struct PostDetailPage {
 
             if (this.post!.prompt) {
               Column() {
-                Row() { Text("Prompt").fontSize(11).fontColor("#FFB800").backgroundColor("#FFB80020").borderRadius(4).padding({ left: 6, right: 6, top: 2, bottom: 2 }); Blank(); Text("复制").fontSize(11).fontColor(COLORS.primary).onClick(() => { const pboard = pasteboard.getSystemPasteboard(); pboard.setData(pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.post!.prompt)) }); Span("  改编").fontSize(11).fontColor(COLORS.primary).onClick(() => this.remixPost()) }.width("100%").margin({ bottom: 10 })
+                Row() { Text("Prompt").fontSize(11).fontColor("#FFB800").backgroundColor("#FFB80020").borderRadius(4).padding({ left: 6, right: 6, top: 2, bottom: 2 }); Blank(); Text("复制").fontSize(11).fontColor(COLORS.primary).onClick(() => { const pboard = pasteboard.getSystemPasteboard(); pboard.setData(pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.post!.prompt)) }); Text("  改编").fontSize(11).fontColor(COLORS.primary).onClick(() => this.remixPost()) }.width("100%").margin({ bottom: 10 })
                 Text(this.post!.prompt).fontSize(13).fontColor("#E5E5EA").fontFamily("monospace").lineHeight(22).width("100%")
               }.width("100%").padding(14).margin({ left: 16, right: 16, bottom: 16 }).backgroundColor("#1D1D1F").borderRadius(12)
             }
