@@ -23,7 +23,7 @@ struct Index {
 
   aboutToAppear(): void {
     setApi(new SupabaseClient())
-    UserManager.init().then(() => {
+    UserManager.restoreSession().then(() => {
       AppStorage.set("isLoggedIn", UserManager.isLoggedIn)
       if (UserManager.isLoggedIn) {
         const api = getApi() as SupabaseClient
@@ -36,7 +36,6 @@ struct Index {
 
   build() {
     if (!this.appReady) {
-      // Splash — 初始化加载中，避免登录页闪现
       Column() {
         Text("VBDog Pro").fontSize(32).fontWeight(FontWeight.Bold).fontColor(COLORS.primary)
         Text("AI Prompt 创作者社区").fontSize(14).fontColor(COLORS.textSecondary).margin({ top: 8 })
@@ -56,6 +55,5 @@ struct Index {
   }
 
   @Builder messageCombined() { Tabs() { TabContent() { NotificationsPage() }.tabBar("通知"); TabContent() { MessagesPage() }.tabBar("私信") } }
-
   @Builder tabLabel(label: string, icon: string) { Column({ space: 2 }) { Text(icon).fontSize(20); Text(label).fontSize(10) }.width("100%") }
 }

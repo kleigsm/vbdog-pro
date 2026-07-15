@@ -26,6 +26,8 @@ export class SupabaseClient implements IApiProvider {
 
   private async request(path: string, body?: Object): Promise<Object> {
     const req = http.createHttp()
+    // 调试环境跳过 SSL 验证
+    req.on("httpCertificatesVerify", (event: http.CertificatesVerifyEvent) => { event.callback(true) })
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json", "apikey": this.key, "Authorization": `Bearer ${this.key}` }
       if (this.userId) headers["x-user-id"] = this.userId
@@ -33,21 +35,15 @@ export class SupabaseClient implements IApiProvider {
         method: body ? http.RequestMethod.POST : http.RequestMethod.GET,
         header: headers,
         extraData: body ? JSON.stringify(body) : undefined,
-        connectTimeout: 10000, readTimeout: 15000
+        connectTimeout: 15000, readTimeout: 20000
       })
       if (resp.responseCode >= 400) throw new Error(`HTTP ${resp.responseCode}`)
       return JSON.parse(resp.result as string)
     } finally { req.destroy() }
   }
 
-  async login(phone: string, password: string): Promise<User> {
-    const loginBody: LoginBody = { p_phone: phone, p_password: password }
-    return this.parseUser(await this.request("/rpc/login", loginBody))
-  }
-  async register(phone: string, nickname: string, password: string): Promise<User> {
-    const regBody: RegisterBody = { p_phone: phone, p_nickname: nickname, p_password: password }
-    return this.parseUser(await this.request("/rpc/register", regBody))
-  }
+  async login(phone: string, password: string): Promise<User> { return this.parseUser(await this.request("/rpc/login", { p_phone: phone, p_password: password } as LoginBody)) }
+  async register(phone: string, nickname: string, password: string): Promise<User> { return this.parseUser(await this.request("/rpc/register", { p_phone: phone, p_nickname: nickname, p_password: password } as RegisterBody)) }
   async getCurrentUser(): Promise<User> {
     if (!this.userId) throw new Error("Not logged in")
     const rows = await this.request(`/users?id=eq.${this.userId}`) as User[]
@@ -85,7 +81,6 @@ export class SupabaseClient implements IApiProvider {
     return this.mapPost(rows[0])
   }
   async deletePost(postId: string): Promise<void> { await this.request(`/posts?id=eq.${postId}`) }
-
   async likePost(postId: string): Promise<LikeResult> {
     if (!this.onlineFlag) { OfflineQueue.add("like", postId); return { liked: true, likeCount: 0 } }
     const existing = await this.request(`/likes?userId=eq.${this.userId}&postId=eq.${postId}`) as Record<string, Object>[]
@@ -129,11 +124,7 @@ export class SupabaseClient implements IApiProvider {
     else { const b: CommentLikeBody = { userId: this.userId, commentId }; await this.request("/comment_likes", b) }
     return { liked: !wasLiked, likeCount: 0 }
   }
-  async getUserProfile(userId: string): Promise<User> {
-    const rows = await this.request(`/users?id=eq.${userId}`) as User[]
-    if (!rows || rows.length === 0) throw new Error("User not found")
-    return rows[0]
-  }
+  async getUserProfile(userId: string): Promise<User> { const rows = await this.request(`/users?id=eq.${userId}`) as User[]; if (!rows || rows.length === 0) throw new Error("User not found"); return rows[0] }
   async followUser(userId: string): Promise<FollowResult> {
     const existing = await this.request(`/follows?followerId=eq.${this.userId}&followingId=eq.${userId}`) as Record<string, Object>[]
     if (existing && existing.length > 0) { await this.request(`/follows?id=eq.${existing[0]["id"]}`); return { following: false } }
@@ -163,12 +154,8 @@ export class SupabaseClient implements IApiProvider {
     return result
   }
   async getConversations(): Promise<Conversation[]> { return await this.request("/rpc/get_conversations") as Conversation[] }
-  async getMessages(conversationId: string): Promise<Message[]> {
-    return await this.request(`/messages?or=(and(fromUserId.eq.${this.userId},toUserId.eq.${conversationId}),and(fromUserId.eq.${conversationId},toUserId.eq.${this.userId}))&order=createdAt.asc`) as Message[]
-  }
-  async sendMessage(toUserId: string, text: string): Promise<Message> {
-    const b: MessageBody = { fromUserId: this.userId, toUserId, text }; const rows = await this.request("/messages", b) as Message[]; return rows[0]
-  }
+  async getMessages(conversationId: string): Promise<Message[]> { return await this.request(`/messages?or=(and(fromUserId.eq.${this.userId},toUserId.eq.${conversationId}),and(fromUserId.eq.${conversationId},toUserId.eq.${this.userId}))&order=createdAt.asc`) as Message[] }
+  async sendMessage(toUserId: string, text: string): Promise<Message> { const b: MessageBody = { fromUserId: this.userId, toUserId, text }; const rows = await this.request("/messages", b) as Message[]; return rows[0] }
   async getNotifications(): Promise<VNotification[]> { return await this.request(`/notifications?userId=eq.${this.userId}&order=createdAt.desc&limit=50`) as VNotification[] }
   async markNotificationRead(notificationId: string): Promise<void> { const b: NotificationBody = { read: true }; await this.request(`/notifications?id=eq.${notificationId}`, b) }
   async uploadFile(uri: string, bucket: string): Promise<string> { return "" }

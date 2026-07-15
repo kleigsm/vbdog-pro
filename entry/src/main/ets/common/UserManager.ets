@@ -1,32 +1,44 @@
-/**
- * UserManager — 用户状态管理（DataStore 持久化）
- */
-
-import { preferences } from "@kit.ArkData"
+﻿import { preferences } from "@kit.ArkData"
 import { User } from "./Models"
 import { getApi } from "./ApiProvider"
 import { SupabaseClient } from "./SupabaseClient"
+import { common } from "@kit.AbilityKit"
 
-const STORE_NAME = "vbdog_pro_user"
-const KEY_USER_ID = "userId"
-const KEY_NICKNAME = "nickname"
-const KEY_PHONE = "phone"
+const STORE_NAME: string = "vbdog_pro_user"
+const KEY_USER_ID: string = "userId"
+const KEY_NICKNAME: string = "nickname"
+const KEY_PHONE: string = "phone"
 
 export class UserManager {
   private static _store: preferences.Preferences | null = null
   private static _currentUser: User | null = null
+  private static _context: common.Context | null = null
 
-  static async init(): Promise<void> {
-    UserManager._store = preferences.getPreferencesSync(getContext(), { name: STORE_NAME })
-    const userId = UserManager._store.getSync(KEY_USER_ID, "") as string
-    if (userId) {
+  static init(context: common.Context): void {
+    UserManager._context = context
+    try {
+      UserManager._store = preferences.getPreferencesSync(context, { name: STORE_NAME })
+      const userId: string = UserManager._store.getSync(KEY_USER_ID, "") as string
+      if (userId) {
+        const api = getApi() as SupabaseClient
+        api.setUserId(userId)
+        UserManager._store.getSync(KEY_USER_ID, "")  // warm up
+      }
+    } catch (e) {
+      UserManager._store = null
+    }
+  }
+
+  static async restoreSession(): Promise<void> {
+    if (!UserManager._store) return
+    try {
+      const userId: string = UserManager._store.getSync(KEY_USER_ID, "") as string
+      if (!userId) return
       const api = getApi() as SupabaseClient
       api.setUserId(userId)
-      try {
-        UserManager._currentUser = await api.getCurrentUser()
-      } catch {
-        UserManager.clear()
-      }
+      UserManager._currentUser = await api.getCurrentUser()
+    } catch (e) {
+      UserManager.clear()
     }
   }
 
@@ -38,20 +50,24 @@ export class UserManager {
     const api = getApi() as SupabaseClient
     api.setUserId(userId)
     if (UserManager._store) {
-      UserManager._store.putSync(KEY_USER_ID, userId)
-      UserManager._store.putSync(KEY_PHONE, user.phone)
-      UserManager._store.putSync(KEY_NICKNAME, user.nickname)
-      UserManager._store.flush()
+      try {
+        UserManager._store.putSync(KEY_USER_ID, userId)
+        UserManager._store.putSync(KEY_PHONE, user.phone)
+        UserManager._store.putSync(KEY_NICKNAME, user.nickname)
+        UserManager._store.flush()
+      } catch (e) { /* ignore */ }
     }
   }
 
   static clear(): void {
     UserManager._currentUser = null
     if (UserManager._store) {
-      UserManager._store.deleteSync(KEY_USER_ID)
-      UserManager._store.deleteSync(KEY_PHONE)
-      UserManager._store.deleteSync(KEY_NICKNAME)
-      UserManager._store.flush()
+      try {
+        UserManager._store.deleteSync(KEY_USER_ID)
+        UserManager._store.deleteSync(KEY_PHONE)
+        UserManager._store.deleteSync(KEY_NICKNAME)
+        UserManager._store.flush()
+      } catch (e) { /* ignore */ }
     }
   }
 }
