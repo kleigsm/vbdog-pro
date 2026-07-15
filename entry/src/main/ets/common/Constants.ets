@@ -1,6 +1,8 @@
-﻿export const SUPABASE_URL: string = "https://bxecdhlbnpwahwswnqzr.supabase.co"
+﻿export const SUPABASE_URL: string = "http://10.0.2.2:3456"
 export const SUPABASE_ANON_KEY: string = "sb_publishable_UkKBNurH0MXBStUtXjlCeg_5NxQBaJU"
-
+export const AVATAR_COLORS: string[] = [
+  "#FF6B35", "#FF3B30", "#FF9500", "#FFCC00", "#34C759", "#007AFF", "#5856D6", "#AF52DE", "#FF2D55", "#00C7BE",
+]
 export class COLORS {
   static readonly primary: string = "#FF6B35"
   static readonly primaryLight: string = "#FF8C5A"
@@ -21,8 +23,3 @@ export class COLORS {
   static readonly like: string = "#FF3B30"
   static readonly collect: string = "#FFB800"
 }
-
-export const AVATAR_COLORS: string[] = [
-  "#FF6B35", "#FF3B30", "#FF9500", "#FFCC00",
-  "#34C759", "#007AFF", "#5856D6", "#AF52DE", "#FF2D55", "#00C7BE",
-]
