@@ -57,12 +57,7 @@ export class SupabaseClient implements IApiProvider {
     return rows[0]
   }
   async getPosts(category?: string, sort?: string, page?: number): Promise<Post[]> {
-    let query = `/posts?limit=20&offset=${(page ?? 0) * 20}`
-    if (category) query += `&category=eq.${category}`
-    query += sort === "hot" ? "&order=likeCount.desc" : "&order=createdAt.desc"
-    const rows = await this.request(query) as Record<string, Object>[]
-    const result: Post[] = []
-    for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
+    let query = "/posts?limit=5"; i < rows.length; i++) result.push(this.mapPost(rows[i]))
     return result
   }
   async getPostDetail(postId: string): Promise<Post> {
