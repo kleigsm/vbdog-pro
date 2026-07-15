@@ -22,7 +22,10 @@ export struct ProfilePage {
           .fontSize(36).fontColor("#FFF").width(72).height(72).borderRadius(36).textAlign(TextAlign.Center)
           .backgroundColor(AVATAR_COLORS[(UserManager.currentUser?.nickname?.length ?? 0) % AVATAR_COLORS.length])
         Text(UserManager.currentUser?.nickname ?? "用户").fontSize(20).fontWeight(FontWeight.Bold).fontColor(this.isDark ? COLORS.textDark : COLORS.text)
-        Text(this.getLevelTitle(UserManager.currentUser?.level ?? 1)).fontSize(12).fontColor(COLORS.primary).backgroundColor(COLORS.primary + "14").borderRadius(4).padding({ left: 8, right: 8, top: 2, bottom: 2 })
+
+        // Level progress bar
+        this.levelProgress()
+
         if (UserManager.currentUser?.bio) { Text(UserManager.currentUser.bio).fontSize(13).fontColor(COLORS.textSecondary).maxLines(2) }
         Row({ space: 24 }) {
           this.statItem(this.posts.length.toString(), "帖子")
@@ -30,13 +33,17 @@ export struct ProfilePage {
           this.statItem((UserManager.currentUser?.followerCount ?? 0).toString(), "粉丝")
         }.margin({ top: 8 })
 
-        // 暗黑模式开关
         Row({ space: 8 }) {
           Text("🌙 暗黑模式").fontSize(13).fontColor(this.isDark ? COLORS.textDark : COLORS.text)
           Toggle({ type: ToggleType.Switch, isOn: this.isDark }).onChange((value: boolean) => { AppStorage.set("isDark", value) })
         }.padding({ top: 8 })
 
-        Button("编辑资料").fontSize(13).height(32).backgroundColor(this.isDark ? "#3A3A4A" : "#F0F0F5").fontColor(this.isDark ? COLORS.textDark : COLORS.text).borderRadius(16)
+        Row({ space: 8 }) {
+          Button("编辑资料").fontSize(13).height(32).backgroundColor(this.isDark ? "#3A3A4A" : "#F0F0F5").fontColor(this.isDark ? COLORS.textDark : COLORS.text).borderRadius(16)
+          if (UserManager.currentUser?.phone === "00000000000") {
+            Button("管理后台").fontSize(13).height(32).backgroundColor(COLORS.error + "14").fontColor(COLORS.error).borderRadius(16).onClick(() => router.pushUrl({ url: "pages/AdminPage" }))
+          }
+        }
       }.width("100%").padding({ top: 20, bottom: 16 }).backgroundColor(this.isDark ? COLORS.cardDark : COLORS.card)
 
       Row({ space: 0 }) {
@@ -64,6 +71,24 @@ export struct ProfilePage {
     }.width("100%").height("100%").backgroundColor(this.isDark ? COLORS.backgroundDark : COLORS.background)
   }
 
+  @Builder levelProgress() {
+    const level: number = UserManager.currentUser?.level ?? 1
+    const exp: number = UserManager.currentUser?.exp ?? 0
+    const current: LevelItem | undefined = LEVELS.find((l: LevelItem) => l.level === level)
+    const max: number = current ? current.max : 100
+    const pct: number = Math.min(100, Math.floor((exp / max) * 100))
+    const title: string = current ? current.title : "🌱 新手"
+
+    Column({ space: 4 }) {
+      Text(title).fontSize(11).fontColor(COLORS.primary)
+      Row() {
+        Row().width(`${pct}%`).height(4).backgroundColor(COLORS.primary).borderRadius(2)
+        Row().width(`${100 - pct}%`).height(4).backgroundColor("#E5E5EA").borderRadius(2)
+      }.width(120).height(4).borderRadius(2)
+      Text(`${exp}/${max} XP`).fontSize(10).fontColor(COLORS.textSecondary)
+    }.alignItems(HorizontalAlign.Center).margin({ bottom: 4 })
+  }
+
   @Builder statItem(value: string, label: string) { Column({ space: 2 }) { Text(value).fontSize(18).fontWeight(FontWeight.Bold).fontColor(this.isDark ? COLORS.textDark : COLORS.text); Text(label).fontSize(11).fontColor(COLORS.textSecondary) } }
 
   async loadData(): Promise<void> { this.loading = true; await this.loadPosts(); this.loading = false }
@@ -71,6 +96,4 @@ export struct ProfilePage {
   async loadPosts(): Promise<void> { try { const uid = UserManager.currentUser?.id; if (uid) this.posts = await getApi().getUserPosts(uid) } catch (e) { this.posts = [] } }
 
   async loadCollections(): Promise<void> { this.loading = true; try { const uid = UserManager.currentUser?.id; if (uid) this.posts = await getApi().getUserCollections(uid) } catch (e) { this.posts = [] } finally { this.loading = false } }
-
-  getLevelTitle(level: number): string { const l: LevelItem | undefined = LEVELS.find((li: LevelItem) => li.level === level); return l ? l.title : "" }
 }
