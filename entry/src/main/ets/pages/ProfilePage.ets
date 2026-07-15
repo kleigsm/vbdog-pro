@@ -23,7 +23,6 @@ export struct ProfilePage {
           .backgroundColor(AVATAR_COLORS[(UserManager.currentUser?.nickname?.length ?? 0) % AVATAR_COLORS.length])
         Text(UserManager.currentUser?.nickname ?? "用户").fontSize(20).fontWeight(FontWeight.Bold).fontColor(this.isDark ? COLORS.textDark : COLORS.text)
 
-        // Level progress bar
         this.levelProgress()
 
         if (UserManager.currentUser?.bio) { Text(UserManager.currentUser.bio).fontSize(13).fontColor(COLORS.textSecondary).maxLines(2) }
@@ -72,28 +71,59 @@ export struct ProfilePage {
   }
 
   @Builder levelProgress() {
+    Column({ space: 4 }) {
+      Text(this.getLevelTitle(UserManager.currentUser?.level ?? 1)).fontSize(11).fontColor(COLORS.primary)
+      Row() {
+        Row().width(this.expPercentStr()).height(4).backgroundColor(COLORS.primary).borderRadius(2)
+        Row().width(this.expRemainStr()).height(4).backgroundColor("#E5E5EA").borderRadius(2)
+      }.width(120).height(4).borderRadius(2)
+      Text(this.expText()).fontSize(10).fontColor(COLORS.textSecondary)
+    }.alignItems(HorizontalAlign.Center).margin({ bottom: 4 })
+  }
+
+  @Builder statItem(value: string, label: string) {
+    Column({ space: 2 }) {
+      Text(value).fontSize(18).fontWeight(FontWeight.Bold).fontColor(this.isDark ? COLORS.textDark : COLORS.text)
+      Text(label).fontSize(11).fontColor(COLORS.textSecondary)
+    }
+  }
+
+  expPercent(): number {
     const level: number = UserManager.currentUser?.level ?? 1
     const exp: number = UserManager.currentUser?.exp ?? 0
     const current: LevelItem | undefined = LEVELS.find((l: LevelItem) => l.level === level)
     const max: number = current ? current.max : 100
-    const pct: number = Math.min(100, Math.floor((exp / max) * 100))
-    const title: string = current ? current.title : "🌱 新手"
-
-    Column({ space: 4 }) {
-      Text(title).fontSize(11).fontColor(COLORS.primary)
-      Row() {
-        Row().width(`${pct}%`).height(4).backgroundColor(COLORS.primary).borderRadius(2)
-        Row().width(`${100 - pct}%`).height(4).backgroundColor("#E5E5EA").borderRadius(2)
-      }.width(120).height(4).borderRadius(2)
-      Text(`${exp}/${max} XP`).fontSize(10).fontColor(COLORS.textSecondary)
-    }.alignItems(HorizontalAlign.Center).margin({ bottom: 4 })
+    return Math.min(100, Math.floor((exp / max) * 100))
   }
 
-  @Builder statItem(value: string, label: string) { Column({ space: 2 }) { Text(value).fontSize(18).fontWeight(FontWeight.Bold).fontColor(this.isDark ? COLORS.textDark : COLORS.text); Text(label).fontSize(11).fontColor(COLORS.textSecondary) } }
+  expPercentStr(): string { return this.expPercent().toString() }
+
+  expRemainStr(): string { return (100 - this.expPercent()).toString() }
+
+  expText(): string {
+    const level: number = UserManager.currentUser?.level ?? 1
+    const exp: number = UserManager.currentUser?.exp ?? 0
+    const current: LevelItem | undefined = LEVELS.find((l: LevelItem) => l.level === level)
+    const max: number = current ? current.max : 100
+    return exp.toString() + "/" + max.toString() + " XP"
+  }
+
+  getLevelTitle(level: number): string {
+    const l: LevelItem | undefined = LEVELS.find((li: LevelItem) => li.level === level)
+    return l ? l.title : ""
+  }
 
   async loadData(): Promise<void> { this.loading = true; await this.loadPosts(); this.loading = false }
 
-  async loadPosts(): Promise<void> { try { const uid = UserManager.currentUser?.id; if (uid) this.posts = await getApi().getUserPosts(uid) } catch (e) { this.posts = [] } }
+  async loadPosts(): Promise<void> {
+    try { const uid = UserManager.currentUser?.id; if (uid) this.posts = await getApi().getUserPosts(uid) }
+    catch (e) { this.posts = [] }
+  }
 
-  async loadCollections(): Promise<void> { this.loading = true; try { const uid = UserManager.currentUser?.id; if (uid) this.posts = await getApi().getUserCollections(uid) } catch (e) { this.posts = [] } finally { this.loading = false } }
+  async loadCollections(): Promise<void> {
+    this.loading = true
+    try { const uid = UserManager.currentUser?.id; if (uid) this.posts = await getApi().getUserCollections(uid) }
+    catch (e) { this.posts = [] }
+    finally { this.loading = false }
+  }
 }
