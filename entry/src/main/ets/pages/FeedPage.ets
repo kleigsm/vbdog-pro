@@ -25,7 +25,7 @@ struct PostCard {
     }.width("100%").backgroundColor(this.isDark ? COLORS.cardDark : COLORS.card).borderRadius(12).shadow({ radius: 4, color: "#00000010", offsetY: 2 }).onClick(() => this.onCardClick?.())
   }
 
-  randomHeight(): number { const h = 120 + ((this.post.title.length + this.post.content.length) % 5) * 15; return h }
+  randomHeight(): number { const h: number = 120 + ((this.post.title.length + this.post.content.length) % 5) * 15; return h }
   getColor(cat: string): string { const m: Record<string, string> = { "Prompt": "#FF6B35", "Skill": "#5856D6", "VibeCoding": "#34C759", "Tutorial": "#007AFF", "Tool": "#FF9500" }; return m[cat] ?? COLORS.primary }
   formatCount(n: number): string { if (n >= 10000) return (n / 10000).toFixed(1) + "w"; if (n >= 1000) return (n / 1000).toFixed(1) + "k"; return n.toString() }
 }
@@ -49,13 +49,13 @@ export struct FeedPage {
   @State activeCategory: string = ""
   @State page: number = 0
   @State offlineCount: number = 0
+  @State errorMsg: string = ""
   @StorageLink("isDark") isDark: boolean = false
 
   aboutToAppear(): void { OfflineQueue.init(); this.loadPosts(); this.checkOffline() }
 
   build() {
     Column() {
-      // 离线横幅
       if (this.offlineCount > 0) {
         Row() { Text("离线模式 · " + this.offlineCount + " 个操作待同步").fontSize(12).fontColor("#FFF"); Blank(); Text("重试").fontSize(12).fontColor("#FFD700").onClick(() => this.retrySync()) }
         .width("100%").padding({ left: 16, right: 16, top: 6, bottom: 6 }).backgroundColor("#FF9500")
@@ -81,11 +81,18 @@ export struct FeedPage {
           Column({ space: 10 }) { ForEach([0, 1, 2, 3], (_: number) => { SkeletonCard() }) }.width("50%").padding({ left: 4, right: 8 })
         }.width("100%").layoutWeight(1)
       } else if (this.posts.length === 0) {
-        Column({ space: 12 }) { Text("📝").fontSize(48); Text("还没有帖子，快来发布第一条吧！").fontSize(14).fontColor(COLORS.textSecondary) }.width("100%").margin({ top: 100 })
+        Column({ space: 12 }) {
+          Text("📝").fontSize(48)
+          if (this.errorMsg) {
+            Text("网络连接失败").fontSize(15).fontWeight(FontWeight.Medium).fontColor(COLORS.error)
+            Text(this.errorMsg).fontSize(12).fontColor(COLORS.textSecondary).maxLines(3).textAlign(TextAlign.Center).padding({ left: 30, right: 30 })
+            Button("重试").fontSize(14).height(36).backgroundColor(COLORS.primary).fontColor("#FFF").borderRadius(18).margin({ top: 8 }).onClick(() => { this.errorMsg = ""; this.loadPosts() })
+          } else {
+            Text("还没有帖子，快来发布第一条吧！").fontSize(14).fontColor(COLORS.textSecondary)
+          }
+        }.width("100%").margin({ top: 80 })
       } else {
-        WaterFlow() {
-          ForEach(this.posts, (post: Post) => { FlowItem() { PostCard({ post: post, onCardClick: () => this.onPostClick(post) }) } })
-        }.columnsTemplate("1fr 1fr").columnsGap(8).rowsGap(8).layoutWeight(1).padding({ left: 8, right: 8 })
+        WaterFlow() { ForEach(this.posts, (post: Post) => { FlowItem() { PostCard({ post: post, onCardClick: () => this.onPostClick(post) }) } }) }.columnsTemplate("1fr 1fr").columnsGap(8).rowsGap(8).layoutWeight(1).padding({ left: 8, right: 8 })
       }
     }.width("100%").height("100%").backgroundColor(this.isDark ? COLORS.backgroundDark : COLORS.background)
   }
@@ -96,11 +103,16 @@ export struct FeedPage {
 
   async loadPosts(append: boolean = false): Promise<void> {
     this.loading = true
+    this.errorMsg = ""
     try {
       const newPosts: Post[] = await getApi().getPosts(this.filter.category || undefined, this.filter.sort, append ? this.page : 0) as Post[]
       if (append) { const ids: Set<string> = new Set(); for (let i = 0; i < this.posts.length; i++) ids.add(this.posts[i].id); const toAdd: Post[] = []; for (let i = 0; i < newPosts.length; i++) { if (!ids.has(newPosts[i].id)) toAdd.push(newPosts[i]) }; this.posts = this.posts.concat(toAdd) }
       else { this.posts = newPosts; this.checkOffline() }
-    } catch (e) { const api = getApi() as SupabaseClient; api.setOnline(false); this.offlineCount = OfflineQueue.count }
+    } catch (e) {
+      const api = getApi() as SupabaseClient; api.setOnline(false); this.offlineCount = OfflineQueue.count
+      const errObj: Object = e as Object
+      this.errorMsg = (errObj as Record<string, string>)["message"] ?? "无法连接到服务器，请检查网络"
+    }
     finally { this.loading = false }
   }
 
