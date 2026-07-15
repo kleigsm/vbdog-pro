@@ -27,7 +27,6 @@ export class SupabaseClient implements IApiProvider {
   private async request(path: string, body?: Object): Promise<Object> {
     const req = http.createHttp()
     // 调试环境跳过 SSL 验证
-    req.on("httpCertificatesVerify", (event: http.CertificatesVerifyEvent) => { event.callback(true) })
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json", "apikey": this.key, "Authorization": `Bearer ${this.key}` }
       if (this.userId) headers["x-user-id"] = this.userId
