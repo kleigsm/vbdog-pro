@@ -29,7 +29,7 @@ export class SupabaseClient implements IApiProvider {
     // 调试环境跳过 SSL 验证
     try {
       const headers: Record<string, string> = { "apikey": this.key, "Authorization": `Bearer ${this.key}` }; if (body) headers["Content-Type"] = "application/json"
-      // x-user-id removed
+      if (this.userId) headers["x-user-id"] = this.userId
       const resp = await req.request(`${this.url}/rest/v1${path}`, {
         method: body ? http.RequestMethod.POST : http.RequestMethod.GET,
         header: headers,
@@ -57,14 +57,16 @@ export class SupabaseClient implements IApiProvider {
     return rows[0]
   }
   async getPosts(category?: string, sort?: string, page?: number): Promise<Post[]> {
-    let query = "/posts?limit=5"
+    let query = `/posts?select=*&limit=20&offset=${(page ?? 0) * 20}`
+    if (category) query += `&category=eq.${category}`
+    query += sort === "hot" ? "&order=likeCount.desc" : "&order=createdAt.desc"
     const rows = await this.request(query) as Record<string, Object>[]
     const result: Post[] = []
     for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
     return result
   }
   async getPostDetail(postId: string): Promise<Post> {
-    const rows = await this.request(`/posts?id=eq.${postId}`) as Record<string, Object>[]
+    const rows = await this.request(`/posts?select=*&id=eq.${postId}`) as Record<string, Object>[]
     if (!rows || rows.length === 0) throw new Error("Post not found")
     return this.mapPost(rows[0])
   }
@@ -129,7 +131,7 @@ export class SupabaseClient implements IApiProvider {
     return { following: true }
   }
   async getUserPosts(userId: string): Promise<Post[]> {
-    const rows = await this.request(`/posts?userId=eq.${userId}&order=createdAt.desc`) as Record<string, Object>[]
+    const rows = await this.request(`/posts?select=*&userId=eq.${userId}&order=createdAt.desc`) as Record<string, Object>[]
     const result: Post[] = []
     for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
     return result
@@ -139,13 +141,13 @@ export class SupabaseClient implements IApiProvider {
     if (!collects || collects.length === 0) return []
     let ids = ""
     for (let i = 0; i < collects.length; i++) { if (i > 0) ids += ","; ids += collects[i]["postId"] as string }
-    const rows = await this.request(`/posts?id=in.(${ids})`) as Record<string, Object>[]
+    const rows = await this.request(`/posts?select=*&id=in.(${ids})`) as Record<string, Object>[]
     const result: Post[] = []
     for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
     return result
   }
   async search(query: string): Promise<Post[]> {
-    const rows = await this.request(`/posts?or=(title.ilike.*${query}*,content.ilike.*${query}*)&order=createdAt.desc&limit=20`) as Record<string, Object>[]
+    const rows = await this.request(`/posts?select=*&or=(title.ilike.*${query}*,content.ilike.*${query}*)&order=createdAt.desc&limit=20`) as Record<string, Object>[]
     const result: Post[] = []
     for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
     return result
