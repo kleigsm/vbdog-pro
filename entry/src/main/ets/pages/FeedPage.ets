@@ -111,7 +111,7 @@ export struct FeedPage {
     } catch (e) {
       const api = getApi() as SupabaseClient; api.setOnline(false); this.offlineCount = OfflineQueue.count
       const errObj: Object = e as Object
-      this.errorMsg = JSON.stringify(e)
+      this.errorMsg = String(e)
     }
     finally { this.loading = false }
   }
