@@ -59,7 +59,7 @@ export struct ProfilePage {
             ListItem() {
               Row({ space: 12 }) {
                 Text(post.title).fontSize(14).fontColor(this.isDark ? COLORS.textDark : COLORS.text).maxLines(1).layoutWeight(1)
-                Text("❤️ " + post.likeCount + "  💬 " + post.commentCount).fontSize(11).fontColor(COLORS.textSecondary)
+                Text("❤️ " + post.likeCount + "  💬 " + post.commentCount).fontSize(11).fontColor(COLORS.textSecondary); if (post.userId === UserManager.currentUser?.id) { Text("删除").fontSize(11).fontColor(COLORS.error).margin({ left: 8 }).onClick(() => this.deleteMyPost(post)) }
               }.width("100%").padding(14).backgroundColor(this.isDark ? COLORS.cardDark : COLORS.card).onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: post.id } }))
             }
           })
@@ -120,7 +120,7 @@ export struct ProfilePage {
     catch (e) { this.posts = [] }
   }
 
-  async loadCollections(): Promise<void> {
+  async deleteMyPost(post: Post): Promise<void> { try { await getApi().deletePost(post.id); this.posts = this.posts.filter(p => p.id !== post.id) } catch (e) { /* ignore */ } }\n\n  async loadCollections(): Promise<void> {
     this.loading = true
     try { const uid = UserManager.currentUser?.id; if (uid) this.posts = await getApi().getUserCollections(uid) }
     catch (e) { this.posts = [] }

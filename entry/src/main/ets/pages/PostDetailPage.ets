@@ -34,7 +34,7 @@ struct PostDetailPage {
     else if (!this.post) { Column({ space: 12 }) { Text("😕").fontSize(48); Text("帖子不存在").fontSize(15).fontColor(COLORS.textSecondary) }.width("100%").height("100%").justifyContent(FlexAlign.Center).backgroundColor(this.isDark ? COLORS.backgroundDark : COLORS.background) }
     else {
       Column() {
-        Row() { Text("← 返回").fontSize(15).fontColor(COLORS.primary).onClick(() => router.back()); Blank(); if (this.isOwnPost()) { Text("删除").fontSize(13).fontColor(COLORS.error).onClick(() => this.showDelete = true) } }.width("100%").padding(16)
+        Row() { Text("← 返回").fontSize(15).fontColor(COLORS.primary).onClick(() => router.back()); Blank(); if (this.isOwnPost()) { Text("编辑").fontSize(13).fontColor(COLORS.primary).onClick(() => this.editPost()).margin({ right: 12 }); Text("删除").fontSize(13).fontColor(COLORS.error).onClick(() => this.showDelete = true) } }.width("100%").padding(16)
 
         Scroll() {
           Column() {
@@ -176,7 +176,7 @@ struct PostDetailPage {
 
   isOwnPost(): boolean { return UserManager.currentUser?.id === this.post?.userId }
 
-  searchTag(tag: string): void { router.pushUrl({ url: "pages/SearchPage", params: { query: tag } }) }
+  editPost(): void { router.pushUrl({ url: "pages/CreatePage", params: { editPostId: this.postId, editTitle: this.post?.title, editContent: this.post?.content, editPrompt: this.post?.prompt, editCategory: this.post?.category, editModel: this.post?.model } }) }\n\n  searchTag(tag: string): void { router.pushUrl({ url: "pages/SearchPage", params: { query: tag } }) }
 
   remixPost(): void { router.pushUrl({ url: "pages/CreatePage", params: { remixFrom: this.postId, remixTitle: "改编自: " + (this.post?.title ?? ""), remixPrompt: this.post?.prompt ?? "" } }) }
 

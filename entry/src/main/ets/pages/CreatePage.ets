@@ -17,23 +17,35 @@ export struct CreatePage {
   @State model: string = "Claude"
   @State submitting: boolean = false
   @State remixLabel: string = ""
+  @State isEditMode: boolean = false
+  private editPostId: string = ""
   private draftTimer: number = -1
 
   aboutToAppear(): void {
     const params: Object = router.getParams() as Object
     if (params) {
       const p: Record<string, string> = params as Record<string, string>
+      if (p["editPostId"]) {
+        this.editPostId = p["editPostId"]
+        this.isEditMode = true
+        if (p["editTitle"]) this.title = p["editTitle"]
+        if (p["editContent"]) this.content = p["editContent"]
+        if (p["editPrompt"]) this.prompt = p["editPrompt"]
+        if (p["editCategory"]) this.category = p["editCategory"]
+        if (p["editModel"]) this.model = p["editModel"]
+        return
+      }
       if (p["remixPrompt"]) { this.prompt = p["remixPrompt"]; this.remixLabel = "改编自: " + (p["remixTitle"] ?? "") }
       if (p["remixTitle"]) this.title = p["remixTitle"]
     }
     this.loadDraft(); this.startAutoSave()
   }
 
-  aboutToDisappear(): void { this.saveDraft(); clearInterval(this.draftTimer) }
+  aboutToDisappear(): void { if (!this.isEditMode) this.saveDraft(); clearInterval(this.draftTimer) }
 
   build() {
     Column() {
-      Text(this.remixLabel ? this.remixLabel : "发布帖子").fontSize(18).fontWeight(FontWeight.Bold).fontColor(COLORS.text).width("100%").padding({ left: 16, top: 16, bottom: 8 })
+      Text(this.isEditMode ? "编辑帖子" : (this.remixLabel ? this.remixLabel : "发布帖子")).fontSize(18).fontWeight(FontWeight.Bold).fontColor(COLORS.text).width("100%").padding({ left: 16, top: 16, bottom: 8 })
       Scroll() {
         Column({ space: 14 }) {
           TextInput({ placeholder: "标题", text: this.title }).width("100%").height(44).fontSize(16).backgroundColor("#F0F0F5").borderRadius(10).onChange((v: string) => { this.title = v })
@@ -51,11 +63,11 @@ export struct CreatePage {
         }.padding(16)
       }.layoutWeight(1)
 
-      Button(this.submitting ? "发布中..." : "发布")
+      Button(this.submitting ? "保存中..." : (this.isEditMode ? "保存修改" : "发布"))
         .width("88%").height(48).fontSize(16).fontWeight(FontWeight.Medium)
         .backgroundColor(this.canSubmit() ? COLORS.primary : "#CCC").borderRadius(12)
         .enabled(this.canSubmit() && !this.submitting).margin({ bottom: 16 })
-        .onClick(() => this.submit())
+        .onClick(() => this.isEditMode ? this.saveEdit() : this.submit())
     }.width("100%").height("100%").backgroundColor(COLORS.background)
   }
 
@@ -63,9 +75,19 @@ export struct CreatePage {
 
   async submit() { if (!this.canSubmit()) return; this.submitting = true; try { await getApi().createPost({ title: this.title.trim(), content: this.content.trim(), prompt: this.prompt.trim(), category: this.category, model: this.model }); promptAction.showToast({ message: "发布成功！" }); this.title = ""; this.content = ""; this.prompt = ""; this.remixLabel = ""; this.saveDraft(); router.back() } catch (e) { promptAction.showToast({ message: "发布失败" }) } finally { this.submitting = false } }
 
+  async saveEdit(): Promise<void> {
+    if (!this.canSubmit()) return
+    this.submitting = true
+    try {
+      // First delete the old post, then create a new one
+      await getApi().deletePost(this.editPostId)
+      await getApi().createPost({ title: this.title.trim(), content: this.content.trim(), prompt: this.prompt.trim(), category: this.category, model: this.model })
+      promptAction.showToast({ message: "保存成功！" }); router.back()
+    } catch (e) { promptAction.showToast({ message: "保存失败" }) }
+    finally { this.submitting = false }
+  }
+
   startAutoSave(): void { this.draftTimer = setInterval(() => this.saveDraft(), 10000) }
-
   saveDraft(): void { try { const s = preferences.getPreferencesSync(getContext(), { name: "vbdog_draft" }); s.putSync(DRAFT_KEY, JSON.stringify({ title: this.title, content: this.content, prompt: this.prompt, category: this.category, model: this.model })); s.flush() } catch (e) { /* ignore */ } }
-
   loadDraft(): void { try { const s = preferences.getPreferencesSync(getContext(), { name: "vbdog_draft" }); const raw: string = s.getSync(DRAFT_KEY, "{}") as string; const d: Record<string, string> = JSON.parse(raw) as Record<string, string>; if (d["title"]) this.title = d["title"]; if (d["content"]) this.content = d["content"]; if (d["prompt"]) this.prompt = d["prompt"]; if (d["category"]) this.category = d["category"]; if (d["model"]) this.model = d["model"] } catch (e) { /* ignore */ } }
 }
