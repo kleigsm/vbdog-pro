@@ -3,7 +3,8 @@ import { Post, Comment, LevelItem, LEVELS } from "../common/Models"
 import { COLORS, AVATAR_COLORS } from "../common/Constants"
 import { UserManager } from "../common/UserManager"
 import { router } from "@kit.ArkUI"
-import { pasteboard, promptAction } from "@kit.BasicServicesKit"
+import { pasteboard } from "@kit.BasicServicesKit"
+import { promptAction } from "@kit.ArkUI"
 
 @Entry
 @Component

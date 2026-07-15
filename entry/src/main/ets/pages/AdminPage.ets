@@ -66,7 +66,7 @@ export struct AdminPage {
     this.loading = true
     try {
       // Get recent posts
-      const allPosts: Post[] = await getApi().getPosts("", "latest", 0) as Post[]
+      const allPosts: Post[] = await getApi().getPosts("", "latest", 0)
       this.posts = allPosts
       this.postCount = allPosts.length
       this.userCount = 3 // placeholder
@@ -84,6 +84,6 @@ export struct AdminPage {
         this.postCount--
       } catch (e) { /* ignore */ }
       finally { this.deletingId = "" }
-    }
+    } })
   }
 }
