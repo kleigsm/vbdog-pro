@@ -176,7 +176,11 @@ struct PostDetailPage {
 
   isOwnPost(): boolean { return UserManager.currentUser?.id === this.post?.userId }
 
-  editPost(): void { router.pushUrl({ url: "pages/CreatePage", params: { editPostId: this.postId, editTitle: this.post?.title, editContent: this.post?.content, editPrompt: this.post?.prompt, editCategory: this.post?.category, editModel: this.post?.model } }) }\n\n  searchTag(tag: string): void { router.pushUrl({ url: "pages/SearchPage", params: { query: tag } }) }
+  editPost(): void {
+    router.pushUrl({ url: "pages/CreatePage", params: { editPostId: this.postId, editTitle: this.post?.title, editContent: this.post?.content, editPrompt: this.post?.prompt, editCategory: this.post?.category, editModel: this.post?.model } })
+  }
+
+  searchTag(tag: string): void { router.pushUrl({ url: "pages/SearchPage", params: { query: tag } }) }
 
   remixPost(): void { router.pushUrl({ url: "pages/CreatePage", params: { remixFrom: this.postId, remixTitle: "改编自: " + (this.post?.title ?? ""), remixPrompt: this.post?.prompt ?? "" } }) }
 
