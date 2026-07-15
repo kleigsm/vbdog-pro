@@ -29,7 +29,7 @@ export class SupabaseClient implements IApiProvider {
     // 调试环境跳过 SSL 验证
     try {
       const headers: Record<string, string> = { "apikey": this.key, "Authorization": `Bearer ${this.key}` }; if (body) headers["Content-Type"] = "application/json"
-      if (this.userId) headers["x-user-id"] = this.userId
+      // x-user-id removed
       const resp = await req.request(`${this.url}/rest/v1${path}`, {
         method: body ? http.RequestMethod.POST : http.RequestMethod.GET,
         header: headers,
