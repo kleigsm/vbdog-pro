@@ -1,5 +1,5 @@
 ﻿import { getApi } from "../common/ApiProvider"
-import { Post, LevelItem, LEVELS } from "../common/Models"
+import { Post } from "../common/Models"
 import { COLORS } from "../common/Constants"
 import { UserManager } from "../common/UserManager"
 import { router } from "@kit.ArkUI"
@@ -20,7 +20,6 @@ export struct AdminPage {
     Column() {
       Row() { Text("管理后台").fontSize(18).fontWeight(FontWeight.Bold).fontColor(COLORS.text); Blank() }.width("100%").padding(16)
 
-      // Dashboard
       Row({ space: 12 }) {
         this.statCard("用户", this.userCount.toString(), COLORS.primary)
         this.statCard("帖子", this.postCount.toString(), COLORS.success)
@@ -44,7 +43,7 @@ export struct AdminPage {
                 if (this.deletingId === post.id) {
                   LoadingProgress().width(20).height(20)
                 } else {
-                  Text("删除").fontSize(12).fontColor(COLORS.error).onClick(() => this.deletePost(post))
+                  Text("删除").fontSize(12).fontColor(COLORS.error).onClick(() => this.confirmDelete(post))
                 }
               }.width("100%").padding(14).backgroundColor(COLORS.card)
               .onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: post.id } }))
@@ -65,25 +64,31 @@ export struct AdminPage {
   async loadData(): Promise<void> {
     this.loading = true
     try {
-      // Get recent posts
       const allPosts: Post[] = await getApi().getPosts("", "latest", 0)
       this.posts = allPosts
       this.postCount = allPosts.length
-      this.userCount = 3 // placeholder
+      this.userCount = 3
     } catch (e) { /* ignore */ }
     finally { this.loading = false }
   }
 
-  async deletePost(post: Post): Promise<void> {
-    const confirmed = alert("确认删除帖子「" + post.title + "」？", "管理后台", ["取消", "确认删除"])
-    if (confirmed === "确认删除") {
-      this.deletingId = post.id
-      try {
-        await getApi().deletePost(post.id)
-        this.posts = this.posts.filter(p => p.id !== post.id)
-        this.postCount--
-      } catch (e) { /* ignore */ }
-      finally { this.deletingId = "" }
-    } })
+  confirmDelete(post: Post): void {
+    promptAction.showDialog({
+      title: "确认删除",
+      message: "删除帖子「" + post.title + "」？",
+      buttons: [{ text: "取消", color: "#999" }, { text: "删除", color: "#FF3B30" }]
+    }).then((result: { index: number }) => {
+      if (result.index === 1) this.doDelete(post)
+    })
+  }
+
+  async doDelete(post: Post): Promise<void> {
+    this.deletingId = post.id
+    try {
+      await getApi().deletePost(post.id)
+      this.posts = this.posts.filter(p => p.id !== post.id)
+      this.postCount--
+    } catch (e) { /* ignore */ }
+    finally { this.deletingId = "" }
   }
 }
