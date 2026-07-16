@@ -57,14 +57,19 @@ export class SupabaseClient implements IApiProvider {
     return rows[0]
   }
   async getPosts(category?: string, sort?: string, page?: number): Promise<Post[]> {
-    let query = `/posts?select=*&limit=20&offset=${(page ?? 0) * 20}`
-    if (category) query += `&category=eq.${category}`
-    query += sort === "hot" ? "&order=likeCount.desc" : "&order=createdAt.desc"
-    const rows = await this.request(query) as Record<string, Object>[]
+    const cat: string = category ? category : ""
+    const srt: string = sort ? sort : "latest"
+    const pg: number = page ? page : 0
+    const body: Record<string, Object> = {}
+    body["p_category"] = cat
+    body["p_sort"] = srt
+    body["p_page"] = pg
+    const rows = await this.request("/rpc/get_posts", body) as Record<string, Object>[]
     const result: Post[] = []
     for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
     return result
   }
+
   async getPostDetail(postId: string): Promise<Post> {
     const rows = await this.request(`/posts?select=*&id=eq.${postId}`) as Record<string, Object>[]
     if (!rows || rows.length === 0) throw new Error("Post not found")
