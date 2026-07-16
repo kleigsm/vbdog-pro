@@ -1,4 +1,4 @@
-﻿import { preferences } from "@kit.ArkData"
+import { preferences } from "@kit.ArkData"
 import { User } from "./Models"
 import { getApi } from "./ApiProvider"
 import { SupabaseClient } from "./SupabaseClient"
@@ -8,6 +8,7 @@ const STORE_NAME: string = "vbdog_pro_user"
 const KEY_USER_ID: string = "userId"
 const KEY_NICKNAME: string = "nickname"
 const KEY_PHONE: string = "phone"
+const KEY_BIO: string = "bio"
 
 export class UserManager {
   private static _store: preferences.Preferences | null = null
@@ -22,7 +23,7 @@ export class UserManager {
       if (userId) {
         const api = getApi() as SupabaseClient
         api.setUserId(userId)
-        UserManager._store.getSync(KEY_USER_ID, "")  // warm up
+        UserManager._store.getSync(KEY_USER_ID, "")
       }
     } catch (e) {
       UserManager._store = null
@@ -44,6 +45,9 @@ export class UserManager {
 
   static get currentUser(): User | null { return UserManager._currentUser }
   static get isLoggedIn(): boolean { return UserManager._currentUser !== null }
+  static get isAdmin(): boolean {
+    return UserManager._currentUser?.phone === "00000000000"
+  }
 
   static async setUser(user: User, userId: string): Promise<void> {
     UserManager._currentUser = user
@@ -54,6 +58,20 @@ export class UserManager {
         UserManager._store.putSync(KEY_USER_ID, userId)
         UserManager._store.putSync(KEY_PHONE, user.phone)
         UserManager._store.putSync(KEY_NICKNAME, user.nickname)
+        UserManager._store.putSync(KEY_BIO, user.bio ?? "")
+        UserManager._store.flush()
+      } catch (e) { /* ignore */ }
+    }
+  }
+
+  static saveProfile(nickname: string, bio: string): void {
+    if (!UserManager._currentUser) return
+    UserManager._currentUser.nickname = nickname
+    UserManager._currentUser.bio = bio
+    if (UserManager._store) {
+      try {
+        UserManager._store.putSync(KEY_NICKNAME, nickname)
+        UserManager._store.putSync(KEY_BIO, bio)
         UserManager._store.flush()
       } catch (e) { /* ignore */ }
     }
@@ -66,6 +84,7 @@ export class UserManager {
         UserManager._store.deleteSync(KEY_USER_ID)
         UserManager._store.deleteSync(KEY_PHONE)
         UserManager._store.deleteSync(KEY_NICKNAME)
+        UserManager._store.deleteSync(KEY_BIO)
         UserManager._store.flush()
       } catch (e) { /* ignore */ }
     }

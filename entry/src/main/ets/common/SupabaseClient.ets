@@ -12,6 +12,7 @@ interface InsertCollectBody { user_id: string; post_id: string }
 interface InsertCommentBody { post_id: string; user_id: string; content: string; reply_to: string | null; like_count: number }
 interface InsertCommentLikeBody { user_id: string; comment_id: string }
 interface InsertFollowBody { follower_id: string; following_id: string }
+interface ConversationRpcParams { p_user_id: string }
 interface InsertMessageBody { from_user_id: string; to_user_id: string; text: string }
 
 export class SupabaseClient implements IApiProvider {
@@ -82,7 +83,7 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async getPosts(category?: string, sort?: string, page?: number): Promise<Post[]> {
-    let query = "/posts?select=*&limit=20&offset=" + ((page ?? 0) * 20).toString()
+    let query = "/posts?select=*,users(*)&limit=20&offset=" + ((page ?? 0) * 20).toString()
     if (category) query += "&category=eq." + category
     query += sort === "hot" ? "&order=like_count.desc" : "&order=created_at.desc"
     const rows = await this.request(query) as Record<string, Object>[]
@@ -92,7 +93,7 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async getPostDetail(postId: string): Promise<Post> {
-    const rows = await this.request("/posts?select=*&id=eq." + postId) as Record<string, Object>[]
+    const rows = await this.request("/posts?select=*,users(*)&id=eq." + postId) as Record<string, Object>[]
     if (!rows || rows.length === 0) throw new Error("Post not found")
     return this.mapPost(rows[0])
   }
@@ -136,11 +137,24 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async getComments(postId: string): Promise<Comment[]> {
-    const rows = await this.request("/comments?post_id=eq." + postId + "&order=created_at.asc") as Record<string, Object>[]
+    const rows = await this.request("/comments?select=*,users(*)&post_id=eq." + postId + "&order=created_at.asc") as Record<string, Object>[]
     const result: Comment[] = []
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i]
-      const c: Comment = { id: r["id"] as string, postId: r["post_id"] as string, userId: r["user_id"] as string, content: r["content"] as string, replyTo: (r["reply_to"] ?? "") as string, likeCount: r["like_count"] as number, liked: false, author: null, createdAt: r["created_at"] as string }
+      const u = r["users"] as Record<string, Object>
+      const c: Comment = {
+        id: r["id"] as string, postId: r["post_id"] as string, userId: r["user_id"] as string,
+        content: r["content"] as string, replyTo: (r["reply_to"] ?? "") as string,
+        likeCount: r["like_count"] as number, liked: false,
+        author: u ? {
+          id: u["id"] as string, phone: u["phone"] as string, nickname: u["nickname"] as string,
+          avatarUrl: u["avatar_url"] as string, avatarColor: u["avatar_color"] as string,
+          bio: u["bio"] as string, level: u["level"] as number, exp: u["exp"] as number,
+          followingCount: u["following_count"] as number, followerCount: u["follower_count"] as number,
+          postCount: u["post_count"] as number, createdAt: u["created_at"] as string
+        } : null,
+        createdAt: r["created_at"] as string
+      }
       result.push(c)
     }
     return result
@@ -189,7 +203,7 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async getUserPosts(userId: string): Promise<Post[]> {
-    const rows = await this.request("/posts?select=*&user_id=eq." + userId + "&order=created_at.desc") as Record<string, Object>[]
+    const rows = await this.request("/posts?select=*,users(*)&user_id=eq." + userId + "&order=created_at.desc") as Record<string, Object>[]
     const result: Post[] = []
     for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
     return result
@@ -200,20 +214,33 @@ export class SupabaseClient implements IApiProvider {
     if (!collects || collects.length === 0) return []
     let ids = ""
     for (let i = 0; i < collects.length; i++) { if (i > 0) ids += ","; ids += collects[i]["post_id"] as string }
-    const rows = await this.request("/posts?select=*&id=in.(" + ids + ")") as Record<string, Object>[]
+    const rows = await this.request("/posts?select=*,users(*)&id=in.(" + ids + ")") as Record<string, Object>[]
+    const result: Post[] = []
+    for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
+    return result
+  }
+  async getUserLikes(userId: string): Promise<Post[]> {
+    const likes = await this.request("/likes?user_id=eq." + userId) as Record<string, Object>[]
+    if (!likes || likes.length === 0) return []
+    let ids = ""
+    for (let i = 0; i < likes.length; i++) { if (i > 0) ids += ","; ids += likes[i]["post_id"] as string }
+    const rows = await this.request("/posts?select=*,users(*)&id=in.(" + ids + ")") as Record<string, Object>[]
     const result: Post[] = []
     for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
     return result
   }
 
   async search(query: string): Promise<Post[]> {
-    const rows = await this.request("/posts?select=*&or=(title.ilike.*" + query + "*,content.ilike.*" + query + "*)&order=created_at.desc&limit=20") as Record<string, Object>[]
+    const rows = await this.request("/posts?select=*,users(*)&or=(title.ilike.*" + query + "*,content.ilike.*" + query + "*)&order=created_at.desc&limit=20") as Record<string, Object>[]
     const result: Post[] = []
     for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
     return result
   }
 
-  async getConversations(): Promise<Conversation[]> { return await this.request("/rpc/get_conversations") as Conversation[] }
+  async getConversations(): Promise<Conversation[]> {
+    const params: ConversationRpcParams = { p_user_id: this.userId }
+    return await this.request("/rpc/get_conversations", params) as Conversation[]
+  }
 
   async getMessages(conversationId: string): Promise<Message[]> {
     return await this.request("/messages?or=(and(from_user_id.eq." + this.userId + ",to_user_id.eq." + conversationId + "),and(from_user_id.eq." + conversationId + ",to_user_id.eq." + this.userId + "))&order=created_at.asc") as Message[]
@@ -226,7 +253,26 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async getNotifications(): Promise<VNotification[]> {
-    return await this.request("/notifications?user_id=eq." + this.userId + "&order=created_at.desc&limit=50") as VNotification[]
+    const rows = await this.request("/notifications?select=*,from_user:users!notifications_from_user_id_fkey(*)&user_id=eq." + this.userId + "&order=created_at.desc&limit=50") as Record<string, Object>[]
+    const result: VNotification[] = []
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i]
+      const fu = r["from_user"] as Record<string, Object>
+      result.push({
+        id: r["id"] as string, userId: r["user_id"] as string, type: r["type"] as string,
+        relatedId: r["related_id"] as string, content: r["content"] as string,
+        read: r["read"] as boolean,
+        fromUser: fu ? {
+          id: fu["id"] as string, phone: fu["phone"] as string, nickname: fu["nickname"] as string,
+          avatarUrl: fu["avatar_url"] as string, avatarColor: fu["avatar_color"] as string,
+          bio: fu["bio"] as string, level: fu["level"] as number, exp: fu["exp"] as number,
+          followingCount: fu["following_count"] as number, followerCount: fu["follower_count"] as number,
+          postCount: fu["post_count"] as number, createdAt: fu["created_at"] as string
+        } : null,
+        createdAt: r["created_at"] as string
+      })
+    }
+    return result
   }
 
   async markNotificationRead(notificationId: string): Promise<void> {
@@ -258,6 +304,7 @@ export class SupabaseClient implements IApiProvider {
   }
 
   private mapPost(raw: Record<string, Object>): Post {
+    const u = raw["users"] as Record<string, Object>
     return {
       id: raw["id"] as string, userId: raw["user_id"] as string, title: raw["title"] as string,
       content: raw["content"] as string, prompt: raw["prompt"] as string,
@@ -265,7 +312,14 @@ export class SupabaseClient implements IApiProvider {
       tags: [], likeCount: raw["like_count"] as number,
       collectCount: raw["collect_count"] as number, commentCount: raw["comment_count"] as number,
       shareCount: raw["share_count"] as number, liked: false, collected: false,
-      author: null, createdAt: raw["created_at"] as string, updatedAt: raw["updated_at"] as string
+      author: u ? {
+        id: u["id"] as string, phone: u["phone"] as string, nickname: u["nickname"] as string,
+        avatarUrl: u["avatar_url"] as string, avatarColor: u["avatar_color"] as string,
+        bio: u["bio"] as string, level: u["level"] as number, exp: u["exp"] as number,
+        followingCount: u["following_count"] as number, followerCount: u["follower_count"] as number,
+        postCount: u["post_count"] as number, createdAt: u["created_at"] as string
+      } : null,
+      createdAt: raw["created_at"] as string, updatedAt: raw["updated_at"] as string
     }
   }
 }

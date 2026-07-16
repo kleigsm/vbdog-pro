@@ -1,48 +1,239 @@
+import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_RED, S_XS, S_SM, S_MD, S_LG, S_XL, S_2XL, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
+import { Post } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
-import { Post, LEVELS, LevelItem } from "../common/Models"
-import { COLORS, AVATAR_COLORS } from "../common/Constants"
 import { UserManager } from "../common/UserManager"
-import { router } from "@kit.ArkUI"
+import router from "@ohos.router"
+import { promptAction } from "@kit.ArkUI"
 
 @Entry
 @Component
 export struct ProfilePage {
-  @State posts: Post[] = []
+  @State tab: number = 0
+  @State nick: string = ""
+  @State bio: string = ""
+  @State av: string = "🐤"
+  @State uname: string = ""
+  @State lv: number = 1
+  @State fol: number = 0
+  @State fow: number = 0
+  @State lks: number = 0
+  @State myPosts: Post[] = []
+  @State likedPosts: Post[] = []
+  @State collectedPosts: Post[] = []
   @State loading: boolean = true
-  @State activeTab: number = 0
-  @StorageLink("isLoggedIn") isLoggedIn: boolean = false
-  @StorageLink("isDark") isDark: boolean = false
 
-  aboutToAppear(): void { this.loadData() }
+  aboutToAppear(): void { this.refresh() }
+
+  getLevelTitle(): string {
+    if (this.lv >= 10) return "🎳 传奇创作者"
+    if (this.lv >= 7) return "💵 资深大师"
+    if (this.lv >= 5) return "⭐ 高级玩家"
+    if (this.lv >= 3) return "🔡 熟练用户"
+    return "🌡 新手入门"
+  }
+
+  getLevelProgress(): number {
+    const thresholds = [0, 100, 500, 1500, 5000, 15000, 50000, 100000, 200000, 500000]
+    const current = thresholds[Math.min(this.lv - 1, thresholds.length - 1)]
+    const next = thresholds[Math.min(this.lv, thresholds.length - 1)]
+    if (next === current) return 100
+    const exp = UserManager.currentUser?.exp ?? 0
+    return Math.min(100, Math.round(((exp - current) / (next - current)) * 100))
+  }
+
+  refresh(): void {
+    this.loading = true
+    const user = UserManager.currentUser
+    this.nick = user?.nickname ?? "用户"
+    this.bio = user?.bio ?? ""
+    this.uname = user?.phone ?? ""
+    this.lv = user?.level ?? 1
+    this.fol = user?.followerCount ?? 0
+    this.fow = user?.followingCount ?? 0
+    this.loadPosts()
+  }
+
+  async loadPosts(): Promise<void> {
+    const uid = UserManager.currentUser?.id
+    if (!uid) { this.loading = false; return }
+    try {
+      this.myPosts = await getApi().getUserPosts(uid) as Post[]
+    } catch (_e) {
+      this.myPosts = []
+    } finally {
+      this.loading = false
+    }
+  }
+
+  async loadLiked(): Promise<void> {
+    this.loading = true
+    const uid = UserManager.currentUser?.id
+    if (!uid) { this.loading = false; return }
+    try {
+      this.likedPosts = await getApi().getUserLikes(uid) as Post[]
+    } catch (_e) { this.likedPosts = [] }
+    finally { this.loading = false }
+  }
+
+  async loadCollected(): Promise<void> {
+    this.loading = true
+    const uid = UserManager.currentUser?.id
+    if (!uid) { this.loading = false; return }
+    try {
+      this.collectedPosts = await getApi().getUserCollections(uid) as Post[]
+    } catch (_e) { this.collectedPosts = [] }
+    finally { this.loading = false }
+  }
+
+  async deleteMyPost(post: Post): Promise<void> {
+    try {
+      await getApi().deletePost(post.id)
+      this.myPosts = this.myPosts.filter((p: Post) => p.id !== post.id)
+    } catch (_e) { }
+  }
 
   build() {
     Column() {
-      Column({ space: 8 }) {
-        Text(UserManager.currentUser?.nickname?.charAt(0) ?? "用").fontSize(40).fontColor("#FFF").width(80).height(80).borderRadius(40).textAlign(TextAlign.Center).backgroundColor(AVATAR_COLORS[(UserManager.currentUser?.nickname?.length ?? 0) % AVATAR_COLORS.length]).shadow({ radius: 12, color: COLORS.primary + "30", offsetY: 4 })
-        Text(UserManager.currentUser?.nickname ?? "用户").fontSize(20).fontWeight(FontWeight.Bold).fontColor(this.isDark ? COLORS.textDark : COLORS.text)
-        Row({ space: 8 }) { Text(this.getLevelShortTitle(UserManager.currentUser?.level ?? 1)).fontSize(10).fontColor(COLORS.primary).backgroundColor(COLORS.primary + "14").borderRadius(4).padding({ left: 8, right: 8, top: 2, bottom: 2 }); Stack() { Row().width("100%").height(6).backgroundColor("#E5E5EA").borderRadius(3); Row().width(this.expPercent().toString() + "%").height(6).backgroundColor(COLORS.primary).borderRadius(3) }.layoutWeight(1); Text(UserManager.currentUser?.exp.toString() ?? "0").fontSize(10).fontColor(COLORS.textSecondary) }.width("70%")
-        if (UserManager.currentUser?.bio) { Text(UserManager.currentUser.bio).fontSize(13).fontColor(COLORS.textSecondary).maxLines(2) }
-        Row({ space: 0 }) { this.statItem(this.posts.length.toString(), "帖子", COLORS.primary); this.statItem((UserManager.currentUser?.followingCount ?? 0).toString(), "关注", COLORS.accentPurple); this.statItem((UserManager.currentUser?.followerCount ?? 0).toString(), "粉丝", COLORS.accentTeal) }.width("100%").margin({ top: 12 })
-        Row({ space: 4 }) { Text(this.isDark ? "☾" : "☀").fontSize(14); Text("暗黑模式").fontSize(13).fontColor(this.isDark ? COLORS.textDark : COLORS.text) }.padding({ top: 10 })
-        Toggle({ type: ToggleType.Switch, isOn: this.isDark }).onChange((value: boolean) => { AppStorage.set("isDark", value) })
-        Row({ space: 8 }) { Button("编辑资料").fontSize(13).height(34).backgroundColor(this.isDark ? "#2A2A40" : "#F0F0F5").fontColor(this.isDark ? COLORS.textDark : COLORS.text).borderRadius(17); if (UserManager.currentUser?.phone === "00000000000") { Button("管理后台").fontSize(13).height(34).backgroundColor(COLORS.error + "14").fontColor(COLORS.error).borderRadius(17).onClick(() => router.pushUrl({ url: "pages/AdminPage" })) } }
-      }.width("100%").padding({ top: 24, bottom: 18 }).backgroundColor(this.isDark ? COLORS.cardDark : COLORS.card)
+      // Profile header
+      Column() {
+        Row() {
+          Text(this.nick.charAt(0)).fontSize(40).fontColor("#FFF")
+            .width(64).height(64).borderRadius(32).textAlign(TextAlign.Center)
+            .backgroundColor(this.getAvatarColor(this.nick))
+          Column() {
+            Text(this.nick).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+            Text("@用户" + (UserManager.currentUser?.level ?? 1)).fontSize(F_SM).fontColor(C_TEXT3).margin({ top: 2 })
+            Row() {
+              Text("Lv." + this.lv).fontSize(F_CAPT).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
+                .padding({ left: S_SM, right: S_SM, top: 2, bottom: 2 }).backgroundColor("#FFF3E0").borderRadius(8)
+              Text(this.getLevelTitle()).fontSize(F_CAPT).fontColor(C_TEXT3).margin({ left: S_SM })
+            }.margin({ top: 4 })
+          }.layoutWeight(1).alignItems(HorizontalAlign.Start).margin({ left: S_LG })
+          Text("编辑").fontSize(F_SM).fontColor(C_PRIMARY)
+            .padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM })
+            .borderRadius(16).borderWidth(1).borderColor(C_PRIMARY)
+            .onClick(() => { router.pushUrl({ url: "pages/EditProfilePage" }) })
+        }.width("100%")
 
-      Row({ space: 0 }) { Button("帖子").fontSize(14).fontWeight(this.activeTab === 0 ? FontWeight.Medium : FontWeight.Normal).fontColor(this.activeTab === 0 ? COLORS.primary : COLORS.textSecondary).type(ButtonType.Normal).backgroundColor(Color.Transparent).layoutWeight(1).onClick(() => { this.activeTab = 0; this.loadPosts() }); Button("收藏").fontSize(14).fontWeight(this.activeTab === 1 ? FontWeight.Medium : FontWeight.Normal).fontColor(this.activeTab === 1 ? COLORS.primary : COLORS.textSecondary).type(ButtonType.Normal).backgroundColor(Color.Transparent).layoutWeight(1).onClick(() => { this.activeTab = 1; this.loadCollections() }) }.width("100%").height(42)
-      Divider().strokeWidth(0.5).color("#E5E5EA")
+        if (this.bio) {
+          Text(this.bio).fontSize(F_BODY).fontColor(C_TEXT2).margin({ top: S_MD }).width("100%")
+        }
 
-      if (this.loading) { LoadingProgress().width(32).height(32).margin({ top: 60 }) }
-      else if (this.posts.length === 0) { Text(this.activeTab === 0 ? "还没有发布帖子" : "还没有收藏帖子").fontSize(13).fontColor(COLORS.textSecondary).margin({ top: 60 }) }
-      else { List({ space: 1 }) { ForEach(this.posts, (post: Post) => { ListItem() { Row({ space: 12 }) { Text(post.title).fontSize(14).fontColor(this.isDark ? COLORS.textDark : COLORS.text).maxLines(1).layoutWeight(1); Row({ space: 6 }) { Row({ space: 2 }) { Text("❤️").fontSize(10); Text(post.likeCount.toString()).fontSize(11).fontColor(COLORS.textSecondary) }; Row({ space: 2 }) { Text("💬").fontSize(10); Text(post.commentCount.toString()).fontSize(11).fontColor(COLORS.textSecondary) } }; if (post.userId === UserManager.currentUser?.id) { Text("🗑").fontSize(14).fontColor(COLORS.error).onClick(() => this.deleteMyPost(post)) } }.width("100%").padding(14).backgroundColor(this.isDark ? COLORS.cardDark : COLORS.card).onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: post.id } })) } }) }.layoutWeight(1).backgroundColor(this.isDark ? "#16162A" : "#F0F0F5") }
-      Button("退出登录").fontSize(13).fontColor(COLORS.error).type(ButtonType.Normal).backgroundColor(Color.Transparent).width("100%").padding(14).onClick(() => { UserManager.clear(); AppStorage.set("isLoggedIn", false) })
-    }.width("100%").height("100%").backgroundColor(this.isDark ? COLORS.backgroundDark : COLORS.background)
+        // Level progress bar
+        Row() {
+          Column() {}.width(this.getLevelProgress().toString() + "%").height("100%")
+            .borderRadius(3).backgroundColor(C_PRIMARY)
+        }.width("100%").height(4).backgroundColor(C_BG).borderRadius(3).margin({ top: S_MD })
+        Text("升级进度 " + this.getLevelProgress() + "%").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: S_XS })
+
+        // Stats
+        Row() {
+          Column() {
+            Text(this.fol.toString()).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+            Text("粉丝").fontSize(F_CAPT).fontColor(C_TEXT3)
+          }
+          Column() {
+            Text(this.fow.toString()).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+            Text("关注").fontSize(F_CAPT).fontColor(C_TEXT3)
+          }.margin({ left: S_2XL })
+          Column() {
+            Text(this.lks.toString()).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+            Text("获赞").fontSize(F_CAPT).fontColor(C_TEXT3)
+          }.margin({ left: S_2XL })
+        }.width("100%").margin({ top: S_MD })
+      }.width("100%").padding(S_LG).backgroundColor(C_CARD)
+
+      // Tab bar
+      Row() {
+        ForEach(["我的发布", "我的喜欢", "我的收藏"], (t: string, i: number) => {
+          Text(t).fontSize(F_BODY).fontColor(this.tab === i ? C_PRIMARY : C_TEXT2)
+            .fontWeight(this.tab === i ? FontWeight.Bold : FontWeight.Normal)
+            .layoutWeight(1).textAlign(TextAlign.Center).padding({ top: S_MD, bottom: S_MD })
+            .borderWidth({ bottom: this.tab === i ? 2 : 0 }).borderColor(this.tab === i ? C_PRIMARY : Color.Transparent)
+            .onClick(() => {
+              this.tab = i
+              if (i === 0) this.loadPosts()
+              else if (i === 1) this.loadLiked()
+              else this.loadCollected()
+            })
+        }, (_t: string, i: number) => i.toString())
+      }.width("100%").backgroundColor(C_CARD)
+
+      // Content
+      if (this.loading) {
+        LoadingProgress().width(32).height(32).color(C_PRIMARY).margin({ top: 60 })
+      } else if (this.tab === 0) {
+        if (this.myPosts.length === 0) {
+          Column() { Text("暂无发布").fontSize(F_BODY).fontColor(C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
+        } else {
+          List() {
+            ForEach(this.myPosts, (p: Post) => {
+              ListItem() {
+                Row() {
+                  Column() {
+                    Text(p.title).fontSize(F_BODY).fontColor(C_TEXT1).maxLines(1).width("100%")
+                    Text(p.likeCount + "赞 · " + p.commentCount + "评论").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: 2 })
+                  }.layoutWeight(1).alignItems(HorizontalAlign.Start)
+                  Button("删除").fontSize(11).fontColor("#FFFFFF").backgroundColor(C_RED).borderRadius(10).height(28)
+                    .padding({ left: S_MD, right: S_MD })
+                    .onClick(() => this.deleteMyPost(p))
+                }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD, bottom: S_MD })
+                .onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: p.id } }))
+              }
+            }, (p: Post) => p.id)
+          }.layoutWeight(1).width("100%")
+        }
+      } else if (this.tab === 1) {
+        if (this.likedPosts.length === 0) {
+          Column() { Text("暂无喜欢").fontSize(F_BODY).fontColor(C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
+        } else {
+          List() {
+            ForEach(this.likedPosts, (p: Post) => {
+              ListItem() {
+                Row() {
+                  Text("❤️").fontSize(16).margin({ right: S_MD })
+                  Text(p.title).fontSize(F_BODY).fontColor(C_TEXT1).layoutWeight(1).maxLines(1)
+                  Text(p.author?.nickname ?? "").fontSize(F_CAPT).fontColor(C_TEXT3)
+                }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD, bottom: S_MD })
+                .onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: p.id } }))
+              }
+            }, (p: Post) => p.id)
+          }.layoutWeight(1).width("100%")
+        }
+      } else {
+        if (this.collectedPosts.length === 0) {
+          Column() { Text("暂无收藏").fontSize(F_BODY).fontColor(C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
+        } else {
+          List() {
+            ForEach(this.collectedPosts, (p: Post) => {
+              ListItem() {
+                Row() {
+                  Text("⭐").fontSize(16).margin({ right: S_MD })
+                  Text(p.title).fontSize(F_BODY).fontColor(C_TEXT1).layoutWeight(1).maxLines(1)
+                  Text(p.author?.nickname ?? "").fontSize(F_CAPT).fontColor(C_TEXT3)
+                }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD, bottom: S_MD })
+                .onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: p.id } }))
+              }
+            }, (p: Post) => p.id)
+          }.layoutWeight(1).width("100%")
+        }
+      }
+
+      // Settings + Logout
+      Row() {
+        Text("设置").fontSize(F_SM).fontColor(C_TEXT2).onClick(() => { router.pushUrl({ url: "pages/SettingsPage" }) })
+        Blank()
+        Text("退出登录").fontSize(F_SM).fontColor(C_RED).onClick(() => {
+          UserManager.clear(); AppStorage.set("isLoggedIn", false)
+        })
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM }).backgroundColor(C_CARD)
+    }.width("100%").height("100%").backgroundColor(C_BG)
   }
 
-  @Builder statItem(value: string, label: string, color: string) { Column({ space: 2 }) { Text(value).fontSize(22).fontWeight(FontWeight.Bold).fontColor(color); Text(label).fontSize(11).fontColor(COLORS.textSecondary) }.layoutWeight(1).alignItems(HorizontalAlign.Center) }
-  async deleteMyPost(post: Post): Promise<void> { try { await getApi().deletePost(post.id); this.posts = this.posts.filter(p => p.id !== post.id) } catch (e) { } }
-  expPercent(): number { const lv: number = UserManager.currentUser?.level ?? 1; const xp: number = UserManager.currentUser?.exp ?? 0; const lvl: LevelItem | undefined = LEVELS.find((l: LevelItem) => l.level === lv); const m: number = lvl ? lvl.max : 100; return Math.min(100, Math.floor((xp / m) * 100)) }
-  getLevelShortTitle(level: number): string { const l: LevelItem | undefined = LEVELS.find((li: LevelItem) => li.level === level); return l ? l.title : "" }
-  async loadData(): Promise<void> { this.loading = true; await this.loadPosts(); this.loading = false }
-  async loadPosts(): Promise<void> { try { const uid = UserManager.currentUser?.id; if (uid) this.posts = await getApi().getUserPosts(uid) } catch (e) { this.posts = [] } }
-  async loadCollections(): Promise<void> { this.loading = true; try { const uid = UserManager.currentUser?.id; if (uid) this.posts = await getApi().getUserCollections(uid) } catch (e) { this.posts = [] } finally { this.loading = false } }
+  getAvatarColor(nickname: string): string {
+    const colors: string[] = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9"]
+    let hash = 0
+    for (let i = 0; i < nickname.length; i++) { hash = nickname.charCodeAt(i) + ((hash << 5) - hash) }
+    return colors[Math.abs(hash) % colors.length]
+  }
 }

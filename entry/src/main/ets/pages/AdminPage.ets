@@ -1,7 +1,8 @@
-import { getApi } from "../common/ApiProvider"
+import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_RED, S_SM, S_MD, S_LG, S_XL, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
 import { Post } from "../common/Models"
-import { COLORS } from "../common/Constants"
-import { router } from "@kit.ArkUI"
+import { getApi } from "../common/ApiProvider"
+import { UserManager } from "../common/UserManager"
+import router from "@ohos.router"
 import { promptAction } from "@kit.ArkUI"
 
 interface DialogResult { index: number }
@@ -9,28 +10,104 @@ interface DialogResult { index: number }
 @Entry
 @Component
 export struct AdminPage {
-  @State posts: Post[] = []
-  @State loading: boolean = true
-  @State userCount: number = 0
   @State postCount: number = 0
+  @State userCount: number = 5
+  @State allPosts: Post[] = []
+  @State loading: boolean = true
   @State deletingId: string = ""
 
-  aboutToAppear(): void { this.loadData() }
+  aboutToAppear(): void {
+    if (!UserManager.isAdmin) { router.back(); return }
+    this.loadData()
+  }
+
+  async loadData(): Promise<void> {
+    this.loading = true
+    try {
+      const allPosts: Post[] = await getApi().getPosts("", "latest", 0) as Post[]
+      this.allPosts = allPosts
+      this.postCount = allPosts.length
+    } catch (_e) { this.allPosts = [] }
+    finally { this.loading = false }
+  }
+
+  async doDelete(post: Post): Promise<void> {
+    this.deletingId = post.id
+    try {
+      await getApi().deletePost(post.id)
+      this.allPosts = this.allPosts.filter((p: Post) => p.id !== post.id)
+      this.postCount--
+    } catch (_e) { }
+    finally { this.deletingId = "" }
+  }
+
+  confirmDelete(post: Post): void {
+    promptAction.showDialog({
+      title: "确认删除",
+      message: "删除帖子《" + post.title + "》？",
+      buttons: [{ text: "取消", color: "#999" }, { text: "删除", color: "#FF3B30" }]
+    }).then((res: DialogResult) => { if (res.index === 1) this.doDelete(post) })
+  }
 
   build() {
     Column() {
-      Row() { Text("管理后台").fontSize(20).fontWeight(FontWeight.Bold).fontColor(COLORS.text); Blank(); Text("Admin").fontSize(11).fontColor(COLORS.textSecondary).backgroundColor("#F0F0F5").borderRadius(4).padding({ left: 8, right: 8, top: 3, bottom: 3 }) }.width("100%").padding(16)
-      Row({ space: 12 }) { this.statCard("用户数", this.userCount.toString(), COLORS.primary); this.statCard("帖子数", this.postCount.toString(), COLORS.success) }.width("100%").padding({ left: 16, right: 16, bottom: 12 })
-      Divider().strokeWidth(8).color("#F0F0F5")
-      Row() { Text("所有帖子").fontSize(15).fontWeight(FontWeight.Medium).fontColor(COLORS.text); Blank(); Text(this.postCount.toString() + " 篇").fontSize(12).fontColor(COLORS.textSecondary) }.width("100%").padding(16)
-      if (this.loading) { LoadingProgress().width(32).height(32).margin({ top: 60 }) }
-      else { List({ space: 1 }) { ForEach(this.posts, (post: Post) => { ListItem() { Row({ space: 12 }) { Column({ space: 2 }) { Text(post.title).fontSize(14).fontColor(COLORS.text).maxLines(1); Row({ space: 6 }) { Text("作者: " + (post.author?.nickname ?? "用户")).fontSize(11).fontColor(COLORS.textSecondary); Row({ space: 2 }) { Text("❤️").fontSize(9); Text(post.likeCount.toString()).fontSize(11).fontColor(COLORS.textSecondary) } } }.alignItems(HorizontalAlign.Start).layoutWeight(1); if (this.deletingId === post.id) { LoadingProgress().width(20).height(20) } else { Text("删除").fontSize(12).fontColor(COLORS.error).backgroundColor(COLORS.error + "10").borderRadius(6).padding({ left: 10, right: 10, top: 4, bottom: 4 }).onClick(() => this.confirmDelete(post)) } }.width("100%").padding(14).backgroundColor(COLORS.card).onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: post.id } })) } }) }.layoutWeight(1).backgroundColor("#F0F0F5") }
-    }.width("100%").height("100%").backgroundColor(COLORS.background)
+      Row() {
+        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(C_TEXT1)
+          .onClick(() => { router.back() })
+        Text("🔰 管理后台").fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+          .layoutWeight(1).textAlign(TextAlign.Center)
+        Text("").width(24)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+
+      Scroll() {
+        Column() {
+          // Stats cards
+          Row() {
+            Column() {
+              Text(this.postCount.toString()).fontSize(28).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
+              Text("总帖子").fontSize(F_CAPT).fontColor(C_TEXT3)
+            }.width("48%").padding(S_LG).backgroundColor(C_CARD).borderRadius(R_LG)
+
+            Column() {
+              Text(this.userCount.toString()).fontSize(28).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
+              Text("总用户").fontSize(F_CAPT).fontColor(C_TEXT3)
+            }.width("48%").padding(S_LG).backgroundColor(C_CARD).borderRadius(R_LG).margin({ left: "4%" })
+          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD })
+
+          // Post list
+          Text("帖子管理").fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+            .width("100%").padding({ left: S_LG, top: S_LG })
+
+          if (this.loading) {
+            LoadingProgress().width(32).height(32).color(C_PRIMARY).margin({ top: 60 })
+          } else {
+            ForEach(this.allPosts, (p: Post) => {
+              Row() {
+                Column() {
+                  Text(p.title).fontSize(F_SM).fontColor(C_TEXT1).fontWeight(FontWeight.Medium).maxLines(1)
+                  Text((p.author?.nickname ?? "用户") + " · " + p.likeCount + "赞 · " + this.formatTime(p.createdAt))
+                    .fontSize(F_CAPT).fontColor(C_TEXT3)
+                }.layoutWeight(1).alignItems(HorizontalAlign.Start)
+                if (this.deletingId === p.id) {
+                  LoadingProgress().width(20).height(20)
+                } else {
+                  Button("删除").fontSize(11).fontColor("#FFFFFF").backgroundColor(C_RED)
+                    .borderRadius(12).height(28).padding({ left: S_MD, right: S_MD })
+                    .onClick(() => this.confirmDelete(p))
+                }
+              }.width("100%").padding(S_LG)
+            }, (p: Post) => p.id)
+          }
+
+          Column().height(40)
+        }.width("100%")
+      }.layoutWeight(1).width("100%")
+    }.width("100%").height("100%").backgroundColor(C_BG)
   }
 
-  @Builder statCard(label: string, value: string, color: string) { Column({ space: 6 }) { Text(value).fontSize(28).fontWeight(FontWeight.Bold).fontColor(color); Text(label).fontSize(12).fontColor(COLORS.textSecondary) }.width("47%").padding(20).backgroundColor(COLORS.card).borderRadius(14).border({ width: { left: 3 }, color: color }) }
-
-  async loadData(): Promise<void> { this.loading = true; try { const allPosts: Post[] = await getApi().getPosts("", "latest", 0); this.posts = allPosts; this.postCount = allPosts.length; this.userCount = 5 } catch (e) { } finally { this.loading = false } }
-  confirmDelete(post: Post): void { promptAction.showDialog({ title: "确认删除", message: "删除帖子「" + post.title + "」？", buttons: [{ text: "取消", color: "#999" }, { text: "删除", color: "#FF3B30" }] }).then((res: DialogResult) => { if (res.index === 1) this.doDelete(post) }) }
-  async doDelete(post: Post): Promise<void> { this.deletingId = post.id; try { await getApi().deletePost(post.id); this.posts = this.posts.filter(p => p.id !== post.id); this.postCount-- } catch (e) { } finally { this.deletingId = "" } }
+  formatTime(t: string): string {
+    if (!t) return ""
+    const d = new Date(t)
+    return (d.getMonth() + 1) + "-" + d.getDate()
+  }
 }

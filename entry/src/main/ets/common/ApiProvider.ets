@@ -19,6 +19,7 @@ export interface IApiProvider {
   followUser(userId: string): Promise<FollowResult>
   getUserPosts(userId: string): Promise<Post[]>
   getUserCollections(userId: string): Promise<Post[]>
+  getUserLikes(userId: string): Promise<Post[]>
   search(query: string): Promise<Post[]>
   getConversations(): Promise<Conversation[]>
   getMessages(conversationId: string): Promise<Message[]>

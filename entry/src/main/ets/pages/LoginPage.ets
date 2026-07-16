@@ -1,6 +1,7 @@
+import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_RED, C_BORDER, C_DARK, S_XS, S_SM, S_MD, S_LG, S_XL, R_MD, F_CAPT, F_SM, F_BODY, F_LG, F_H1, APP_NAME } from "../common/Constants"
 import { getApi } from "../common/ApiProvider"
-import { COLORS } from "../common/Constants"
 import { UserManager } from "../common/UserManager"
+import { promptAction } from "@kit.ArkUI"
 
 @Component
 export struct LoginPage {
@@ -14,36 +15,44 @@ export struct LoginPage {
   build() {
     Column() {
       Column() {
-        Text("VBDog Pro").fontSize(40).fontWeight(FontWeight.Bold).fontColor("#FFF").margin({ top: 80, bottom: 6 })
-        Text("AI Prompt 创作者社区").fontSize(16).fontColor("rgba(255,255,255,0.8)").margin({ top: 4 })
-        Text("发现 · 分享 · 创造").fontSize(13).fontColor("rgba(255,255,255,0.55)").margin({ top: 48 })
-      }.width("100%").height("38%").justifyContent(FlexAlign.Center).alignItems(HorizontalAlign.Center).linearGradient({ angle: 160, colors: [[COLORS.primary, 0], ["#E55A2B", 1]] })
+        Text("🐤").fontSize(80)
+        Text(APP_NAME).fontSize(F_H1).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold).margin({ top: S_MD })
+        Text("AI 创作者社区").fontSize(F_BODY).fontColor(C_TEXT2).margin({ top: S_SM })
+      }.width("100%").margin({ top: 60 })
 
-      Column({ space: 14 }) {
-        Column({ space: 10 }) {
-          Row({ space: 10 }) {
-            Text("📱").fontSize(18)
-            TextInput({ placeholder: "手机号", text: this.phone }).layoutWeight(1).height(48).fontSize(15).backgroundColor("#F8F8FA").borderRadius(14).type(InputType.Number).maxLength(11).onChange((v: string) => { this.phone = v; this.errorMsg = "" })
-          }.width("100%")
-          if (this.isRegister) {
-            Row({ space: 10 }) {
-              Text("👤").fontSize(18)
-              TextInput({ placeholder: "昵称", text: this.nickname }).layoutWeight(1).height(48).fontSize(15).backgroundColor("#F8F8FA").borderRadius(14).maxLength(20).onChange((v: string) => { this.nickname = v; this.errorMsg = "" })
-            }.width("100%")
-          }
-          Row({ space: 10 }) {
-            Text("🔑").fontSize(18)
-            TextInput({ placeholder: "密码", text: this.password }).layoutWeight(1).height(48).fontSize(15).backgroundColor("#F8F8FA").borderRadius(14).type(InputType.Password).maxLength(20).onChange((v: string) => { this.password = v; this.errorMsg = "" }).onSubmit(() => this.handleSubmit())
-          }.width("100%")
+      Column() {
+        if (this.isRegister) {
+          TextInput({ placeholder: "昵称（给自己取个名字）", text: this.nickname })
+            .fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_CARD).borderRadius(R_MD)
+            .borderWidth(1).borderColor(C_BORDER).height(50).padding({ left: S_LG }).width("100%").maxLength(20)
+            .onChange((v: string) => { this.nickname = v; this.errorMsg = "" }).margin({ bottom: S_MD })
         }
-        if (this.errorMsg) { Text(this.errorMsg).fontSize(13).fontColor(COLORS.error).width("100%").textAlign(TextAlign.Center) }
-        Button(this.loading ? (this.isRegister ? "注册中..." : "登录中...") : (this.isRegister ? "注册" : "登录")).width("100%").height(50).fontSize(16).fontWeight(FontWeight.Medium).fontColor("#FFF").backgroundColor(COLORS.primary).borderRadius(24).shadow({ radius: 8, color: COLORS.primary + "33", offsetY: 4 }).enabled(!this.loading).onClick(() => this.handleSubmit())
-        Row() {
-          Text(this.isRegister ? "已有账号？" : "没有账号？").fontSize(14).fontColor(COLORS.textSecondary)
-          Text(this.isRegister ? "去登录" : "去注册").fontSize(14).fontColor(COLORS.primary).fontWeight(FontWeight.Medium).onClick(() => { this.isRegister = !this.isRegister; this.errorMsg = "" })
-        }.justifyContent(FlexAlign.Center)
-      }.width("88%").padding({ top: 28, bottom: 24, left: 16, right: 16 }).backgroundColor(COLORS.card).borderRadius({ topLeft: 28, topRight: 28 }).margin({ top: -24 })
-    }.width("100%").height("100%").backgroundColor(COLORS.primary)
+
+        TextInput({ placeholder: "手机号（输入 11 位数字）", text: this.phone })
+          .fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_CARD).borderRadius(R_MD)
+          .borderWidth(1).borderColor(C_BORDER).height(50).padding({ left: S_LG }).width("100%").type(InputType.PhoneNumber).maxLength(11)
+          .onChange((v: string) => { this.phone = v; this.errorMsg = "" }).margin({ bottom: S_MD })
+
+        TextInput({ placeholder: "密码（至少 6 位）", text: this.password })
+          .fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_CARD).borderRadius(R_MD)
+          .borderWidth(1).borderColor(C_BORDER).height(50).padding({ left: S_LG }).width("100%").type(InputType.Password)
+          .onChange((v: string) => { this.password = v; this.errorMsg = "" }).onSubmit(() => this.handleSubmit()).margin({ bottom: S_XL })
+
+        if (this.errorMsg) {
+          Text(this.errorMsg).fontSize(F_SM).fontColor(C_RED).width("100%").textAlign(TextAlign.Center).margin({ bottom: S_MD })
+        }
+
+        Button(this.loading ? (this.isRegister ? "注册中..." : "登录中...") : (this.isRegister ? "注册加入 VBDog" : "登录"))
+          .fontSize(F_LG).fontColor("#FFFFFF").backgroundColor(C_PRIMARY).borderRadius(24)
+          .height(50).width("100%").fontWeight(FontWeight.Bold)
+          .enabled(!this.loading).onClick(() => this.handleSubmit())
+      }.width("100%").padding({ left: S_XL, right: S_XL, top: S_XL })
+
+      Text(this.isRegister ? "已有账号？去登录" : "没有账号？去注册").fontSize(F_SM).fontColor(C_PRIMARY)
+        .margin({ top: S_LG }).onClick(() => { this.isRegister = !this.isRegister; this.errorMsg = "" })
+
+      Text("模拟登录，任意手机号即可").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: S_XL })
+    }.width("100%").height("100%").backgroundColor(C_BG)
   }
 
   async handleSubmit(): Promise<void> {
@@ -53,10 +62,15 @@ export struct LoginPage {
     if (this.isRegister && !this.nickname.trim()) { this.errorMsg = "请输入昵称"; return }
     this.loading = true
     try {
-      const user = this.isRegister ? await getApi().register(this.phone, this.nickname.trim(), this.password) : await getApi().login(this.phone, this.password)
+      const user = this.isRegister
+        ? await getApi().register(this.phone, this.nickname.trim(), this.password)
+        : await getApi().login(this.phone, this.password)
       await UserManager.setUser(user, user.id)
       AppStorage.set("isLoggedIn", true)
-    } catch (e) { this.errorMsg = "操作失败，请重试" }
-    finally { this.loading = false }
+    } catch (e) {
+      this.errorMsg = "操作失败，请重试"
+    } finally {
+      this.loading = false
+    }
   }
 }

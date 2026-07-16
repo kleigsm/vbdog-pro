@@ -1,3 +1,16 @@
 {
-  "src": ["pages/Index", "pages/PostDetailPage", "pages/SearchPage", "pages/CreatePage", "pages/ProfilePage", "pages/NotificationsPage", "pages/MessagesPage", "pages/AdminPage"]
+  "src": [
+    "pages/Index",
+    "pages/PostDetailPage",
+    "pages/SearchPage",
+    "pages/CreatePage",
+    "pages/ProfilePage",
+    "pages/NotificationsPage",
+    "pages/MessagesPage",
+    "pages/AdminPage",
+    "pages/EditProfilePage",
+    "pages/SettingsPage",
+    "pages/UserPage",
+    "pages/CollectionPage"
+  ]
 }
