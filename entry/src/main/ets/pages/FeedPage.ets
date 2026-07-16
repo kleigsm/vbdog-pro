@@ -111,7 +111,7 @@ export struct FeedPage {
     } catch (e) {
       const api = getApi() as SupabaseClient; api.setOnline(false); this.offlineCount = OfflineQueue.count
       const errObj: Object = e as Object
-      this.errorMsg = String(e)
+      this.errorMsg = "网络连接失败" + (String(e))
     }
     finally { this.loading = false }
   }
