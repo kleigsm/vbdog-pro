@@ -57,7 +57,8 @@ export class SupabaseClient implements IApiProvider {
     return rows[0]
   }
   async getPosts(category?: string, sort?: string, page?: number): Promise<Post[]> {
-    const body: Record<string, Object> = { p_category: category || null, p_sort: sort || "latest", p_page: page || 0 }
+    interface GetPostsBody { p_category: string; p_sort: string; p_page: number }
+    const body: GetPostsBody = { p_category: category || "", p_sort: sort || "latest", p_page: page || 0 }
     const rows = await this.request("/rpc/get_posts", body) as Record<string, Object>[]
     const result: Post[] = []
     for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
