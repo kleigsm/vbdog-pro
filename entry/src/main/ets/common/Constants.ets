@@ -1,4 +1,4 @@
-﻿export const SUPABASE_URL: string = "https://bxecdhlbnpwahwswnqzr.supabase.co"
+﻿export const SUPABASE_URL: string = "http://192.168.5.169:3456"
 export const SUPABASE_ANON_KEY: string = "sb_publishable_UkKBNurH0MXBStUtXjlCeg_5NxQBaJU"
 export const AVATAR_COLORS: string[] = [
   "#FF6B35", "#FF3B30", "#FF9500", "#FFCC00", "#34C759", "#007AFF", "#5856D6", "#AF52DE", "#FF2D55", "#00C7BE",
