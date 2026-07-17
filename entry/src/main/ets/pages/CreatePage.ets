@@ -4,6 +4,7 @@ import { promptAction } from "@kit.ArkUI"
 import router from "@ohos.router"
 import { preferences } from "@kit.ArkData"
 import { photoAccessHelper } from "@kit.MediaLibraryKit"
+import { photoAccessHelper } from "@kit.MediaLibraryKit"
 
 @Entry
 @Component
@@ -17,6 +18,7 @@ export struct CreatePage {
   @State submitting: boolean = false
   @State draftSaved: boolean = false
   @State remixAuthor: string = ""
+  @State imageUris: string[] = []
   onCreated?: () => void
   private prefs: preferences.Preferences | null = null
   private saveTimer: number = -1
@@ -64,6 +66,25 @@ export struct CreatePage {
     this.tags = [...this.tags]
   }
 
+  pickImages(): void {
+    try {
+      let picker = new photoAccessHelper.PhotoViewPicker()
+      let self = this
+      picker.select({
+        MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+        maxSelectNumber: 9 - self.imageUris.length
+      }).then((res: photoAccessHelper.PhotoSelectResult): void => {
+        if (res.photoUris.length > 0) {
+          self.imageUris = self.imageUris.concat(res.photoUris)
+        }
+      }).catch((): void => { })
+    } catch (_e) { }
+  }
+
+  removeImage(index: number): void {
+    this.imageUris.splice(index, 1)
+    this.imageUris = this.imageUris.concat([])
+  }
 
   pickImages(): void {
     try {
@@ -84,6 +105,7 @@ export struct CreatePage {
     this.imageUris.splice(index, 1)
     this.imageUris = this.imageUris.concat([])
   }
+
   submit(): void {
     if (!this.title.trim()) { promptAction.showToast({ message: "请输入标题", duration: 2000 }); return }
     if (!this.promptText.trim()) { promptAction.showToast({ message: "请输入 Prompt 内容", duration: 2000 }); return }
@@ -137,7 +159,6 @@ export struct CreatePage {
             .onChange((v: string) => { this.content = v })
             .margin({ left: S_LG, right: S_LG, top: S_MD })
 
-
           Column() {
             Text("添加图片（最多 9 张）").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
             Row() {
@@ -156,6 +177,26 @@ export struct CreatePage {
               }, (uri: string, idx: number) => idx.toString())
             }
           }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
+
+          Column() {
+            Text(").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
+            Row() {
+              Column() { Text("#").fontSize(28); Text(").fontSize(10).fontColor(C_TEXT3) }
+              .width(72).height(72).borderRadius(R_MD).backgroundColor(C_CARD).borderWidth(1).borderColor(C_BORDER)
+              .justifyContent(FlexAlign.Center).margin({ right: S_SM })
+              .onClick(() => { this.pickImages() })
+              ForEach(this.imageUris, (uri: string, idx: number) => {
+                Stack() {
+                  Image(uri).width(72).height(72).borderRadius(R_MD).objectFit(ImageFit.Cover)
+                  Text("X").fontSize(14).fontColor("#FFF").width(20).height(20)
+                    .borderRadius(10).backgroundColor("#FF4757").textAlign(TextAlign.Center)
+                    .position({ x: 56, y: 0 })
+                    .onClick(() => { this.removeImage(idx) })
+                }.margin({ right: S_SM })
+              }, (uri: string, idx: number) => idx.toString())
+            }
+          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
+
           Column() {
             Text("Prompt / Skill 内容 *").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
             TextArea({ placeholder: "粘贴你的 prompt 或 skill 原文...", text: this.promptText })
@@ -167,25 +208,6 @@ export struct CreatePage {
           Text("Prompt 字符: " + this.promptText.length).fontSize(F_CAPT).fontColor(C_TEXT3)
             .width("100%").textAlign(TextAlign.End).padding({ right: S_LG, top: S_XS })
 
-
-          Column() {
-            Text("添加图片（最多 9 张）").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
-            Row() {
-              Column() { Text("#").fontSize(28); Text("选择图片").fontSize(10).fontColor(C_TEXT3) }
-              .width(72).height(72).borderRadius(R_MD).backgroundColor(C_CARD).borderWidth(1).borderColor(C_BORDER)
-              .justifyContent(FlexAlign.Center).margin({ right: S_SM })
-              .onClick(() => { this.pickImages() })
-              ForEach(this.imageUris, (uri: string, idx: number) => {
-                Stack() {
-                  Image(uri).width(72).height(72).borderRadius(R_MD).objectFit(ImageFit.Cover)
-                  Text("X").fontSize(14).fontColor("#FFF").width(20).height(20)
-                    .borderRadius(10).backgroundColor("#FF4757").textAlign(TextAlign.Center)
-                    .position({ x: 56, y: 0 })
-                    .onClick(() => { this.removeImage(idx) })
-                }.margin({ right: S_SM })
-              }, (uri: string, idx: number) => idx.toString())
-            }
-          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
           Column() {
             Text("分类").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
             Row() {
@@ -199,25 +221,6 @@ export struct CreatePage {
             }
           }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
 
-
-          Column() {
-            Text("添加图片（最多 9 张）").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
-            Row() {
-              Column() { Text("#").fontSize(28); Text("选择图片").fontSize(10).fontColor(C_TEXT3) }
-              .width(72).height(72).borderRadius(R_MD).backgroundColor(C_CARD).borderWidth(1).borderColor(C_BORDER)
-              .justifyContent(FlexAlign.Center).margin({ right: S_SM })
-              .onClick(() => { this.pickImages() })
-              ForEach(this.imageUris, (uri: string, idx: number) => {
-                Stack() {
-                  Image(uri).width(72).height(72).borderRadius(R_MD).objectFit(ImageFit.Cover)
-                  Text("X").fontSize(14).fontColor("#FFF").width(20).height(20)
-                    .borderRadius(10).backgroundColor("#FF4757").textAlign(TextAlign.Center)
-                    .position({ x: 56, y: 0 })
-                    .onClick(() => { this.removeImage(idx) })
-                }.margin({ right: S_SM })
-              }, (uri: string, idx: number) => idx.toString())
-            }
-          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
           Column() {
             Text("适配模型").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
             Row() {
@@ -230,25 +233,6 @@ export struct CreatePage {
             }
           }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
 
-
-          Column() {
-            Text("添加图片（最多 9 张）").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
-            Row() {
-              Column() { Text("#").fontSize(28); Text("选择图片").fontSize(10).fontColor(C_TEXT3) }
-              .width(72).height(72).borderRadius(R_MD).backgroundColor(C_CARD).borderWidth(1).borderColor(C_BORDER)
-              .justifyContent(FlexAlign.Center).margin({ right: S_SM })
-              .onClick(() => { this.pickImages() })
-              ForEach(this.imageUris, (uri: string, idx: number) => {
-                Stack() {
-                  Image(uri).width(72).height(72).borderRadius(R_MD).objectFit(ImageFit.Cover)
-                  Text("X").fontSize(14).fontColor("#FFF").width(20).height(20)
-                    .borderRadius(10).backgroundColor("#FF4757").textAlign(TextAlign.Center)
-                    .position({ x: 56, y: 0 })
-                    .onClick(() => { this.removeImage(idx) })
-                }.margin({ right: S_SM })
-              }, (uri: string, idx: number) => idx.toString())
-            }
-          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
           Column() {
             Text("标签（最多 5 个）").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
             Row() {

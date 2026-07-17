@@ -1,4 +1,4 @@
-import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, C_RED, C_COLLECT, C_BLUE, C_DARK_BORDER, C_BORDER, S_XS, S_SM, S_MD, S_LG, S_XL, R_MD, R_LG, F_CAPT, F_SM, F_BODY, F_LG, F_H2, TARGET_MODELS } from "../common/Constants"
+import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_RED, C_COLLECT, C_BLUE, C_BORDER, S_XS, S_SM, S_MD, S_LG, S_XL, R_MD, R_LG, F_CAPT, F_SM, F_BODY, F_LG, F_H2, TARGET_MODELS } from "../common/Constants"
 import { Post, Comment } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
@@ -18,7 +18,6 @@ function avatarColor(name: string): string {
 @Entry
 @Component
 struct PostDetailPage {
-  @StorageLink("isDark") isDark: boolean = false
   @State post: Post | null = null
   @State comments: Comment[] = []
   @State commentText: string = ""
@@ -144,23 +143,23 @@ struct PostDetailPage {
   build() {
     if (this.loading) {
       Column() { LoadingProgress().width(40).height(40).color(C_PRIMARY) }
-        .width("100%").height("100%").justifyContent(FlexAlign.Center).backgroundColor(this.isDark ? C_DARK_BG : C_BG)
+        .width("100%").height("100%").justifyContent(FlexAlign.Center).backgroundColor(C_BG)
     } else if (!this.post) {
       Column({ space: 12 }) {
         Text("😕").fontSize(48)
-        Text("帖子不存在").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
+        Text("帖子不存在").fontSize(F_BODY).fontColor(C_TEXT2)
         Button("返回").fontSize(F_SM).backgroundColor(C_PRIMARY).fontColor("#FFF").borderRadius(18).height(36)
           .onClick(() => router.back())
-      }.width("100%").height("100%").justifyContent(FlexAlign.Center).backgroundColor(this.isDark ? C_DARK_BG : C_BG)
+      }.width("100%").height("100%").justifyContent(FlexAlign.Center).backgroundColor(C_BG)
     } else {
       Column() {
         Row() {
-          Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1)
+          Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(C_TEXT1)
             .onClick(() => { router.back() })
-          Text("帖子详情").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+          Text("帖子详情").fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
             .layoutWeight(1).textAlign(TextAlign.Center)
           Text("").width(24)
-        }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
+        }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
 
         Scroll() {
           Column() {
@@ -170,9 +169,9 @@ struct PostDetailPage {
                 .width(40).height(40).borderRadius(20).textAlign(TextAlign.Center)
                 .backgroundColor(avatarColor(this.post!.author?.nickname ?? ""))
               Column() {
-                Text(this.post!.author?.nickname ?? "用户").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium)
+                Text(this.post!.author?.nickname ?? "用户").fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Medium)
                 Text("Lv." + (this.post!.author?.level ?? 1) + " · " + this.formatTime(this.post!.createdAt ?? ""))
-                  .fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+                  .fontSize(F_CAPT).fontColor(C_TEXT3)
               }.margin({ left: S_MD }).alignItems(HorizontalAlign.Start)
               .onClick(() => {
                 if (this.post?.userId) {
@@ -195,18 +194,25 @@ struct PostDetailPage {
                   .borderRadius(16).borderWidth(1).borderColor(C_RED)
                   .onClick(() => this.showDelete = true)
               }
-            }.width("100%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
+            }.width("100%").padding(S_LG).backgroundColor(C_CARD)
 
             // Title
-            Text(this.post!.title).fontSize(F_H2).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+            Text(this.post!.title).fontSize(F_H2).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
               .width("100%").padding({ left: S_LG, right: S_LG, top: S_LG }).lineHeight(28)
 
             // Content
             if (this.post!.content) {
-              Text(this.post!.content).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).width("100%")
+              Text(this.post!.content).fontSize(F_BODY).fontColor(C_TEXT2).width("100%")
                 .padding({ left: S_LG, right: S_LG, top: S_SM }).lineHeight(22)
             }
 
+            if (this.post!.images && this.post!.images.length > 0) {
+              Row() {
+                ForEach(this.post!.images.slice(0, 9), (img: string) => {
+                  Image(img).width(100).height(100).borderRadius(8).objectFit(ImageFit.Cover).margin(4)
+                }, (img: string) => img)
+              }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM })
+            }
             if (this.post!.images && this.post!.images.length > 0) {
               Row() {
                 ForEach(this.post!.images.slice(0, 9), (img: string) => {
@@ -238,7 +244,7 @@ struct PostDetailPage {
             if (this.post!.prompt) {
               Column() {
                 Row() {
-                  Text("📋 Prompt 原文").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold).layoutWeight(1)
+                  Text("📋 Prompt 原文").fontSize(F_SM).fontColor(C_TEXT1).fontWeight(FontWeight.Bold).layoutWeight(1)
                   Text("📋 复制").fontSize(F_SM).fontColor(C_BLUE).backgroundColor(Color.Transparent)
                     .onClick(() => { this.copyPrompt() })
                   Text("🎨 改编").fontSize(F_SM).fontColor(C_PRIMARY).backgroundColor(Color.Transparent)
@@ -247,10 +253,10 @@ struct PostDetailPage {
                       router.pushUrl({ url: "pages/CreatePage", params: { remixPrompt: this.post!.prompt, remixTitle: "改编自: " + this.post!.title, remixAuthor: this.post!.author?.nickname } })
                     })
                 }.width("100%").padding({ left: S_MD, right: S_MD, top: S_MD })
-                Text(this.post!.prompt).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontFamily("monospace")
+                Text(this.post!.prompt).fontSize(F_SM).fontColor(C_TEXT1).fontFamily("monospace")
                   .padding(S_MD).width("100%").textAlign(TextAlign.Start).lineHeight(20)
               }
-              .width("100%").backgroundColor("#F8F9FA").borderRadius(R_LG).borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
+              .width("100%").backgroundColor("#F8F9FA").borderRadius(R_LG).borderWidth(1).borderColor(C_BORDER)
               .margin({ left: S_LG, right: S_LG, top: S_LG })
             }
 
@@ -258,30 +264,30 @@ struct PostDetailPage {
             Row() {
               Row() {
                 Text(this.isLiked ? "❤️" : "🤍").fontSize(22).scale({ x: this.likeAnimScale, y: this.likeAnimScale })
-                Text(this.formatCount(this.likeCount)).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).margin({ left: S_XS })
+                Text(this.formatCount(this.likeCount)).fontSize(F_SM).fontColor(C_TEXT2).margin({ left: S_XS })
               }.onClick(() => { this.toggleLike() })
 
               Row() {
                 Text(this.isCollected ? "⭐" : "☆").fontSize(22).scale({ x: this.collectAnimScale, y: this.collectAnimScale })
-                Text(this.formatCount(this.collectCount)).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).margin({ left: S_XS })
+                Text(this.formatCount(this.collectCount)).fontSize(F_SM).fontColor(C_TEXT2).margin({ left: S_XS })
               }.margin({ left: 24 }).onClick(() => { this.toggleCollect() })
 
               Row() {
                 Text("💬").fontSize(22)
-                Text(this.comments.length.toString()).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).margin({ left: S_XS })
+                Text(this.comments.length.toString()).fontSize(F_SM).fontColor(C_TEXT2).margin({ left: S_XS })
               }.margin({ left: 24 }).onClick(() => { this.showCommentInput = true })
 
               Blank()
             }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
 
-            Divider().color(this.isDark ? C_DARK_BORDER : C_BORDER).margin({ left: S_LG, right: S_LG, top: S_LG })
+            Divider().color(C_BORDER).margin({ left: S_LG, right: S_LG, top: S_LG })
 
             // Comments section
-            Text("评论 (" + this.comments.length + ")").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+            Text("评论 (" + this.comments.length + ")").fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
               .width("100%").padding({ left: S_LG, top: S_LG })
 
             if (this.comments.length === 0) {
-              Text("暂无评论，来说两句吧").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+              Text("暂无评论，来说两句吧").fontSize(F_CAPT).fontColor(C_TEXT3)
                 .width("100%").textAlign(TextAlign.Center).padding({ top: 40, bottom: 40 })
             } else {
               ForEach(this.comments, (cmt: Comment) => {
@@ -292,17 +298,17 @@ struct PostDetailPage {
                       .backgroundColor(avatarColor(cmt.author?.nickname ?? ""))
                     Column() {
                       Row() {
-                        Text(cmt.author?.nickname ?? "用户").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium)
-                        Text(" · " + this.formatTime(cmt.createdAt)).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ left: S_XS })
+                        Text(cmt.author?.nickname ?? "用户").fontSize(F_SM).fontColor(C_TEXT1).fontWeight(FontWeight.Medium)
+                        Text(" · " + this.formatTime(cmt.createdAt)).fontSize(F_CAPT).fontColor(C_TEXT3).margin({ left: S_XS })
                       }
                       if (cmt.replyTo) {
-                        Text("↳ 回复").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+                        Text("↳ 回复").fontSize(F_CAPT).fontColor(C_TEXT3)
                       }
-                      Text(cmt.content).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).margin({ top: 2 }).width("100%")
+                      Text(cmt.content).fontSize(F_BODY).fontColor(C_TEXT1).margin({ top: 2 }).width("100%")
                       Row() {
                         Text(cmt.liked ? "❤️" : "🤍").fontSize(14)
                           .onClick(() => this.toggleCommentLike(cmt))
-                        Text(cmt.likeCount.toString()).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ left: S_XS, right: S_LG })
+                        Text(cmt.likeCount.toString()).fontSize(F_CAPT).fontColor(C_TEXT3).margin({ left: S_XS, right: S_LG })
                         Text("回复").fontSize(F_CAPT).fontColor(C_PRIMARY)
                           .onClick(() => { this.replyToCommentId = cmt.id; this.replyToUserName = cmt.author?.nickname ?? "用户"; this.showCommentInput = true })
                       }.margin({ top: S_XS })
@@ -314,14 +320,14 @@ struct PostDetailPage {
 
             // Similar posts
             if (this.similarPosts.length > 0) {
-              Divider().color(this.isDark ? C_DARK_BORDER : C_BORDER).margin({ left: S_LG, right: S_LG, top: S_LG })
-              Text("推荐帖子").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+              Divider().color(C_BORDER).margin({ left: S_LG, right: S_LG, top: S_LG })
+              Text("推荐帖子").fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
                 .width("100%").padding({ left: S_LG, top: S_LG })
               ForEach(this.similarPosts, (sp: Post) => {
                 Row({ space: 10 }) {
-                  Text(sp.title).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).maxLines(1).layoutWeight(1)
-                  Text(this.formatCount(sp.likeCount)).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
-                  Text("›").fontSize(16).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+                  Text(sp.title).fontSize(F_SM).fontColor(C_TEXT1).maxLines(1).layoutWeight(1)
+                  Text(this.formatCount(sp.likeCount)).fontSize(F_CAPT).fontColor(C_TEXT3)
+                  Text("›").fontSize(16).fontColor(C_TEXT3)
                 }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD, bottom: S_MD })
                 .onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: sp.id } }))
               }, (sp: Post) => sp.id)
@@ -337,38 +343,38 @@ struct PostDetailPage {
             if (this.replyToUserName) {
               Row() {
                 Text("回复 @" + this.replyToUserName).fontSize(F_CAPT).fontColor(C_PRIMARY)
-                Text(" ✕").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+                Text(" ✕").fontSize(F_CAPT).fontColor(C_TEXT3)
                   .onClick(() => { this.replyToCommentId = ""; this.replyToUserName = "" })
               }.padding({ left: S_LG, top: S_XS, bottom: S_XS }).width("100%")
             }
             Row() {
               TextInput({ placeholder: this.replyToUserName ? "回复 @" + this.replyToUserName + "..." : "写下你的评论...", text: this.commentText })
-                .fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(20)
-                .borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER).layoutWeight(1).height(40).padding({ left: S_LG })
+                .fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_CARD).borderRadius(20)
+                .borderWidth(1).borderColor(C_BORDER).layoutWeight(1).height(40).padding({ left: S_LG })
                 .onChange((v: string) => { this.commentText = v })
                 .onSubmit(() => { this.submitComment() })
               Text("发送").fontSize(F_BODY).fontColor(this.commentText.trim() ? C_PRIMARY : C_TEXT3)
                 .margin({ left: S_MD }).fontWeight(FontWeight.Bold)
                 .onClick(() => { this.submitComment() })
             }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM })
-            .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderWidth({ top: 0.5 }).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
+            .backgroundColor(C_CARD).borderWidth({ top: 0.5 }).borderColor(C_BORDER)
           }.width("100%")
         }
-      }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
+      }.width("100%").height("100%").backgroundColor(C_BG)
 
       // Delete confirm modal
       if (this.showDelete) {
         Column() {
           Column({ space: 14 }) {
-            Text("确认删除").fontSize(F_LG).fontWeight(FontWeight.Bold).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1)
-            Text("删除后无法恢复，确定要删除吗？").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).textAlign(TextAlign.Center)
+            Text("确认删除").fontSize(F_LG).fontWeight(FontWeight.Bold).fontColor(C_TEXT1)
+            Text("删除后无法恢复，确定要删除吗？").fontSize(F_SM).fontColor(C_TEXT2).textAlign(TextAlign.Center)
             Row({ space: 12 }) {
-              Button("取消").width("45%").height(42).backgroundColor(this.isDark ? C_DARK_BG : C_BG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).borderRadius(10)
+              Button("取消").width("45%").height(42).backgroundColor(C_BG).fontColor(C_TEXT1).borderRadius(10)
                 .onClick(() => this.showDelete = false)
               Button("确认删除").width("45%").height(42).backgroundColor(C_RED).fontColor("#FFF").borderRadius(10)
                 .onClick(() => this.doDelete())
             }.width("100%").justifyContent(FlexAlign.Center)
-          }.width("80%").padding(24).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(16)
+          }.width("80%").padding(24).backgroundColor(C_CARD).borderRadius(16)
         }.width("100%").height("100%").backgroundColor("#00000030").justifyContent(FlexAlign.Center)
         .onClick(() => this.showDelete = false)
       }

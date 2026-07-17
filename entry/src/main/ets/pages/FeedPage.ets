@@ -89,6 +89,9 @@ struct PostCard {
       if (this.post.images && this.post.images.length > 0) {
         Image(this.post.images[0]).width("100%").height(120).objectFit(ImageFit.Cover).borderRadius({ topLeft: R_LG, topRight: R_LG })
       }
+      if (this.post.images && this.post.images.length > 0) {
+        Image(this.post.images[0]).width("100%").height(120).objectFit(ImageFit.Cover).borderRadius({ topLeft: R_LG, topRight: R_LG })
+      }
     .shadow({ radius: 4, color: "#00000008", offsetY: 2 })
     .onClick(() => { router.pushUrl({ url: "pages/PostDetailPage", params: { postId: this.post.id } }) })
   }
