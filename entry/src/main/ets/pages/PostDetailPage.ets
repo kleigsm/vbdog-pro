@@ -32,6 +32,8 @@ struct PostDetailPage {
   @State replyToUserName: string = ""
   @State loading: boolean = true
   @State similarPosts: Post[] = []
+  @State showReportDialog: boolean = false
+  @State reportReasons: string[] = ["垃圾广告", "色情内容", "政治敏感", "人身攻击", "其他"]
   @State showDelete: boolean = false
   private postId: string = ""
 
@@ -193,8 +195,7 @@ struct PostDetailPage {
                 Text("举报").fontSize(F_SM).fontColor(C_TEXT3)
                   .margin({ right: S_MD })
                   .onClick(() => {
-                    getApi().reportPost(this.postId, "")
-                    promptAction.showToast({ message: "已举报" })
+                    this.showReportDialog = true
                   })
                 Text("删除").fontSize(F_SM).fontColor(C_RED)
                   .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
@@ -206,8 +207,7 @@ struct PostDetailPage {
                   .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
                   .borderRadius(16).borderWidth(1).borderColor(C_BORDER)
                   .onClick(() => {
-                    getApi().reportPost(this.postId, "")
-                    promptAction.showToast({ message: "已举报" })
+                    this.showReportDialog = true
                   })
               }
             }.width("100%").padding(S_LG).backgroundColor(C_CARD)
@@ -377,6 +377,28 @@ struct PostDetailPage {
           }.width("100%")
         }
       }.width("100%").height("100%").backgroundColor(C_BG)
+
+      // Delete confirm modal
+      if (this.showDelete) {
+      // Report dialog
+      if (this.showReportDialog) {
+        Column() {
+          Column({ space: 12 }) {
+            Text("举报原因").fontSize(F_LG).fontWeight(FontWeight.Bold).fontColor(C_TEXT1)
+            ForEach(this.reportReasons, (r: string) => {
+              Text(r).fontSize(F_BODY).fontColor(C_PRIMARY).width("100%").textAlign(TextAlign.Center).padding({ top: S_MD, bottom: S_MD })
+              .onClick(() => {
+                getApi().reportPost(this.postId, r)
+                promptAction.showToast({ message: "已举报: " + r, duration: 1000 })
+                this.showReportDialog = false
+              })
+            }, (r: string) => r)
+            Button("取消").fontSize(F_SM).backgroundColor(C_BG).fontColor(C_TEXT2).borderRadius(10).height(38).width("100%")
+            .onClick(() => this.showReportDialog = false)
+          }.width("80%").padding(20).backgroundColor(C_CARD).borderRadius(16)
+        }.width("100%").height("100%").backgroundColor("#00000030").justifyContent(FlexAlign.Center)
+        .onClick(() => this.showReportDialog = false)
+      }
 
       // Delete confirm modal
       if (this.showDelete) {

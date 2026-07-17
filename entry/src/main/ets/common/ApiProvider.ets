@@ -31,6 +31,8 @@ export interface IApiProvider {
   adminDeletePost(postId: string): Promise<void>
   reportPost(postId: string, reason: string): Promise<void>
   blockUser(userId: string): Promise<void>
+  getReports(): Promise<Report[]>
+  resolveReport(reportId: string, action: string, postId: string): Promise<void>
 }
 
 let _provider: IApiProvider | null = null

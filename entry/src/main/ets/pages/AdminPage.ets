@@ -1,5 +1,5 @@
 import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, C_RED, S_SM, S_MD, S_LG, S_XL, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
-import { Post } from "../common/Models"
+import { Post, Report } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
 import router from "@ohos.router"
@@ -16,10 +16,13 @@ export struct AdminPage {
   @State allPosts: Post[] = []
   @State loading: boolean = true
   @State deletingId: string = ""
+  @State reports: Report[] = []
+  @State tab: number = 0
 
   aboutToAppear(): void {
     if (!UserManager.isAdmin) { router.back(); return }
     this.loadData()
+    this.loadReports()
   }
 
   async loadData(): Promise<void> {

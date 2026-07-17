@@ -288,9 +288,17 @@ export class SupabaseClient implements IApiProvider {
   }
   async reportPost(postId: string, reason: string): Promise<void> {
     await this.request("/reports", { reporter_id: this.userId, post_id: postId, reason: reason })
+    await this.request("/notifications", { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: "new report: " + reason })
   }
   async blockUser(userId: string): Promise<void> {
     await this.request("/blocks", { blocker_id: this.userId, blocked_id: userId })
+  }
+  async getReports(): Promise<Report[]> {
+    return await this.request("/reports?select=*&status=eq.pending&order=created_at.desc") as Report[]
+  }
+  async resolveReport(reportId: string, action: string, postId: string): Promise<void> {
+    if (action === "delete") await this.deletePost(postId)
+    await this.request("/reports?id=eq." + reportId, { status: "resolved" })
   }
 
   async adminDeletePost(postId: string): Promise<void> {
