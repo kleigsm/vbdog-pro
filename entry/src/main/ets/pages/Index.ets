@@ -1,4 +1,4 @@
-﻿import { UserManager } from "../common/UserManager"
+import { UserManager } from "../common/UserManager"
 import { SupabaseClient } from "../common/SupabaseClient"
 import { getApi, setApi } from "../common/ApiProvider"
 import { C_PRIMARY, C_BG, C_TEXT2, C_TEXT3, C_CARD, C_BORDER, C_DARK_BG, C_DARK_CARD, C_DARK_TEXT2, C_DARK_BORDER, S_XS, S_XL, F_CAPT, F_BODY, F_H1 } from "../common/Constants"
@@ -17,6 +17,8 @@ interface TabItem { idx: number; title: string; icon: string }
 @Component
 struct Index {
   @StorageLink("isLoggedIn") isLoggedIn: boolean = false
+  @StorageLink("isDark") isDark: boolean = false
+  @StorageLink("isDark") isDark: boolean = false
   @StorageLink("isDark") isDark: boolean = false
   @State currentTab: number = 0
   @State appReady: boolean = false
