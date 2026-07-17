@@ -1,7 +1,7 @@
 import { UserManager } from "../common/UserManager"
 import { SupabaseClient } from "../common/SupabaseClient"
 import { getApi, setApi } from "../common/ApiProvider"
-import { C_PRIMARY, C_BG, C_TEXT2, C_TEXT3, C_CARD, C_BORDER, C_DARK_BG, C_DARK_CARD, C_DARK_TEXT2, C_DARK_BORDER, S_XS, S_XL, F_CAPT, F_BODY, F_H1 } from "../common/Constants"
+import { C_PRIMARY, C_BG, C_DARK_BG, C_TEXT2, C_DARK_TEXT2, C_TEXT3, C_CARD, C_DARK_CARD, C_BORDER, C_DARK_BORDER, S_XS, S_XL, F_CAPT, F_BODY, F_H1 } from "../common/Constants"
 import { LoginPage } from "./LoginPage"
 import { FeedPage } from "./FeedPage"
 import { SearchPage } from "./SearchPage"
@@ -17,8 +17,6 @@ interface TabItem { idx: number; title: string; icon: string }
 @Component
 struct Index {
   @StorageLink("isLoggedIn") isLoggedIn: boolean = false
-  @StorageLink("isDark") isDark: boolean = false
-  @StorageLink("isDark") isDark: boolean = false
   @StorageLink("isDark") isDark: boolean = false
   @State currentTab: number = 0
   @State appReady: boolean = false
@@ -40,9 +38,9 @@ struct Index {
     if (!this.appReady) {
       Column() {
         Column({ space: 16 }) {
-          Text("馃悿").fontSize(80)
+          Text("🐤").fontSize(80)
           Text("VBDog Pro").fontSize(F_H1).fontWeight(FontWeight.Bold).fontColor(C_PRIMARY)
-          Text("AI Prompt 鍒涗綔鑰呯ぞ鍖?).fontSize(F_BODY).fontColor(C_TEXT2)
+          Text("AI Prompt 创作者社区").fontSize(F_BODY).fontColor(C_TEXT2)
           LoadingProgress().width(28).height(28).margin({ top: 24 }).color(C_PRIMARY)
         }.justifyContent(FlexAlign.Center).alignItems(HorizontalAlign.Center)
       }.width("100%").height("100%").justifyContent(FlexAlign.Center).backgroundColor(this.isDark ? C_DARK_BG : C_BG)
@@ -70,11 +68,11 @@ struct Index {
   }
 
   private tabs: TabItem[] = [
-    { idx: 0, title: "鍙戠幇", icon: "馃敟" },
-    { idx: 1, title: "鎼滅储", icon: "馃攳" },
-    { idx: 2, title: "鍙戝竷", icon: "" },
-    { idx: 3, title: "鍔ㄦ€?, icon: "馃挰" },
-    { idx: 4, title: "鎴戠殑", icon: "馃懁" },
+    { idx: 0, title: "发现", icon: "🔥" },
+    { idx: 1, title: "搜索", icon: "🔍" },
+    { idx: 2, title: "发布", icon: "" },
+    { idx: 3, title: "动态", icon: "💬" },
+    { idx: 4, title: "我的", icon: "👤" },
   ]
 
   @Builder makeTab(t: TabItem) {
