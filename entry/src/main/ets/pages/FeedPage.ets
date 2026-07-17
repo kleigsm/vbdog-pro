@@ -86,12 +86,6 @@ struct PostCard {
       .padding({ left: S_MD, right: S_MD, top: S_MD, bottom: S_MD }).alignItems(HorizontalAlign.Start).width("100%")
     }
     .width("100%").borderRadius(R_LG).backgroundColor(C_CARD)
-      if (this.post.images && this.post.images.length > 0) {
-        Image(this.post.images[0]).width("100%").height(120).objectFit(ImageFit.Cover).borderRadius({ topLeft: R_LG, topRight: R_LG })
-      }
-      if (this.post.images && this.post.images.length > 0) {
-        Image(this.post.images[0]).width("100%").height(120).objectFit(ImageFit.Cover).borderRadius({ topLeft: R_LG, topRight: R_LG })
-      }
     .shadow({ radius: 4, color: "#00000008", offsetY: 2 })
     .onClick(() => { router.pushUrl({ url: "pages/PostDetailPage", params: { postId: this.post.id } }) })
   }
