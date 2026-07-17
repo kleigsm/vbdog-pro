@@ -72,17 +72,17 @@ export struct CreatePage {
       picker.select({
         MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
         maxSelectNumber: 9 - self.imageUris.length
-      }).then((res: photoAccessHelper.PhotoSelectResult) => {
+      }).then((res: photoAccessHelper.PhotoSelectResult): void => {
         if (res.photoUris.length > 0) {
-          self.imageUris = [...self.imageUris, ...res.photoUris]
+          self.imageUris = self.imageUris.concat(res.photoUris)
         }
-      }).catch(() => { })
+      }).catch((): void => { })
     } catch (_e) { }
   }
 
   removeImage(index: number): void {
     this.imageUris.splice(index, 1)
-    this.imageUris = [...this.imageUris]
+    this.imageUris = this.imageUris.concat([])
   }
   submit(): void {
     if (!this.title.trim()) { promptAction.showToast({ message: "请输入标题", duration: 2000 }); return }
@@ -141,17 +141,14 @@ export struct CreatePage {
           Column() {
             Text("添加图片（最多 9 张）").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
             Row() {
-              Column() {
-                Text("📲").fontSize(28)
-                Text("选择图片").fontSize(10).fontColor(C_TEXT3)
-              }
+              Column() { Text("#").fontSize(28); Text("选择图片").fontSize(10).fontColor(C_TEXT3) }
               .width(72).height(72).borderRadius(R_MD).backgroundColor(C_CARD).borderWidth(1).borderColor(C_BORDER)
               .justifyContent(FlexAlign.Center).margin({ right: S_SM })
               .onClick(() => { this.pickImages() })
               ForEach(this.imageUris, (uri: string, idx: number) => {
                 Stack() {
                   Image(uri).width(72).height(72).borderRadius(R_MD).objectFit(ImageFit.Cover)
-                  Text("✕").fontSize(14).fontColor("#FFF").width(20).height(20)
+                  Text("X").fontSize(14).fontColor("#FFF").width(20).height(20)
                     .borderRadius(10).backgroundColor("#FF4757").textAlign(TextAlign.Center)
                     .position({ x: 56, y: 0 })
                     .onClick(() => { this.removeImage(idx) })
@@ -174,17 +171,14 @@ export struct CreatePage {
           Column() {
             Text("添加图片（最多 9 张）").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
             Row() {
-              Column() {
-                Text("📲").fontSize(28)
-                Text("选择图片").fontSize(10).fontColor(C_TEXT3)
-              }
+              Column() { Text("#").fontSize(28); Text("选择图片").fontSize(10).fontColor(C_TEXT3) }
               .width(72).height(72).borderRadius(R_MD).backgroundColor(C_CARD).borderWidth(1).borderColor(C_BORDER)
               .justifyContent(FlexAlign.Center).margin({ right: S_SM })
               .onClick(() => { this.pickImages() })
               ForEach(this.imageUris, (uri: string, idx: number) => {
                 Stack() {
                   Image(uri).width(72).height(72).borderRadius(R_MD).objectFit(ImageFit.Cover)
-                  Text("✕").fontSize(14).fontColor("#FFF").width(20).height(20)
+                  Text("X").fontSize(14).fontColor("#FFF").width(20).height(20)
                     .borderRadius(10).backgroundColor("#FF4757").textAlign(TextAlign.Center)
                     .position({ x: 56, y: 0 })
                     .onClick(() => { this.removeImage(idx) })
@@ -209,17 +203,14 @@ export struct CreatePage {
           Column() {
             Text("添加图片（最多 9 张）").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
             Row() {
-              Column() {
-                Text("📲").fontSize(28)
-                Text("选择图片").fontSize(10).fontColor(C_TEXT3)
-              }
+              Column() { Text("#").fontSize(28); Text("选择图片").fontSize(10).fontColor(C_TEXT3) }
               .width(72).height(72).borderRadius(R_MD).backgroundColor(C_CARD).borderWidth(1).borderColor(C_BORDER)
               .justifyContent(FlexAlign.Center).margin({ right: S_SM })
               .onClick(() => { this.pickImages() })
               ForEach(this.imageUris, (uri: string, idx: number) => {
                 Stack() {
                   Image(uri).width(72).height(72).borderRadius(R_MD).objectFit(ImageFit.Cover)
-                  Text("✕").fontSize(14).fontColor("#FFF").width(20).height(20)
+                  Text("X").fontSize(14).fontColor("#FFF").width(20).height(20)
                     .borderRadius(10).backgroundColor("#FF4757").textAlign(TextAlign.Center)
                     .position({ x: 56, y: 0 })
                     .onClick(() => { this.removeImage(idx) })
@@ -243,17 +234,14 @@ export struct CreatePage {
           Column() {
             Text("添加图片（最多 9 张）").fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width("100%")
             Row() {
-              Column() {
-                Text("📲").fontSize(28)
-                Text("选择图片").fontSize(10).fontColor(C_TEXT3)
-              }
+              Column() { Text("#").fontSize(28); Text("选择图片").fontSize(10).fontColor(C_TEXT3) }
               .width(72).height(72).borderRadius(R_MD).backgroundColor(C_CARD).borderWidth(1).borderColor(C_BORDER)
               .justifyContent(FlexAlign.Center).margin({ right: S_SM })
               .onClick(() => { this.pickImages() })
               ForEach(this.imageUris, (uri: string, idx: number) => {
                 Stack() {
                   Image(uri).width(72).height(72).borderRadius(R_MD).objectFit(ImageFit.Cover)
-                  Text("✕").fontSize(14).fontColor("#FFF").width(20).height(20)
+                  Text("X").fontSize(14).fontColor("#FFF").width(20).height(20)
                     .borderRadius(10).backgroundColor("#FF4757").textAlign(TextAlign.Center)
                     .position({ x: 56, y: 0 })
                     .onClick(() => { this.removeImage(idx) })
