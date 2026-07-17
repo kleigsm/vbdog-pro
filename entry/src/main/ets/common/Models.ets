@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Models — 数据模型 + 辅助类型
  */
 export interface User {

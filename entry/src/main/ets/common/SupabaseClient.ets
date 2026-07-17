@@ -280,7 +280,7 @@ export class SupabaseClient implements IApiProvider {
     await this.request("/notifications?id=eq." + notificationId, b)
   }
 
-  async uploadFile(uri: string, bucket: string): Promise<string> { try { const fs = require("@ohos.file.fs"); const f = fs.openSync(uri); const buf = new ArrayBuffer(1024 * 1024); let data = ""; let len = 0; while ((len = fs.readSync(f.fd, buf)) > 0) { data += String.fromCharCode.apply(null, new Uint8Array(buf.slice(0, len))); } fs.closeSync(f); const fn = Date.now().toString() + ".jpg"; await this.request("/storage/v1/object/" + bucket + "/" + fn, { headers: { "Content-Type": "image/jpeg" } }); return this.url + "/storage/v1/object/public/" + bucket + "/" + fn; } catch (_e) { return ""; } }
+  async uploadFile(uri: string, bucket: string): Promise<string> { return "" }
 
   async isAdmin(): Promise<boolean> {
     const user = await this.getCurrentUser()

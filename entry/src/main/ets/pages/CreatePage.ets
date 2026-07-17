@@ -38,7 +38,7 @@ export struct CreatePage {
         p.get("title", "").then((v: preferences.ValueType) => { const s = v as string; if (s) this.title = s })
         p.get("content", "").then((v: preferences.ValueType) => { const s = v as string; if (s) this.content = s })
         p.get("prompt", "").then((v: preferences.ValueType) => { const s = v as string; if (s) this.promptText = s })
-      })
+      }))
     }
     this.saveTimer = setInterval(() => { this.saveDraft() }, 10000)
   }
@@ -66,16 +66,16 @@ export struct CreatePage {
     this.tags = [...this.tags]
   }
 
-  async pickImages(): void {
+  pickImages(): void {
     try {
       const picker = new photoAccessHelper.PhotoViewPicker()
-      const res: photoAccessHelper.PhotoSelectResult = await picker.select({
+      picker.select({
         MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
         maxSelectNumber: 9 - this.imageUris.length
-      })
-      if (res.photoUris.length > 0) {
+      }))
+      .then((res: photoAccessHelper.PhotoSelectResult) => {
         this.imageUris = [...this.imageUris, ...res.photoUris]
-      }
+      })
     } catch (_e) { }
   }
 
@@ -110,8 +110,8 @@ export struct CreatePage {
           .enabled(!this.submitting && this.title.trim().length > 0).onClick(() => this.submit())
         if (this.title || this.promptText) {
           Text("草稿已保存").fontSize(F_CAPT).fontColor(C_PRIMARY).opacity(this.draftSaved ? 1 : 0.5)
-        }
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
+        })
+      }).width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       Scroll() {
         Column() {
@@ -120,8 +120,8 @@ export struct CreatePage {
               Text("🎨 改编自 @" + this.remixAuthor).fontSize(F_SM).fontColor(C_PRIMARY)
                 .backgroundColor(C_PRIMARY + "12").borderRadius(8)
                 .padding({ left: S_MD, right: S_MD, top: S_XS, bottom: S_XS })
-            }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD })
-          }
+            }).width("100%").padding({ left: S_LG, right: S_LG, top: S_MD })
+          })
 
           TextInput({ placeholder: "给你的作品起个吸引人的标题...", text: this.title })
             .fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_LG).fontWeight(FontWeight.Bold).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
@@ -144,7 +144,7 @@ export struct CreatePage {
               .backgroundColor("#F8F9FA").borderRadius(R_MD).borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
               .padding(12).height(160).width("100%")
               .onChange((v: string) => { this.promptText = v })
-          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
+          }).width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
           Text("Prompt 字符: " + this.promptText.length).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
             .width("100%").textAlign(TextAlign.End).padding({ right: S_LG, top: S_XS })
 
@@ -157,9 +157,9 @@ export struct CreatePage {
                   .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM }).borderRadius(16).margin({ right: S_SM })
                   .backgroundColor(this.category === c.id ? C_PRIMARY : C_CARD).borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
                   .onClick(() => { this.category = c.id })
-              }, (c: Category) => c.id)
-            }
-          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
+              }), (c: Category) => c.id)
+            })
+          }).width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
 
           Column() {
             Text("适配模型").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).margin({ bottom: S_SM }).width("100%")
@@ -169,9 +169,9 @@ export struct CreatePage {
                   .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM }).borderRadius(16).margin({ right: S_SM, bottom: S_SM })
                   .backgroundColor(this.targetModel === m ? C_BLUE : C_CARD).borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
                   .onClick(() => { this.targetModel = m })
-              })
-            }
-          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
+              }))
+            })
+          }).width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
 
           Column() {
             
@@ -181,7 +181,7 @@ export struct CreatePage {
               Column() {
                 Text("📲").fontSize(28)
                 Text("选择图片").fontSize(10).fontColor(C_TEXT3)
-              }
+              })
               .width(72).height(72).borderRadius(R_MD).backgroundColor(C_CARD).borderWidth(1).borderColor(C_BORDER)
               .justifyContent(FlexAlign.Center).margin({ right: S_SM })
               .onClick(() => { this.pickImages() })
@@ -192,10 +192,10 @@ export struct CreatePage {
                     .borderRadius(10).backgroundColor("#FF4757").textAlign(TextAlign.Center)
                     .position({ x: 56, y: 0 })
                     .onClick(() => { this.removeImage(idx) })
-                }.margin({ right: S_SM })
-              }, (uri: string, idx: number) => idx.toString())
-            }
-          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
+                }).margin({ right: S_SM })
+              }), (uri: string, idx: number) => idx.toString())
+            })
+          }).width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
 Text("标签（最多 5 个）").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).margin({ bottom: S_SM }).width("100%")
             Row() {
               ForEach(HOT_TAGS.slice(0, 12), (t: VTag) => {
@@ -204,13 +204,13 @@ Text("标签（最多 5 个）").fontSize(F_SM).fontColor(this.isDark ? C_DARK_T
                   .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM }).borderRadius(16).margin({ right: S_SM, bottom: S_SM })
                   .backgroundColor(this.tags.includes(t.name) ? C_PRIMARY : C_CARD).borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
                   .onClick(() => { this.toggleTag(t.name) })
-              })
-            }
-          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
+              }))
+            })
+          }).width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
 
           Column().height(80)
-        }.width("100%")
-      }.layoutWeight(1).width("100%")
+        }).width("100%")
+      }).layoutWeight(1).width("100%")
     }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 }
