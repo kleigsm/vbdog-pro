@@ -57,18 +57,18 @@ export struct SearchPage {
         Row() {
           Text("🔍").fontSize(16).margin({ right: S_SM })
           TextInput({ placeholder: "搜索 prompt、skill、标题...", text: this.query })
-            .placeholderColor(C_TEXT3).fontColor(C_TEXT1).fontSize(F_BODY)
+            .placeholderColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY)
             .backgroundColor(Color.Transparent).layoutWeight(1).height(40)
             .onChange((v: string) => { this.query = v }).onSubmit(() => { this.doSearch(this.query) })
         }
-        .layoutWeight(1).backgroundColor(C_CARD).borderRadius(22).borderWidth(1).borderColor(C_BORDER)
+        .layoutWeight(1).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(22).borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
         .padding({ left: S_LG }).height(42)
 
         if (this.showResults) {
           Text("取消").fontSize(F_SM).fontColor(C_PRIMARY).margin({ left: S_MD })
             .onClick(() => { this.showResults = false; this.query = ""; this.results = [] })
         }
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       if (this.showResults) {
         if (this.searching) {
@@ -76,7 +76,7 @@ export struct SearchPage {
         } else if (this.results.length === 0) {
           Column() {
             Text("🔍").fontSize(48).margin({ bottom: S_MD })
-            Text("没有找到相关内容").fontSize(F_BODY).fontColor(C_TEXT2)
+            Text("没有找到相关内容").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
           }.width("100%").margin({ top: 80 })
         } else {
           List() {
@@ -84,10 +84,10 @@ export struct SearchPage {
               ListItem() {
                 Row() {
                   Column() {
-                    Text(post.title).fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Medium).maxLines(1).width("100%")
+                    Text(post.title).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium).maxLines(1).width("100%")
                     Row() {
-                      Text(post.author?.nickname ?? "用户").fontSize(F_SM).fontColor(C_TEXT3)
-                      Text(" · " + post.likeCount + "赞").fontSize(F_SM).fontColor(C_TEXT3)
+                      Text(post.author?.nickname ?? "用户").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+                      Text(" · " + post.likeCount + "赞").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
                     }.margin({ top: 2 })
                   }.layoutWeight(1).alignItems(HorizontalAlign.Start)
                   Text(this.getCatIcon(post.category)).fontSize(20)
@@ -101,26 +101,26 @@ export struct SearchPage {
         Column() {
           if (this.history.length > 0) {
             Row() {
-              Text("搜索历史").fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Bold).layoutWeight(1)
-              Text("清除").fontSize(F_SM).fontColor(C_TEXT3).onClick(() => { this.clearHistory() })
+              Text("搜索历史").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold).layoutWeight(1)
+              Text("清除").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).onClick(() => { this.clearHistory() })
             }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
             Row() {
               ForEach(this.history.slice(0, 6), (h: string) => {
-                Text(h).fontSize(F_SM).fontColor(C_TEXT2)
+                Text(h).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
                   .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
-                  .backgroundColor(C_CARD).borderRadius(16).margin({ right: S_SM, bottom: S_SM })
+                  .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(16).margin({ right: S_SM, bottom: S_SM })
                   .onClick(() => { this.doSearch(h) })
               }, (h: string) => h)
             }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM })
           }
 
-          Text("热门标签").fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+          Text("热门标签").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
             .width("100%").padding({ left: S_LG, top: S_LG })
           Row() {
             ForEach(HOT_TAGS, (t: VTag) => {
-              Text((t.hot ? "🔥 " : "") + t.name).fontSize(F_SM).fontColor(C_TEXT2)
+              Text((t.hot ? "🔥 " : "") + t.name).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
                 .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
-                .backgroundColor(C_CARD).borderRadius(16).margin({ right: S_SM, bottom: S_SM })
+                .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(16).margin({ right: S_SM, bottom: S_SM })
                 .onClick(() => { this.doSearch(t.name) })
             }, (t: VTag) => t.id)
           }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM })

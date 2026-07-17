@@ -32,13 +32,13 @@ struct EditProfilePage {
   build() {
     Column() {
       Row() {
-        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(C_TEXT1)
+        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1)
           .onClick(() => { router.back() })
-        Text("编辑资料").fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+        Text("编辑资料").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
           .layoutWeight(1).textAlign(TextAlign.Center)
         Text("保存").fontSize(F_BODY).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
           .onClick(() => { this.save() })
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       Column() {
         Column() {
@@ -62,20 +62,20 @@ struct EditProfilePage {
       }.width("100%").alignItems(HorizontalAlign.Center)
 
       Column() {
-        Text("昵称").fontSize(F_SM).fontColor(C_TEXT3).margin({ bottom: S_SM }).width("100%")
-        TextInput({ text: this.name }).fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_BG).borderRadius(R_MD)
+        Text("昵称").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ bottom: S_SM }).width("100%")
+        TextInput({ text: this.name }).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY).backgroundColor(this.isDark ? C_DARK_BG : C_BG).borderRadius(R_MD)
           .height(44).padding({ left: S_LG }).width("100%").onChange((v: string) => { this.name = v })
       }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
 
       Column() {
-        Text("手机号").fontSize(F_SM).fontColor(C_TEXT3).margin({ bottom: S_SM }).width("100%")
-        TextInput({ text: this.username }).fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_BG).borderRadius(R_MD)
+        Text("手机号").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ bottom: S_SM }).width("100%")
+        TextInput({ text: this.username }).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY).backgroundColor(this.isDark ? C_DARK_BG : C_BG).borderRadius(R_MD)
           .height(44).padding({ left: S_LG }).width("100%").enabled(false)
       }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
 
       Column() {
-        Text("简介").fontSize(F_SM).fontColor(C_TEXT3).margin({ bottom: S_SM }).width("100%")
-        TextArea({ text: this.bio }).fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_BG).borderRadius(R_MD)
+        Text("简介").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ bottom: S_SM }).width("100%")
+        TextArea({ text: this.bio }).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY).backgroundColor(this.isDark ? C_DARK_BG : C_BG).borderRadius(R_MD)
           .height(100).padding({ left: S_LG, top: S_MD }).width("100%").onChange((v: string) => { this.bio = v })
       }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
     }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)

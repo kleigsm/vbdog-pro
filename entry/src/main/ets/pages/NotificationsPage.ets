@@ -74,11 +74,11 @@ export struct NotificationsPage {
   build() {
     Column() {
       Row() {
-        Text("动态").fontSize(F_H3).fontColor(C_TEXT1).fontWeight(FontWeight.Bold).layoutWeight(1)
+        Text("动态").fontSize(F_H3).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold).layoutWeight(1)
         if (this.tab === 0 && this.getUnread() > 0) {
           Text("全部已读").fontSize(F_SM).fontColor(C_PRIMARY).onClick(() => this.markAllRead())
         }
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       Row() {
         ForEach(["通知", "私信"], (t: string, i: number) => {
@@ -88,7 +88,7 @@ export struct NotificationsPage {
             .borderWidth({ bottom: this.tab === i ? 2 : 0 }).borderColor(this.tab === i ? C_PRIMARY : Color.Transparent)
             .onClick(() => { this.tab = i })
         }, (_t: string, i: number) => i.toString())
-      }.width("100%").backgroundColor(C_CARD)
+      }.width("100%").backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       if (this.tab === 0) {
         if (this.loading) {
@@ -96,7 +96,7 @@ export struct NotificationsPage {
         } else if (this.notifications.length === 0) {
           Column() {
             Text("🔔").fontSize(40).margin({ bottom: S_MD })
-            Text("暂无通知").fontSize(F_BODY).fontColor(C_TEXT2)
+            Text("暂无通知").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
           }.layoutWeight(1).width("100%").justifyContent(FlexAlign.Center)
         } else {
           List() {
@@ -109,10 +109,10 @@ export struct NotificationsPage {
                   }.margin({ right: S_MD })
                   Column() {
                     Row() {
-                      Text((n.fromUser?.nickname ?? "用户")).fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Medium)
-                      Text(" " + n.content).fontSize(F_BODY).fontColor(C_TEXT2)
+                      Text((n.fromUser?.nickname ?? "用户")).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium)
+                      Text(" " + n.content).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
                     }
-                    Text(this.formatTime(n.createdAt)).fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: 2 })
+                    Text(this.formatTime(n.createdAt)).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: 2 })
                   }.layoutWeight(1).alignItems(HorizontalAlign.Start)
                 }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD, bottom: S_MD })
                 .backgroundColor(n.read ? C_BG : C_CARD)
@@ -125,7 +125,7 @@ export struct NotificationsPage {
         if (this.conversations.length === 0) {
           Column() {
             Text("💬").fontSize(40).margin({ bottom: S_MD })
-            Text("暂无消息").fontSize(F_BODY).fontColor(C_TEXT2)
+            Text("暂无消息").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
           }.layoutWeight(1).width("100%").justifyContent(FlexAlign.Center)
         } else {
           List() {
@@ -134,8 +134,8 @@ export struct NotificationsPage {
                 Row() {
                   Text(c.avatar || "👤").fontSize(32).margin({ right: S_MD })
                   Column() {
-                    Text(c.displayName).fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Medium)
-                    Text(c.lastMsg || "").fontSize(F_SM).fontColor(C_TEXT3).maxLines(1)
+                    Text(c.displayName).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium)
+                    Text(c.lastMsg || "").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).maxLines(1)
                   }.layoutWeight(1).alignItems(HorizontalAlign.Start)
                   if (c.unread > 0) {
                     Text(c.unread.toString()).fontSize(F_CAPT).fontColor("#FFFFFF").backgroundColor("#FF4757")

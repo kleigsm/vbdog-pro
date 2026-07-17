@@ -40,7 +40,7 @@ struct Index {
         Column({ space: 16 }) {
           Text("🐤").fontSize(80)
           Text("VBDog Pro").fontSize(F_H1).fontWeight(FontWeight.Bold).fontColor(C_PRIMARY)
-          Text("AI Prompt 创作者社区").fontSize(F_BODY).fontColor(C_TEXT2)
+          Text("AI Prompt 创作者社区").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
           LoadingProgress().width(28).height(28).margin({ top: 24 }).color(C_PRIMARY)
         }.justifyContent(FlexAlign.Center).alignItems(HorizontalAlign.Center)
       }.width("100%").height("100%").justifyContent(FlexAlign.Center).backgroundColor(this.isDark ? C_DARK_BG : C_BG)

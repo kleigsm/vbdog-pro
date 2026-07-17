@@ -54,11 +54,11 @@ struct PostCard {
       }
 
       Column() {
-        Text(this.post.title).fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+        Text(this.post.title).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
           .maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis }).width("100%").lineHeight(20)
 
         if (this.post.content) {
-          Text(this.post.content).fontSize(F_CAPT).fontColor(C_TEXT3)
+          Text(this.post.content).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
             .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis }).width("100%").margin({ top: S_XS })
         }
 
@@ -67,7 +67,7 @@ struct PostCard {
             Text(this.post.author?.nickname?.charAt(0) ?? "用").fontSize(11).fontColor("#FFF")
               .width(18).height(18).borderRadius(9).textAlign(TextAlign.Center)
               .backgroundColor(this.getAvatarColor(this.post.author?.nickname ?? ""))
-            Text(this.post.author?.nickname ?? "用户").fontSize(F_CAPT).fontColor(C_TEXT3)
+            Text(this.post.author?.nickname ?? "用户").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
               .margin({ left: S_XS }).maxLines(1)
           }.flexShrink(1)
           .onClick(() => {
@@ -79,13 +79,13 @@ struct PostCard {
           Text(this.post.likeCount > 999 ? (this.post.likeCount / 1000).toFixed(1) + "k" : this.post.likeCount.toString())
             .fontSize(F_CAPT).fontColor(this.post.liked ? "#FF4757" : C_TEXT3)
           if (this.post.commentCount > 0) {
-            Text("  💬" + this.post.commentCount).fontSize(F_CAPT).fontColor(C_TEXT3)
+            Text("  💬" + this.post.commentCount).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
           }
         }.width("100%").margin({ top: S_SM })
       }
       .padding({ left: S_MD, right: S_MD, top: S_MD, bottom: S_MD }).alignItems(HorizontalAlign.Start).width("100%")
     }
-    .width("100%").borderRadius(R_LG).backgroundColor(C_CARD)
+    .width("100%").borderRadius(R_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
     .shadow({ radius: 4, color: "#00000008", offsetY: 2 })
     .onClick(() => { router.pushUrl({ url: "pages/PostDetailPage", params: { postId: this.post.id } }) })
   }
@@ -106,7 +106,7 @@ struct SkeletonCard {
         Column().width("85%").height(12).borderRadius(6).backgroundColor("#E8E8ED")
         Column().width("35%").height(10).borderRadius(5).backgroundColor("#E8E8ED")
       }.width("100%").padding({ left: S_MD, right: S_MD, top: S_MD, bottom: S_MD })
-    }.width("100%").backgroundColor(C_CARD).borderRadius(R_LG).opacity(0.7)
+    }.width("100%").backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(R_LG).opacity(0.7)
   }
 }
 
@@ -178,7 +178,7 @@ export struct FeedPage {
         Text(this.sortNew ? "最新" : "最热").fontSize(F_SM).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
           .padding({ left: S_MD, right: S_LG, top: S_SM, bottom: S_SM })
           .onClick(() => { this.toggleSort() })
-      }.width("100%").padding({ top: S_SM, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ top: S_SM, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       Refresh({ refreshing: $$this.isRefreshing }) {
         if (this.loading && this.posts.length === 0) {
@@ -193,9 +193,9 @@ export struct FeedPage {
         } else if (this.posts.length === 0 && !this.loading) {
           Column() {
             Text("📑").fontSize(48).margin({ bottom: S_MD })
-            Text(this.errorMsg ? this.errorMsg : "还没有帖子").fontSize(F_BODY).fontColor(C_TEXT2)
+            Text(this.errorMsg ? this.errorMsg : "还没有帖子").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
             if (!this.errorMsg) {
-              Text("快来发布第一条吧！").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: S_XS })
+              Text("快来发布第一条吧！").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: S_XS })
             } else {
               Button("重试").fontSize(F_SM).height(36).backgroundColor(C_PRIMARY).fontColor("#FFF")
                 .borderRadius(18).margin({ top: S_MD })

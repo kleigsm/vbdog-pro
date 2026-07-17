@@ -53,12 +53,12 @@ export struct AdminPage {
   build() {
     Column() {
       Row() {
-        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(C_TEXT1)
+        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1)
           .onClick(() => { router.back() })
-        Text("🔰 管理后台").fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+        Text("🔰 管理后台").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
           .layoutWeight(1).textAlign(TextAlign.Center)
         Text("").width(24)
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       Scroll() {
         Column() {
@@ -66,17 +66,17 @@ export struct AdminPage {
           Row() {
             Column() {
               Text(this.postCount.toString()).fontSize(28).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
-              Text("总帖子").fontSize(F_CAPT).fontColor(C_TEXT3)
-            }.width("48%").padding(S_LG).backgroundColor(C_CARD).borderRadius(R_LG)
+              Text("总帖子").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }.width("48%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(R_LG)
 
             Column() {
               Text(this.userCount.toString()).fontSize(28).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
-              Text("总用户").fontSize(F_CAPT).fontColor(C_TEXT3)
-            }.width("48%").padding(S_LG).backgroundColor(C_CARD).borderRadius(R_LG).margin({ left: "4%" })
+              Text("总用户").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }.width("48%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(R_LG).margin({ left: "4%" })
           }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD })
 
           // Post list
-          Text("帖子管理").fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+          Text("帖子管理").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
             .width("100%").padding({ left: S_LG, top: S_LG })
 
           if (this.loading) {
@@ -85,9 +85,9 @@ export struct AdminPage {
             ForEach(this.allPosts, (p: Post) => {
               Row() {
                 Column() {
-                  Text(p.title).fontSize(F_SM).fontColor(C_TEXT1).fontWeight(FontWeight.Medium).maxLines(1)
+                  Text(p.title).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium).maxLines(1)
                   Text((p.author?.nickname ?? "用户") + " · " + p.likeCount + "赞 · " + this.formatTime(p.createdAt))
-                    .fontSize(F_CAPT).fontColor(C_TEXT3)
+                    .fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start)
                 if (this.deletingId === p.id) {
                   LoadingProgress().width(20).height(20)

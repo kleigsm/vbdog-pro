@@ -38,20 +38,20 @@ export struct MessagesPage {
   @Builder conversationList() {
     Column() {
       Row() {
-        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(C_TEXT1)
+        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1)
           .onClick(() => { router.back() })
-        Text("私信").fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+        Text("私信").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
           .layoutWeight(1).textAlign(TextAlign.Center)
         Text("").width(24)
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       if (this.loading) {
         LoadingProgress().width(32).height(32).color(C_PRIMARY).margin({ top: 80 })
       } else if (this.conversations.length === 0) {
         Column() {
           Text("💬").fontSize(48).margin({ bottom: S_MD })
-          Text("暂无私信").fontSize(F_BODY).fontColor(C_TEXT2)
-          Text("去关注一些创作者，开始交流吧").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: S_XS })
+          Text("暂无私信").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
+          Text("去关注一些创作者，开始交流吧").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: S_XS })
         }.layoutWeight(1).width("100%").justifyContent(FlexAlign.Center)
       } else {
         List() {
@@ -63,11 +63,11 @@ export struct MessagesPage {
                   .backgroundColor(this.getAvatarColor(conv.nickname))
                 Column() {
                   Row() {
-                    Text(conv.nickname).fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Medium)
+                    Text(conv.nickname).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium)
                     Blank()
-                    Text(this.formatChatTime(conv.lastTime)).fontSize(F_CAPT).fontColor(C_TEXT3)
+                    Text(this.formatChatTime(conv.lastTime)).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
                   }.width("100%")
-                  Text(conv.lastMessage).fontSize(F_SM).fontColor(C_TEXT3).maxLines(1)
+                  Text(conv.lastMessage).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).maxLines(1)
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start).margin({ left: S_MD })
                 if (conv.unreadCount > 0) {
                   Text(conv.unreadCount.toString()).fontSize(11).fontColor("#FFF")
@@ -85,19 +85,19 @@ export struct MessagesPage {
   @Builder chatView() {
     Column() {
       Row() {
-        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(C_TEXT1)
+        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1)
           .onClick(() => { this.activeChat = ""; this.loadConversations() })
-        Text(this.activeName).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+        Text(this.activeName).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
           .layoutWeight(1).textAlign(TextAlign.Center)
         Text("").width(24)
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       List({ scroller: this.scroller }) {
         ForEach(this.messages, (msg: Message, i: number) => {
           ListItem() {
             Column() {
               if (i === 0 || this.shouldShowDate(msg, this.messages[i - 1])) {
-                Text(this.formatDate(msg.createdAt)).fontSize(F_CAPT).fontColor(C_TEXT3)
+                Text(this.formatDate(msg.createdAt)).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
                   .width("100%").textAlign(TextAlign.Center).padding({ top: S_SM, bottom: S_XS })
               }
               Row() {
@@ -108,11 +108,11 @@ export struct MessagesPage {
                     .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM }).borderRadius(16)
                     .backgroundColor(msg.fromUserId === this.myId ? C_PRIMARY : C_CARD)
                     .constraintSize({ maxWidth: "75%" })
-                  Text(this.formatMsgTime(msg.createdAt)).fontSize(10).fontColor(C_TEXT3)
+                  Text(this.formatMsgTime(msg.createdAt)).fontSize(10).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
                     .alignSelf(msg.fromUserId === this.myId ? ItemAlign.End : ItemAlign.Start)
                     .margin({ top: 2 })
                   if (msg.fromUserId === this.myId && i === this.messages.length - 1) {
-                    Text("已发送").fontSize(10).fontColor(C_TEXT3)
+                    Text("已发送").fontSize(10).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
                       .alignSelf(ItemAlign.End).margin({ top: 1 })
                   }
                 }.alignItems(msg.fromUserId === this.myId ? HorizontalAlign.End : HorizontalAlign.Start)
@@ -126,12 +126,12 @@ export struct MessagesPage {
 
       Row() {
         TextInput({ placeholder: "输入消息...", text: this.newMsg })
-          .fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_CARD).borderRadius(20)
-          .borderWidth(1).borderColor(C_BORDER).layoutWeight(1).height(40).padding({ left: S_LG })
+          .fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(20)
+          .borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER).layoutWeight(1).height(40).padding({ left: S_LG })
           .onChange((v: string) => { this.newMsg = v }).onSubmit(() => this.sendMsg())
         Text("发送").fontSize(F_BODY).fontColor(this.newMsg.trim() ? C_PRIMARY : C_TEXT3)
           .margin({ left: S_MD }).fontWeight(FontWeight.Bold).onClick(() => this.sendMsg())
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
     }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 

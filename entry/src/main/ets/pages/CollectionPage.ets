@@ -33,20 +33,20 @@ struct CollectionPage {
   build() {
     Column() {
       Row() {
-        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(C_TEXT1)
+        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1)
           .onClick(() => { router.back() })
-        Text("我的收藏").fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+        Text("我的收藏").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
           .layoutWeight(1).textAlign(TextAlign.Center)
         Text("").width(24)
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       if (this.loading) {
         LoadingProgress().width(32).height(32).color(C_PRIMARY).margin({ top: 80 })
       } else if (this.posts.length === 0) {
         Column() {
           Text("⭐").fontSize(48).margin({ bottom: S_MD })
-          Text("还没有收藏").fontSize(F_BODY).fontColor(C_TEXT2)
-          Text("去发现好内容吧！").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: S_XS })
+          Text("还没有收藏").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
+          Text("去发现好内容吧！").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: S_XS })
         }.layoutWeight(1).width("100%").justifyContent(FlexAlign.Center)
       } else {
         List() {
@@ -54,9 +54,9 @@ struct CollectionPage {
             ListItem() {
               Row() {
                 Text("⭐").fontSize(18).margin({ right: S_MD })
-                Text(p.title).fontSize(F_BODY).fontColor(C_TEXT1).fontWeight(FontWeight.Medium).maxLines(1).layoutWeight(1)
-                Text(p.author?.nickname ?? "").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ right: S_MD })
-                Button("×").fontSize(F_LG).fontColor(C_TEXT3).backgroundColor(Color.Transparent).width(32).height(32)
+                Text(p.title).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium).maxLines(1).layoutWeight(1)
+                Text(p.author?.nickname ?? "").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ right: S_MD })
+                Button("×").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).backgroundColor(Color.Transparent).width(32).height(32)
                   .onClick(() => { this.remove(p.id) })
               }.width("100%").padding({ left: S_LG, right: S_MD, top: S_MD, bottom: S_MD })
               .onClick(() => { router.pushUrl({ url: "pages/PostDetailPage", params: { postId: p.id } }) })

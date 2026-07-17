@@ -102,12 +102,12 @@ export struct ProfilePage {
             .width(64).height(64).borderRadius(32).textAlign(TextAlign.Center)
             .backgroundColor(this.getAvatarColor(this.nick))
           Column() {
-            Text(this.nick).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
-            Text("@用户" + (UserManager.currentUser?.level ?? 1)).fontSize(F_SM).fontColor(C_TEXT3).margin({ top: 2 })
+            Text(this.nick).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+            Text("@用户" + (UserManager.currentUser?.level ?? 1)).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: 2 })
             Row() {
               Text("Lv." + this.lv).fontSize(F_CAPT).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
                 .padding({ left: S_SM, right: S_SM, top: 2, bottom: 2 }).backgroundColor("#FFF3E0").borderRadius(8)
-              Text(this.getLevelTitle()).fontSize(F_CAPT).fontColor(C_TEXT3).margin({ left: S_SM })
+              Text(this.getLevelTitle()).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ left: S_SM })
             }.margin({ top: 4 })
           }.layoutWeight(1).alignItems(HorizontalAlign.Start).margin({ left: S_LG })
           Text("编辑").fontSize(F_SM).fontColor(C_PRIMARY)
@@ -117,29 +117,29 @@ export struct ProfilePage {
         }.width("100%")
 
         if (this.bio) {
-          Text(this.bio).fontSize(F_BODY).fontColor(C_TEXT2).margin({ top: S_MD }).width("100%")
+          Text(this.bio).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).margin({ top: S_MD }).width("100%")
         }
 
         // Level progress bar
         Row() {
           Column() {}.width(this.getLevelProgress().toString() + "%").height("100%")
             .borderRadius(3).backgroundColor(C_PRIMARY)
-        }.width("100%").height(4).backgroundColor(C_BG).borderRadius(3).margin({ top: S_MD })
-        Text("升级进度 " + this.getLevelProgress() + "%").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: S_XS })
+        }.width("100%").height(4).backgroundColor(this.isDark ? C_DARK_BG : C_BG).borderRadius(3).margin({ top: S_MD })
+        Text("升级进度 " + this.getLevelProgress() + "%").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: S_XS })
 
         // Stats
         Row() {
           Column() {
-            Text(this.fol.toString()).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
-            Text("粉丝").fontSize(F_CAPT).fontColor(C_TEXT3)
+            Text(this.fol.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+            Text("粉丝").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
           }
           Column() {
-            Text(this.fow.toString()).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
-            Text("关注").fontSize(F_CAPT).fontColor(C_TEXT3)
+            Text(this.fow.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+            Text("关注").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
           }.margin({ left: S_2XL })
           Column() {
-            Text(this.lks.toString()).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
-            Text("获赞").fontSize(F_CAPT).fontColor(C_TEXT3)
+            Text(this.lks.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+            Text("获赞").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
           }.margin({ left: S_2XL })
         }.width("100%").margin({ top: S_MD })
       }.width("100%").padding(S_LG).backgroundColor(C_CARD)
@@ -165,15 +165,15 @@ export struct ProfilePage {
         LoadingProgress().width(32).height(32).color(C_PRIMARY).margin({ top: 60 })
       } else if (this.tab === 0) {
         if (this.myPosts.length === 0) {
-          Column() { Text("暂无发布").fontSize(F_BODY).fontColor(C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
+          Column() { Text("暂无发布").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
         } else {
           List() {
             ForEach(this.myPosts, (p: Post) => {
               ListItem() {
                 Row() {
                   Column() {
-                    Text(p.title).fontSize(F_BODY).fontColor(C_TEXT1).maxLines(1).width("100%")
-                    Text(p.likeCount + "赞 · " + p.commentCount + "评论").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: 2 })
+                    Text(p.title).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).maxLines(1).width("100%")
+                    Text(p.likeCount + "赞 · " + p.commentCount + "评论").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: 2 })
                   }.layoutWeight(1).alignItems(HorizontalAlign.Start)
                   Button("删除").fontSize(11).fontColor("#FFFFFF").backgroundColor(C_RED).borderRadius(10).height(28)
                     .padding({ left: S_MD, right: S_MD })
@@ -186,15 +186,15 @@ export struct ProfilePage {
         }
       } else if (this.tab === 1) {
         if (this.likedPosts.length === 0) {
-          Column() { Text("暂无喜欢").fontSize(F_BODY).fontColor(C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
+          Column() { Text("暂无喜欢").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
         } else {
           List() {
             ForEach(this.likedPosts, (p: Post) => {
               ListItem() {
                 Row() {
                   Text("❤️").fontSize(16).margin({ right: S_MD })
-                  Text(p.title).fontSize(F_BODY).fontColor(C_TEXT1).layoutWeight(1).maxLines(1)
-                  Text(p.author?.nickname ?? "").fontSize(F_CAPT).fontColor(C_TEXT3)
+                  Text(p.title).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).layoutWeight(1).maxLines(1)
+                  Text(p.author?.nickname ?? "").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
                 }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD, bottom: S_MD })
                 .onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: p.id } }))
               }
@@ -203,15 +203,15 @@ export struct ProfilePage {
         }
       } else {
         if (this.collectedPosts.length === 0) {
-          Column() { Text("暂无收藏").fontSize(F_BODY).fontColor(C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
+          Column() { Text("暂无收藏").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
         } else {
           List() {
             ForEach(this.collectedPosts, (p: Post) => {
               ListItem() {
                 Row() {
                   Text("⭐").fontSize(16).margin({ right: S_MD })
-                  Text(p.title).fontSize(F_BODY).fontColor(C_TEXT1).layoutWeight(1).maxLines(1)
-                  Text(p.author?.nickname ?? "").fontSize(F_CAPT).fontColor(C_TEXT3)
+                  Text(p.title).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).layoutWeight(1).maxLines(1)
+                  Text(p.author?.nickname ?? "").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
                 }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD, bottom: S_MD })
                 .onClick(() => router.pushUrl({ url: "pages/PostDetailPage", params: { postId: p.id } }))
               }
@@ -222,7 +222,7 @@ export struct ProfilePage {
 
       // Settings + Logout
       Row() {
-        Text("设置").fontSize(F_SM).fontColor(C_TEXT2).onClick(() => { router.pushUrl({ url: "pages/SettingsPage" }) })
+        Text("设置").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).onClick(() => { router.pushUrl({ url: "pages/SettingsPage" }) })
         Blank()
         Text("退出登录").fontSize(F_SM).fontColor(C_RED).onClick(() => {
           UserManager.clear(); AppStorage.set("isLoggedIn", false)

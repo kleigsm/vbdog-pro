@@ -48,12 +48,12 @@ struct UserPage {
   build() {
     Column() {
       Row() {
-        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(C_TEXT1)
+        Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1)
           .onClick(() => { router.back() })
-        Text(this.nick || "用户主页").fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
+        Text(this.nick || "用户主页").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
           .layoutWeight(1).textAlign(TextAlign.Center)
         Text("").width(24)
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       if (this.loading) {
         LoadingProgress().width(32).height(32).color(C_PRIMARY).margin({ top: 80 })
@@ -63,20 +63,20 @@ struct UserPage {
             .width(72).height(72).borderRadius(36).textAlign(TextAlign.Center)
             .backgroundColor(this.getAvatarColor(this.nick))
 
-          Text(this.nick).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold).margin({ top: S_MD })
-          Text("Lv." + this.lv).fontSize(F_SM).fontColor(C_TEXT3)
+          Text(this.nick).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold).margin({ top: S_MD })
+          Text("Lv." + this.lv).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
           if (this.bio) {
-            Text(this.bio).fontSize(F_BODY).fontColor(C_TEXT2).margin({ top: S_SM }).textAlign(TextAlign.Center).width("80%")
+            Text(this.bio).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).margin({ top: S_SM }).textAlign(TextAlign.Center).width("80%")
           }
 
           Row() {
             Column() {
-              Text(this.fol.toString()).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
-              Text("粉丝").fontSize(F_CAPT).fontColor(C_TEXT3)
+              Text(this.fol.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+              Text("粉丝").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
             }
             Column() {
-              Text(this.fow.toString()).fontSize(F_LG).fontColor(C_TEXT1).fontWeight(FontWeight.Bold)
-              Text("关注").fontSize(F_CAPT).fontColor(C_TEXT3)
+              Text(this.fow.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+              Text("关注").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
             }.margin({ left: S_2XL })
           }.width("100%").margin({ top: S_MD })
 
@@ -84,27 +84,27 @@ struct UserPage {
             Button("+ 关注").fontSize(F_BODY).fontColor("#FFFFFF").backgroundColor(C_PRIMARY)
               .borderRadius(20).height(36).layoutWeight(1)
               .onClick(() => { promptAction.showToast({ message: "已关注", duration: 1000 }) })
-            Button("私信").fontSize(F_BODY).fontColor(C_PRIMARY).backgroundColor(C_CARD)
+            Button("私信").fontSize(F_BODY).fontColor(C_PRIMARY).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
               .borderRadius(20).height(36).layoutWeight(1).margin({ left: S_MD })
               .borderWidth(1).borderColor(C_PRIMARY)
               .onClick(() => { this.sendMsg() })
           }.width("100%").margin({ top: S_MD })
-        }.width("100%").padding(S_LG).backgroundColor(C_CARD)
+        }.width("100%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
         if (this.posts.length > 0) {
           List() {
             ForEach(this.posts, (p: Post) => {
               ListItem() {
                 Row() {
-                  Text(p.title).fontSize(F_BODY).fontColor(C_TEXT1).maxLines(1).layoutWeight(1)
-                  Text(p.likeCount.toString()).fontSize(F_CAPT).fontColor(C_TEXT3)
+                  Text(p.title).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).maxLines(1).layoutWeight(1)
+                  Text(p.likeCount.toString()).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
                 }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD, bottom: S_MD })
                 .onClick(() => { router.pushUrl({ url: "pages/PostDetailPage", params: { postId: p.id } }) })
               }
             }, (p: Post) => p.id)
           }.layoutWeight(1).width("100%")
         } else {
-          Column() { Text("暂无帖子").fontSize(F_BODY).fontColor(C_TEXT3).margin({ top: 40 }) }.width("100%").layoutWeight(1)
+          Column() { Text("暂无帖子").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: 40 }) }.width("100%").layoutWeight(1)
         }
       }
     }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
