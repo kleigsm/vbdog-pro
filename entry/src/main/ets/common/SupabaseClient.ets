@@ -15,6 +15,7 @@ interface InsertFollowBody { follower_id: string; following_id: string }
 interface ConversationRpcParams { p_user_id: string }
 interface InsertReportBody { reporter_id: string; post_id: string; reason: string; status: string }
 interface InsertBlockBody { blocker_id: string; blocked_id: string }
+interface UpdateReportBody { status: string }
 interface InsertMessageBody { from_user_id: string; to_user_id: string; text: string }
 
 export class SupabaseClient implements IApiProvider {
@@ -286,7 +287,7 @@ export class SupabaseClient implements IApiProvider {
   async reportPost(postId: string, reason: string): Promise<void> {
     const b: InsertReportBody = { reporter_id: this.userId, post_id: postId, reason: reason, status: "pending" }
     await this.request("/reports", b)
-    const n: Record<string, Object> = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: reason }
+    const n: Record<string, Object> = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: reason } as Record<string, Object>
     await this.request("/notifications", n)
   }
   async blockUser(userId: string): Promise<void> {
@@ -298,7 +299,8 @@ export class SupabaseClient implements IApiProvider {
   }
   async resolveReport(reportId: string, action: string, postId: string): Promise<void> {
     if (action === "delete") await this.deletePost(postId)
-    await this.request("/reports?id=eq." + reportId, { status: "resolved" } as Record<string, Object>)
+    const u: UpdateReportBody = { status: "resolved" }
+    await this.request("/reports?id=eq." + reportId, u)
   }
 
   async isAdmin(): Promise<boolean> {
