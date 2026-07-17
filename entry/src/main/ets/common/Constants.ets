@@ -21,6 +21,14 @@ export const C_GLASS = 'rgba(255,255,255,0.9)'
 export const C_LIKE = '#FF4757'
 export const C_COLLECT = '#FFD700'
 
+// ─── Dark Colors ────────────────────────────────────────
+export const C_DARK_BG = '#0D0D1A'
+export const C_DARK_CARD = '#1A1A2E'
+export const C_DARK_TEXT1 = '#F0F0F5'
+export const C_DARK_TEXT2 = '#A0A0B0'
+export const C_DARK_TEXT3 = '#6B6B80'
+export const C_DARK_BORDER = '#2A2A40'
+
 // ─── Spacing ─────────────────────────────────────────────
 export const S_XS = 4; export const S_SM = 8; export const S_MD = 12
 export const S_LG = 16; export const S_XL = 20; export const S_2XL = 24
@@ -57,6 +65,9 @@ export const TARGET_MODELS = ['通用', 'GPT-4', 'GPT-4o', 'Claude Opus', 'Claud
 
 // ─── Animation ───────────────────────────────────────────
 export const ANIM_DURATION_NORMAL = 250
+
+// ─── Dark mode helper ───────────────────────────────────
+export const DK = '_dk'
 
 // ─── Legacy COLORS class (backward compat) ───────────────
 export const AVATAR_COLORS: string[] = [

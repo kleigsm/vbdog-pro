@@ -1,4 +1,4 @@
-import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_RED, C_BORDER, S_XS, S_SM, S_MD, S_LG, S_XL, R_LG, F_CAPT, F_SM, F_BODY, F_H3 } from "../common/Constants"
+import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, C_RED, C_DARK_BORDER, C_BORDER, S_XS, S_SM, S_MD, S_LG, S_XL, R_LG, F_CAPT, F_SM, F_BODY, F_H3 } from "../common/Constants"
 import { VNotification } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
@@ -11,6 +11,7 @@ interface ConvItem {
 @Entry
 @Component
 export struct NotificationsPage {
+  @StorageLink("isDark") isDark: boolean = false
   @State tab: number = 0
   @State notifications: VNotification[] = []
   @State conversations: ConvItem[] = []
@@ -147,6 +148,6 @@ export struct NotificationsPage {
           }.layoutWeight(1).width("100%")
         }
       }
-    }.width("100%").height("100%").backgroundColor(C_BG)
+    }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 }

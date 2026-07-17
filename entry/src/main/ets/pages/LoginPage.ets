@@ -1,10 +1,11 @@
-import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_RED, C_BORDER, C_DARK, S_XS, S_SM, S_MD, S_LG, S_XL, R_MD, F_CAPT, F_SM, F_BODY, F_LG, F_H1, APP_NAME } from "../common/Constants"
+import { C_BG, C_DARK_BG, C_CARD, C_DARK_CARD, C_TEXT1, C_DARK_TEXT1, C_TEXT2, C_DARK_TEXT2, C_TEXT3, C_DARK_TEXT3, C_PRIMARY, C_RED, C_BORDER, C_DARK_BORDER, C_DARK, S_XS, S_SM, S_MD, S_LG, S_XL, R_MD, F_CAPT, F_SM, F_BODY, F_LG, F_H1, APP_NAME } from "../common/Constants"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
 import { promptAction } from "@kit.ArkUI"
 
 @Component
 export struct LoginPage {
+  @StorageLink("isDark") isDark: boolean = false
   @State phone: string = ""
   @State password: string = ""
   @State nickname: string = ""
@@ -17,25 +18,28 @@ export struct LoginPage {
       Column() {
         Text("🐤").fontSize(80)
         Text(APP_NAME).fontSize(F_H1).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold).margin({ top: S_MD })
-        Text("AI 创作者社区").fontSize(F_BODY).fontColor(C_TEXT2).margin({ top: S_SM })
+        Text("AI 创作者社区").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).margin({ top: S_SM })
       }.width("100%").margin({ top: 60 })
 
       Column() {
         if (this.isRegister) {
           TextInput({ placeholder: "昵称（给自己取个名字）", text: this.nickname })
-            .fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_CARD).borderRadius(R_MD)
-            .borderWidth(1).borderColor(C_BORDER).height(50).padding({ left: S_LG }).width("100%").maxLength(20)
+            .fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY)
+            .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(R_MD)
+            .borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER).height(50).padding({ left: S_LG }).width("100%").maxLength(20)
             .onChange((v: string) => { this.nickname = v; this.errorMsg = "" }).margin({ bottom: S_MD })
         }
 
         TextInput({ placeholder: "手机号（输入 11 位数字）", text: this.phone })
-          .fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_CARD).borderRadius(R_MD)
-          .borderWidth(1).borderColor(C_BORDER).height(50).padding({ left: S_LG }).width("100%").type(InputType.PhoneNumber).maxLength(11)
+          .fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY)
+          .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(R_MD)
+          .borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER).height(50).padding({ left: S_LG }).width("100%").type(InputType.PhoneNumber).maxLength(11)
           .onChange((v: string) => { this.phone = v; this.errorMsg = "" }).margin({ bottom: S_MD })
 
         TextInput({ placeholder: "密码（至少 6 位）", text: this.password })
-          .fontColor(C_TEXT1).fontSize(F_BODY).backgroundColor(C_CARD).borderRadius(R_MD)
-          .borderWidth(1).borderColor(C_BORDER).height(50).padding({ left: S_LG }).width("100%").type(InputType.Password)
+          .fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY)
+          .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(R_MD)
+          .borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER).height(50).padding({ left: S_LG }).width("100%").type(InputType.Password)
           .onChange((v: string) => { this.password = v; this.errorMsg = "" }).onSubmit(() => this.handleSubmit()).margin({ bottom: S_XL })
 
         if (this.errorMsg) {
@@ -51,8 +55,8 @@ export struct LoginPage {
       Text(this.isRegister ? "已有账号？去登录" : "没有账号？去注册").fontSize(F_SM).fontColor(C_PRIMARY)
         .margin({ top: S_LG }).onClick(() => { this.isRegister = !this.isRegister; this.errorMsg = "" })
 
-      Text("模拟登录，任意手机号即可").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: S_XL })
-    }.width("100%").height("100%").backgroundColor(C_BG)
+      Text("模拟登录，任意手机号即可").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: S_XL })
+    }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 
   async handleSubmit(): Promise<void> {

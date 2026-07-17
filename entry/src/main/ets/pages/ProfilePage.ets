@@ -1,4 +1,4 @@
-import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_RED, S_XS, S_SM, S_MD, S_LG, S_XL, S_2XL, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
+import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, C_RED, S_XS, S_SM, S_MD, S_LG, S_XL, S_2XL, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
 import { Post } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
@@ -8,6 +8,7 @@ import { promptAction } from "@kit.ArkUI"
 @Entry
 @Component
 export struct ProfilePage {
+  @StorageLink("isDark") isDark: boolean = false
   @State tab: number = 0
   @State nick: string = ""
   @State bio: string = ""
@@ -227,7 +228,7 @@ export struct ProfilePage {
           UserManager.clear(); AppStorage.set("isLoggedIn", false)
         })
       }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM }).backgroundColor(C_CARD)
-    }.width("100%").height("100%").backgroundColor(C_BG)
+    }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 
   getAvatarColor(nickname: string): string {

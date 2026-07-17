@@ -1,4 +1,4 @@
-import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_BORDER, S_XS, S_SM, S_MD, S_LG, S_XL, R_MD, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
+import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, C_DARK_BORDER, C_BORDER, S_XS, S_SM, S_MD, S_LG, S_XL, R_MD, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
 import { getApi } from "../common/ApiProvider"
 import { Conversation, Message } from "../common/Models"
 import { UserManager } from "../common/UserManager"
@@ -7,6 +7,7 @@ import router from "@ohos.router"
 @Entry
 @Component
 export struct MessagesPage {
+  @StorageLink("isDark") isDark: boolean = false
   @State conversations: Conversation[] = []
   @State messages: Message[] = []
   @State newMsg: string = ""
@@ -78,7 +79,7 @@ export struct MessagesPage {
           }, (conv: Conversation) => conv.userId)
         }.layoutWeight(1).width("100%")
       }
-    }.width("100%").height("100%").backgroundColor(C_BG)
+    }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 
   @Builder chatView() {
@@ -131,7 +132,7 @@ export struct MessagesPage {
         Text("发送").fontSize(F_BODY).fontColor(this.newMsg.trim() ? C_PRIMARY : C_TEXT3)
           .margin({ left: S_MD }).fontWeight(FontWeight.Bold).onClick(() => this.sendMsg())
       }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM }).backgroundColor(C_CARD)
-    }.width("100%").height("100%").backgroundColor(C_BG)
+    }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 
   async loadConversations(): Promise<void> {

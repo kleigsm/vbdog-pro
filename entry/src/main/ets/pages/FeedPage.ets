@@ -1,4 +1,4 @@
-import { C_PRIMARY, C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_BORDER, C_GLASS, S_XS, S_SM, S_MD, S_LG, S_XL, R_LG, F_CAPT, F_SM, F_BODY, CATEGORIES, Category } from "../common/Constants"
+﻿import { C_PRIMARY, C_BG, C_DARK_BG, C_CARD, C_DARK_CARD, C_TEXT1, C_DARK_TEXT1, C_TEXT2, C_DARK_TEXT2, C_TEXT3, C_DARK_TEXT3, C_BORDER, C_DARK_BORDER, C_GLASS, S_XS, S_SM, S_MD, S_LG, S_XL, R_LG, F_CAPT, F_SM, F_BODY, CATEGORIES, Category } from "../common/Constants"
 import { Post } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { OfflineQueue } from "../common/OfflineQueue"
@@ -25,11 +25,11 @@ struct PostCard {
   }
 
   getCatIcon(cat: string): string {
-    if (cat === "Prompt") return "💬"
-    if (cat === "Skill") return "🛠"
-    if (cat === "VibeCoding") return "⚡"
-    if (cat === "Tutorial") return "📉"
-    return "🔡"
+    if (cat === "Prompt") return "馃挰"
+    if (cat === "Skill") return "馃洜"
+    if (cat === "VibeCoding") return "鈿?
+    if (cat === "Tutorial") return "馃搲"
+    return "馃敗"
   }
 
   build() {
@@ -46,7 +46,7 @@ struct PostCard {
         .justifyContent(FlexAlign.Center)
 
         if (this.post.likeCount > 5000) {
-          Text("🔥 热门").fontSize(9).fontColor("#FFFFFF").fontWeight(FontWeight.Bold)
+          Text("馃敟 鐑棬").fontSize(9).fontColor("#FFFFFF").fontWeight(FontWeight.Bold)
             .padding({ left: S_SM, right: S_SM, top: 2, bottom: 2 })
             .backgroundColor("#FF4757").borderRadius(8)
             .position({ x: "60%", y: 8 })
@@ -64,10 +64,10 @@ struct PostCard {
 
         Row() {
           Row() {
-            Text(this.post.author?.nickname?.charAt(0) ?? "用").fontSize(11).fontColor("#FFF")
+            Text(this.post.author?.nickname?.charAt(0) ?? "鐢?).fontSize(11).fontColor("#FFF")
               .width(18).height(18).borderRadius(9).textAlign(TextAlign.Center)
               .backgroundColor(this.getAvatarColor(this.post.author?.nickname ?? ""))
-            Text(this.post.author?.nickname ?? "用户").fontSize(F_CAPT).fontColor(C_TEXT3)
+            Text(this.post.author?.nickname ?? "鐢ㄦ埛").fontSize(F_CAPT).fontColor(C_TEXT3)
               .margin({ left: S_XS }).maxLines(1)
           }.flexShrink(1)
           .onClick(() => {
@@ -79,7 +79,7 @@ struct PostCard {
           Text(this.post.likeCount > 999 ? (this.post.likeCount / 1000).toFixed(1) + "k" : this.post.likeCount.toString())
             .fontSize(F_CAPT).fontColor(this.post.liked ? "#FF4757" : C_TEXT3)
           if (this.post.commentCount > 0) {
-            Text("  💬" + this.post.commentCount).fontSize(F_CAPT).fontColor(C_TEXT3)
+            Text("  馃挰" + this.post.commentCount).fontSize(F_CAPT).fontColor(C_TEXT3)
           }
         }.width("100%").margin({ top: S_SM })
       }
@@ -113,6 +113,7 @@ struct SkeletonCard {
 @Entry
 @Component
 export struct FeedPage {
+  @StorageLink("isDark") isDark: boolean = false
   @State posts: Post[] = []
   @State activeCat: string = "all"
   @State sortNew: boolean = true
@@ -139,7 +140,7 @@ export struct FeedPage {
       this.posts = newPosts as Post[]
       this.distributePosts(this.posts)
     }).catch((_e: Error) => {
-      this.errorMsg = "加载失败，请检查网络后重试"
+      this.errorMsg = "鍔犺浇澶辫触锛岃妫€鏌ョ綉缁滃悗閲嶈瘯"
       this.posts = []
     }).finally(() => {
       this.loading = false
@@ -174,7 +175,7 @@ export struct FeedPage {
             }, (cat: Category) => cat.id)
           }.padding({ left: S_LG })
         }.scrollable(ScrollDirection.Horizontal).scrollBar(BarState.Off).layoutWeight(1)
-        Text(this.sortNew ? "最新" : "最热").fontSize(F_SM).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
+        Text(this.sortNew ? "鏈€鏂? : "鏈€鐑?).fontSize(F_SM).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
           .padding({ left: S_MD, right: S_LG, top: S_SM, bottom: S_SM })
           .onClick(() => { this.toggleSort() })
       }.width("100%").padding({ top: S_SM, bottom: S_SM }).backgroundColor(C_CARD)
@@ -191,12 +192,12 @@ export struct FeedPage {
           }.layoutWeight(1).width("100%").padding({ top: S_SM })
         } else if (this.posts.length === 0 && !this.loading) {
           Column() {
-            Text("📑").fontSize(48).margin({ bottom: S_MD })
-            Text(this.errorMsg ? this.errorMsg : "还没有帖子").fontSize(F_BODY).fontColor(C_TEXT2)
+            Text("馃搼").fontSize(48).margin({ bottom: S_MD })
+            Text(this.errorMsg ? this.errorMsg : "杩樻病鏈夊笘瀛?).fontSize(F_BODY).fontColor(C_TEXT2)
             if (!this.errorMsg) {
-              Text("快来发布第一条吧！").fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: S_XS })
+              Text("蹇潵鍙戝竷绗竴鏉″惂锛?).fontSize(F_CAPT).fontColor(C_TEXT3).margin({ top: S_XS })
             } else {
-              Button("重试").fontSize(F_SM).height(36).backgroundColor(C_PRIMARY).fontColor("#FFF")
+              Button("閲嶈瘯").fontSize(F_SM).height(36).backgroundColor(C_PRIMARY).fontColor("#FFF")
                 .borderRadius(18).margin({ top: S_MD })
                 .onClick(() => this.loadFeed())
             }
@@ -223,6 +224,6 @@ export struct FeedPage {
         setTimeout(() => { this.isRefreshing = false }, 1200)
       })
     }
-    .width("100%").height("100%").backgroundColor(C_BG)
+    .width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 }

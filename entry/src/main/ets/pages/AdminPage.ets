@@ -1,4 +1,4 @@
-import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_RED, S_SM, S_MD, S_LG, S_XL, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
+import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, C_RED, S_SM, S_MD, S_LG, S_XL, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
 import { Post } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
@@ -10,6 +10,7 @@ interface DialogResult { index: number }
 @Entry
 @Component
 export struct AdminPage {
+  @StorageLink("isDark") isDark: boolean = false
   @State postCount: number = 0
   @State userCount: number = 5
   @State allPosts: Post[] = []
@@ -102,7 +103,7 @@ export struct AdminPage {
           Column().height(40)
         }.width("100%")
       }.layoutWeight(1).width("100%")
-    }.width("100%").height("100%").backgroundColor(C_BG)
+    }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 
   formatTime(t: string): string {

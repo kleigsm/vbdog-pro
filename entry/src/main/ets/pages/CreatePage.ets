@@ -1,4 +1,4 @@
-import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_BLUE, C_BORDER, S_XS, S_SM, S_MD, S_LG, S_XL, R_MD, R_LG, F_CAPT, F_SM, F_BODY, F_LG, F_H3, CATEGORIES, TARGET_MODELS, HOT_TAGS, Category, VTag } from "../common/Constants"
+import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, C_BLUE, C_DARK_BORDER, C_BORDER, S_XS, S_SM, S_MD, S_LG, S_XL, R_MD, R_LG, F_CAPT, F_SM, F_BODY, F_LG, F_H3, CATEGORIES, TARGET_MODELS, HOT_TAGS, Category, VTag } from "../common/Constants"
 import { getApi } from "../common/ApiProvider"
 import { promptAction } from "@kit.ArkUI"
 import router from "@ohos.router"
@@ -7,6 +7,7 @@ import { preferences } from "@kit.ArkData"
 @Entry
 @Component
 export struct CreatePage {
+  @StorageLink("isDark") isDark: boolean = false
   @State title: string = ""
   @State content: string = ""
   @State promptText: string = ""
@@ -168,6 +169,6 @@ export struct CreatePage {
           Column().height(80)
         }.width("100%")
       }.layoutWeight(1).width("100%")
-    }.width("100%").height("100%").backgroundColor(C_BG)
+    }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 }

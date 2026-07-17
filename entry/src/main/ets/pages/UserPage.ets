@@ -1,4 +1,4 @@
-import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, S_SM, S_MD, S_LG, S_2XL, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
+import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, S_SM, S_MD, S_LG, S_2XL, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
 import { Post } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
@@ -8,6 +8,7 @@ import { promptAction } from "@kit.ArkUI"
 @Entry
 @Component
 struct UserPage {
+  @StorageLink("isDark") isDark: boolean = false
   @State userId: string = ""
   @State nick: string = ""
   @State bio: string = ""
@@ -106,7 +107,7 @@ struct UserPage {
           Column() { Text("暂无帖子").fontSize(F_BODY).fontColor(C_TEXT3).margin({ top: 40 }) }.width("100%").layoutWeight(1)
         }
       }
-    }.width("100%").height("100%").backgroundColor(C_BG)
+    }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 
   getAvatarColor(nickname: string): string {
