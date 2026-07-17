@@ -14,6 +14,8 @@ export interface IApiProvider {
   getComments(postId: string): Promise<Comment[]>
   addComment(postId: string, content: string, replyTo?: string): Promise<Comment>
   deleteComment(commentId: string): Promise<void>
+  getAllComments(): Promise<Comment[]>
+  getAllUsers(): Promise<User[]>
   likeComment(commentId: string): Promise<LikeResult>
   getUserProfile(userId: string): Promise<User>
   followUser(userId: string): Promise<FollowResult>

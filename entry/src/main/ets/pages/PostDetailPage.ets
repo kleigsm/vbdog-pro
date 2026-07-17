@@ -217,6 +217,20 @@ struct PostDetailPage {
               Text(this.post!.content).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).width("100%")
                 .padding({ left: S_LG, right: S_LG, top: S_SM }).lineHeight(22)
             }
+            if (this.post!.images && this.post!.images.length > 0) {
+              Text("📷 图片").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
+                .width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
+              Grid() {
+                ForEach(this.post!.images, (img: string) => {
+                  GridItem() {
+                    Image(img).width("100%").aspectRatio(1).objectFit(ImageFit.Cover).borderRadius(R_MD)
+                  }
+                }, (img: string) => img)
+              }
+              .columnsTemplate("1fr 1fr 1fr")
+              .columnsGap(4).rowsGap(4)
+              .width("100%").padding({ left: S_LG, right: S_LG, top: S_SM })
+            }
 
             // Category + model
             Row() {

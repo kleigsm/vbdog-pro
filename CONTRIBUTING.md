@@ -1,4 +1,4 @@
-﻿# VBDog Pro Git & Commit 规范
+# VBDog Pro Git & Commit 规范
 
 ## 分支策略
 

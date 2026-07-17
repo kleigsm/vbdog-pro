@@ -35,6 +35,11 @@ struct PostCard {
   build() {
     Column() {
       Stack() {
+        if (this.post.images && this.post.images.length > 0) {
+          Image(this.post.images[0]).width("100%").height(120)
+            .objectFit(ImageFit.Cover)
+            .borderRadius({ topLeft: R_LG, topRight: R_LG })
+        } else {
         Column() {
           Text(this.getCatIcon(this.post.category)).fontSize(36)
         }
@@ -44,6 +49,7 @@ struct PostCard {
           colors: [[this.getCatGradient(this.post.category)[0], 0], [this.getCatGradient(this.post.category)[1], 1]]
         })
         .justifyContent(FlexAlign.Center)
+        }
 
         if (this.post.likeCount > 5000) {
           Text("🔥 热门").fontSize(9).fontColor("#FFFFFF").fontWeight(FontWeight.Bold)
@@ -158,6 +164,7 @@ export struct FeedPage {
   }
 
   loadMore(): void {
+    if (this.loadingMore) return
     this.loadFeed()
   }
 
@@ -217,19 +224,27 @@ export struct FeedPage {
             }
           }.layoutWeight(1).width("100%").justifyContent(FlexAlign.Center)
         } else {
-          Row() {
-            List() {
-              ForEach(this.leftPosts, (post: Post) => {
-                ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
-              }, (post: Post) => post.id)
-            }.layoutWeight(1).padding({ left: S_MD, right: S_XS })
+          Column() {
+            Row() {
+              List() {
+                ForEach(this.leftPosts, (post: Post) => {
+                  ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
+                }, (post: Post) => post.id)
+              }.layoutWeight(1).padding({ left: S_MD, right: S_XS }).onReachEnd(() => { this.loadMore() })
 
-            List() {
-              ForEach(this.rightPosts, (post: Post) => {
-                ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
-              }, (post: Post) => post.id)
-            }.layoutWeight(1).padding({ left: S_XS, right: S_MD })
-          }.layoutWeight(1).width("100%").padding({ top: S_SM })
+              List() {
+                ForEach(this.rightPosts, (post: Post) => {
+                  ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
+                }, (post: Post) => post.id)
+              }.layoutWeight(1).padding({ left: S_XS, right: S_MD }).onReachEnd(() => { this.loadMore() })
+            }.layoutWeight(1).width("100%").padding({ top: S_SM })
+            if (this.loadingMore) {
+              LoadingProgress().width(24).height(24).color(C_PRIMARY).margin({ top: S_MD, bottom: S_XS })
+            }
+            if (!this.hasMore && this.posts.length > 0) {
+              Text("- END -").fontSize(F_CAPT).fontColor(C_TEXT3).width("100%").textAlign(TextAlign.Center).padding({ top: S_MD, bottom: S_LG })
+            }
+          }.layoutWeight(1).width("100%")
         }
       }
       .onRefreshing(() => {

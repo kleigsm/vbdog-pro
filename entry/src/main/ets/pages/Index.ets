@@ -38,7 +38,7 @@ struct Index {
     if (!this.appReady) {
       Column() {
         Column({ space: 16 }) {
-          Text("🐤").fontSize(80)
+          Text("🐕").fontSize(80)
           Text("VBDog Pro").fontSize(F_H1).fontWeight(FontWeight.Bold).fontColor(C_PRIMARY)
           Text("AI Prompt 创作者社区").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
           LoadingProgress().width(28).height(28).margin({ top: 24 }).color(C_PRIMARY)

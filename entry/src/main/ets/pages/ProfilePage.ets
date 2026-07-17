@@ -22,6 +22,10 @@ export struct ProfilePage {
   @State likedPosts: Post[] = []
   @State collectedPosts: Post[] = []
   @State loading: boolean = true
+  @State adminPostCount: number = 0
+  @State adminUserCount: number = 0
+  @State adminCommentCount: number = 0
+  @State adminReportCount: number = 0
 
   aboutToAppear(): void { this.refresh() }
 
@@ -52,6 +56,7 @@ export struct ProfilePage {
     this.fol = user?.followerCount ?? 0
     this.fow = user?.followingCount ?? 0
     this.loadPosts()
+    if (UserManager.isAdmin) this.loadAdminStats()
   }
 
   async loadPosts(): Promise<void> {
@@ -90,6 +95,16 @@ export struct ProfilePage {
     try {
       await getApi().deletePost(post.id)
       this.myPosts = this.myPosts.filter((p: Post) => p.id !== post.id)
+    } catch (_e) { }
+  }
+  async loadAdminStats(): Promise<void> {
+    try {
+      const posts = await getApi().getPosts("", "latest", 0)
+      this.adminPostCount = posts.length
+      this.adminUserCount = (await getApi().getAllUsers()).length
+      this.adminCommentCount = (await getApi().getAllComments()).length
+      const reports = await getApi().getReports()
+      this.adminReportCount = reports.length
     } catch (_e) { }
   }
 
@@ -144,9 +159,37 @@ export struct ProfilePage {
         }.width("100%").margin({ top: S_MD })
       }.width("100%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
+      // Admin panel (only for admin)
+      if (UserManager.isAdmin) {
+        Column() {
+          Row() {
+            Column() {
+              Text(this.adminPostCount.toString()).fontSize(20).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
+              Text("帖子").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }.layoutWeight(1).alignItems(HorizontalAlign.Center)
+            Column() {
+              Text(this.adminUserCount.toString()).fontSize(20).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
+              Text("用户").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }.layoutWeight(1).alignItems(HorizontalAlign.Center)
+            Column() {
+              Text(this.adminCommentCount.toString()).fontSize(20).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
+              Text("评论").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }.layoutWeight(1).alignItems(HorizontalAlign.Center)
+            Column() {
+              Text(this.adminReportCount.toString()).fontSize(20).fontColor(this.adminReportCount > 0 ? "#FF4757" : C_PRIMARY).fontWeight(FontWeight.Bold)
+              Text("举报").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }.layoutWeight(1).alignItems(HorizontalAlign.Center)
+          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM })
+          Button("🔰 进入管理后台").fontSize(F_BODY).fontColor("#FFFFFF").fontWeight(FontWeight.Bold)
+            .backgroundColor(C_PRIMARY).borderRadius(20).height(44).width("92%")
+            .onClick(() => { router.pushUrl({ url: "pages/AdminPage" }) })
+            .margin({ top: S_MD, bottom: S_LG })
+        }.width("100%").backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).margin({ top: S_MD }).borderRadius(16)
+      }
+
       // Tab bar
       Row() {
-        ForEach(["我的发布", "我的喜欢", "我的收藏"], (t: string, i: number) => {
+        ForEach(UserManager.isAdmin ? ["我的发布"] : ["我的发布", "我的喜欢", "我的收藏"], (t: string, i: number) => {
           Text(t).fontSize(F_BODY).fontColor(this.tab === i ? C_PRIMARY : C_TEXT2)
             .fontWeight(this.tab === i ? FontWeight.Bold : FontWeight.Normal)
             .layoutWeight(1).textAlign(TextAlign.Center).padding({ top: S_MD, bottom: S_MD })
@@ -163,13 +206,13 @@ export struct ProfilePage {
       // Content
       if (this.loading) {
         LoadingProgress().width(32).height(32).color(C_PRIMARY).margin({ top: 60 })
-      } else if (this.tab === 0) {
-        if (this.myPosts.length === 0) {
-          Column() { Text("暂无发布").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
-        } else {
-          List() {
-            ForEach(this.myPosts, (p: Post) => {
-              ListItem() {
+        } else if (this.tab === 0) {
+          if (this.myPosts.length === 0) {
+            Column() { Text("暂无发布").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
+          } else {
+            List() {
+              ForEach(this.myPosts, (p: Post) => {
+                ListItem() {
                 Row() {
                   Column() {
                     Text(p.title).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).maxLines(1).width("100%")
@@ -184,10 +227,10 @@ export struct ProfilePage {
             }, (p: Post) => p.id)
           }.layoutWeight(1).width("100%")
         }
-      } else if (this.tab === 1) {
+        } else if (this.tab === 1 && !UserManager.isAdmin) {
         if (this.likedPosts.length === 0) {
           Column() { Text("暂无喜欢").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).margin({ top: 60 }) }.width("100%").layoutWeight(1)
-        } else {
+        } else if (!UserManager.isAdmin) {
           List() {
             ForEach(this.likedPosts, (p: Post) => {
               ListItem() {

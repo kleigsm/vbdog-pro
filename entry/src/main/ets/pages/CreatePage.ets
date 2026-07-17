@@ -91,7 +91,7 @@ export struct CreatePage {
     this.submitting = true
     getApi().createPost({
       title: this.title.trim(), content: this.content.trim(), prompt: this.promptText.trim(),
-      category: this.category, model: this.targetModel
+      category: this.category, model: this.targetModel, images: this.imageUris.length > 0 ? this.imageUris : undefined
     }).then(() => {
       promptAction.showToast({ message: "发布成功！🎉", duration: 2000 })
       this.title = ""; this.content = ""; this.promptText = ""; this.tags = []

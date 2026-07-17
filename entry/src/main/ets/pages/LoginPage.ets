@@ -16,7 +16,7 @@ export struct LoginPage {
   build() {
     Column() {
       Column() {
-        Text("🐤").fontSize(80)
+        Text("🐕").fontSize(80)
         Text(APP_NAME).fontSize(F_H1).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold).margin({ top: S_MD })
         Text("AI 创作者社区").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).margin({ top: S_SM })
       }.width("100%").margin({ top: 60 })
