@@ -10,7 +10,7 @@ export interface Post {
   id: string; userId: string; title: string; content: string; prompt: string
   category: string; model: string; tags: string[]; likeCount: number; collectCount: number
   commentCount: number; shareCount: number; liked: boolean; collected: boolean
-  author: User | null; createdAt: string; updatedAt: string
+  images: string[]; author: User | null; createdAt: string; updatedAt: string
 }
 export interface Comment {
   id: string; postId: string; userId: string; content: string; replyTo: string | null
@@ -34,6 +34,7 @@ export interface LikeResult { liked: boolean; likeCount: number }
 export interface CollectResult { collected: boolean; collectCount: number }
 export interface FollowResult { following: boolean }
 export interface CreatePostData { title: string; content: string; prompt: string; category: string; model?: string }
+export interface CreatePostData { title: string; content: string; prompt: string; category: string; model?: string; images?: string[] }
 
 export const CATEGORIES: CategoryItem[] = [
   { key: "", label: "推荐", icon: "🔥" },
