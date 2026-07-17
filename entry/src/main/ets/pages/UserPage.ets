@@ -82,8 +82,13 @@ struct UserPage {
 
           Row() {
             Button("+ 关注").fontSize(F_BODY).fontColor("#FFFFFF").backgroundColor(C_PRIMARY)
-              .borderRadius(20).height(36).layoutWeight(1)
-              .onClick(() => { promptAction.showToast({ message: "已关注", duration: 1000 }) })
+            Button("屏蔽").fontSize(F_BODY).fontColor(C_RED).backgroundColor(C_CARD)
+              .borderRadius(20).height(36).layoutWeight(1).margin({ left: S_MD })
+              .borderWidth(1).borderColor(C_RED)
+              .onClick(() => {
+                getApi().blockUser(this.userId)
+                promptAction.showToast({ message: "已屏蔽" })
+              })
             Button("私信").fontSize(F_BODY).fontColor(C_PRIMARY).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
               .borderRadius(20).height(36).layoutWeight(1).margin({ left: S_MD })
               .borderWidth(1).borderColor(C_PRIMARY)

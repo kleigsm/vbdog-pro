@@ -35,6 +35,9 @@ export interface CollectResult { collected: boolean; collectCount: number }
 export interface FollowResult { following: boolean }
 export interface CreatePostData { title: string; content: string; prompt: string; category: string; model?: string; images?: string[] }
 
+export interface Report { id: string; reporterId: string; postId: string; reason: string; status: string; createdAt: string }
+export interface Block { id: string; blockerId: string; blockedId: string; createdAt: string }
+
 export const CATEGORIES: CategoryItem[] = [
   { key: "", label: "推荐", icon: "🔥" },
   { key: "Prompt", label: "Prompt", icon: "💬" },

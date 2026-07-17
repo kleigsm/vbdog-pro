@@ -286,6 +286,12 @@ export class SupabaseClient implements IApiProvider {
     const user = await this.getCurrentUser()
     return user.phone === "00000000000"
   }
+  async reportPost(postId: string, reason: string): Promise<void> {
+    await this.request("/reports", { reporter_id: this.userId, post_id: postId, reason: reason })
+  }
+  async blockUser(userId: string): Promise<void> {
+    await this.request("/blocks", { blocker_id: this.userId, blocked_id: userId })
+  }
 
   async adminDeletePost(postId: string): Promise<void> {
     if (!(await this.isAdmin())) throw new Error("Unauthorized")

@@ -190,9 +190,25 @@ struct PostDetailPage {
                 })
               if (this.isOwnPost()) {
                 Text("删除").fontSize(F_SM).fontColor(C_RED)
+                Text("举报").fontSize(F_SM).fontColor(C_TEXT3)
+                  .margin({ right: S_MD })
+                  .onClick(() => {
+                    getApi().reportPost(this.postId, "")
+                    promptAction.showToast({ message: "已举报" })
+                  })
+                Text("删除").fontSize(F_SM).fontColor(C_RED)
                   .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
                   .borderRadius(16).borderWidth(1).borderColor(C_RED)
                   .onClick(() => this.showDelete = true)
+                Blank()
+              } else {
+                Text("举报").fontSize(F_SM).fontColor(C_TEXT3)
+                  .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
+                  .borderRadius(16).borderWidth(1).borderColor(C_BORDER)
+                  .onClick(() => {
+                    getApi().reportPost(this.postId, "")
+                    promptAction.showToast({ message: "已举报" })
+                  })
               }
             }.width("100%").padding(S_LG).backgroundColor(C_CARD)
 
