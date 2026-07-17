@@ -118,6 +118,9 @@ export struct FeedPage {
   @State sortNew: boolean = true
   @State loading: boolean = false
   @State isRefreshing: boolean = false
+  @State page: number = 1
+  @State hasMore: boolean = true
+  @State loadingMore: boolean = false
   @State leftPosts: Post[] = []
   @State rightPosts: Post[] = []
   @State errorMsg: string = ""
@@ -131,19 +134,31 @@ export struct FeedPage {
     this.loadFeed()
   }
 
-  loadFeed(): void {
-    this.loading = true; this.errorMsg = ""
+  loadFeed(reset: boolean = false): void {
+    if (reset) { this.page = 1; this.hasMore = true; this.posts = [] }
+    if (!this.hasMore) return
+    this.loading = true; this.loadingMore = this.page > 1; this.errorMsg = ""
     const sort = this.sortNew ? "latest" : "hot"
     const cat = this.activeCat === "all" ? undefined : this.activeCat
-    getApi().getPosts(cat, sort, 0).then((newPosts: Post[]) => {
-      this.posts = newPosts as Post[]
+    getApi().getPosts(cat, sort, this.page - 1).then((newPosts: Post[]) => {
+      let list = newPosts as Post[]
+      if (list.length < 20) this.hasMore = false
+      if (this.page === 1) {
+        this.posts = list
+      } else {
+        this.posts = this.posts.concat(list)
+      }
       this.distributePosts(this.posts)
+      this.page++
     }).catch((_e: Error) => {
-      this.errorMsg = "加载失败，请检查网络后重试"
-      this.posts = []
+      if (this.page === 1) { this.errorMsg = "load failed"; this.posts = [] }
     }).finally(() => {
-      this.loading = false
+      this.loading = false; this.loadingMore = false
     })
+  }
+
+  loadMore(): void {
+    this.loadFeed()
   }
 
   distributePosts(list: Post[]): void {
@@ -155,7 +170,7 @@ export struct FeedPage {
   }
 
   toggleSort(): void {
-    this.sortNew = !this.sortNew; this.filterPosts(this.activeCat)
+    this.sortNew = !this.sortNew; this.page = 1; this.hasMore = true; this.filterPosts(this.activeCat)
   }
 
   build() {
@@ -219,7 +234,7 @@ export struct FeedPage {
       }
       .onRefreshing(() => {
         this.isRefreshing = true
-        this.loadFeed()
+        this.loadFeed(true)
         setTimeout(() => { this.isRefreshing = false }, 1200)
       })
     }
