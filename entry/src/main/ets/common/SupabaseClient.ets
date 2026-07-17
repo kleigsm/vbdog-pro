@@ -289,7 +289,7 @@ export class SupabaseClient implements IApiProvider {
   async reportPost(postId: string, reason: string): Promise<void> {
     const r1 = { reporter_id: this.userId, post_id: postId, reason: reason } as Object
     await this.request("/reports", r1)
-    const r2 = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: "new report: " + reason }
+    const r2: Record<string, Object> = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: "new report: " + reason }
     await this.request("/notifications", r2)
   }
   async blockUser(userId: string): Promise<void> {
