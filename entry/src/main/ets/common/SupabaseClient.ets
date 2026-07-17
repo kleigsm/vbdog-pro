@@ -1,6 +1,6 @@
 import { http } from "@kit.NetworkKit"
 import { IApiProvider } from "./ApiProvider"
-import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData } from "./Models"
+import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData, Report } from "./Models"
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./Constants"
 import { OfflineQueue } from "./OfflineQueue"
 
@@ -99,7 +99,7 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async createPost(data: CreatePostData): Promise<Post> {
-    const body: Record<string, Object> = {}
+    const body: Record<string, Object> = { images: data.images ?? [] }
     body["title"] = data.title; body["content"] = data.content; body["prompt"] = data.prompt
     body["category"] = data.category; body["model"] = data.model ?? "Claude"
     body["user_id"] = this.userId; body["tags"] = []
