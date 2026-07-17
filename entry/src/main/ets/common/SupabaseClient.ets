@@ -287,13 +287,13 @@ export class SupabaseClient implements IApiProvider {
     return user.phone === "00000000000"
   }
   async reportPost(postId: string, reason: string): Promise<void> {
-    const r1: Record<string, Object> = { reporter_id: this.userId, post_id: postId, reason: reason }
+    const r1 = { reporter_id: this.userId, post_id: postId, reason: reason } as Object
     await this.request("/reports", r1)
-    const r2: Record<string, Object> = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: "new report: " + reason }
+    const r2 = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: "new report: " + reason }
     await this.request("/notifications", r2)
   }
   async blockUser(userId: string): Promise<void> {
-    const b: Record<string, Object> = { blocker_id: this.userId, blocked_id: userId }
+    const b = { blocker_id: this.userId, blocked_id: userId } as Object
     await this.request("/blocks", b)
   }
   async getReports(): Promise<Report[]> {
@@ -301,7 +301,7 @@ export class SupabaseClient implements IApiProvider {
   }
   async resolveReport(reportId: string, action: string, postId: string): Promise<void> {
     if (action === "delete") await this.deletePost(postId)
-    const r: Record<string, Object> = { status: "resolved" }
+    const r = { status: "resolved" } as Object
     await this.request("/reports?id=eq." + reportId, r)
   }
 
