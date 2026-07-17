@@ -141,7 +141,7 @@ export struct FeedPage {
   }
 
   loadFeed(reset: boolean = false): void {
-    if (reset) { this.page = 1; this.hasMore = true; this.posts = [] }
+    if (reset) { this.page = 1; this.hasMore = true }
     if (!this.hasMore) return
     this.loading = true; this.loadingMore = this.page > 1; this.errorMsg = ""
     const sort = this.sortNew ? "latest" : "hot"
