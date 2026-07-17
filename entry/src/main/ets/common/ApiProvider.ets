@@ -1,4 +1,4 @@
-import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData, Report } from "./Models"
+﻿import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData } from "./Models"
 
 export interface IApiProvider {
   login(phone: string, password: string): Promise<User>

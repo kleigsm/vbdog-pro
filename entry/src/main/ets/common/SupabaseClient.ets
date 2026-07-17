@@ -13,6 +13,8 @@ interface InsertCommentBody { post_id: string; user_id: string; content: string;
 interface InsertCommentLikeBody { user_id: string; comment_id: string }
 interface InsertFollowBody { follower_id: string; following_id: string }
 interface ConversationRpcParams { p_user_id: string }
+interface InsertReportBody { reporter_id: string; post_id: string; reason: string; status: string }
+interface InsertBlockBody { blocker_id: string; blocked_id: string }
 interface InsertMessageBody { from_user_id: string; to_user_id: string; text: string }
 
 export class SupabaseClient implements IApiProvider {
@@ -99,7 +101,7 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async createPost(data: CreatePostData): Promise<Post> {
-    const body: Record<string, Object> = { images: data.images ?? [] }
+    const body: Record<string, Object> = {}
     body["title"] = data.title; body["content"] = data.content; body["prompt"] = data.prompt
     body["category"] = data.category; body["model"] = data.model ?? "Claude"
     body["user_id"] = this.userId; body["tags"] = []
@@ -281,21 +283,14 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async uploadFile(uri: string, bucket: string): Promise<string> { return "" }
-
-  async isAdmin(): Promise<boolean> {
-    const user = await this.getCurrentUser()
-    return user.phone === "00000000000"
-  }
-
-
   async reportPost(postId: string, reason: string): Promise<void> {
-    const r1: Record<string, Object> = { reporter_id: this.userId, post_id: postId, reason: reason }
-    await this.request("/reports", r1)
-    const r2: Record<string, Object> = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: "new report: " + reason }
-    await this.request("/notifications", r2)
+    const b: InsertReportBody = { reporter_id: this.userId, post_id: postId, reason: reason, status: "pending" }
+    await this.request("/reports", b)
+    const n: Record<string, Object> = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: reason }
+    await this.request("/notifications", n)
   }
   async blockUser(userId: string): Promise<void> {
-    const b: Record<string, Object> = { blocker_id: this.userId, blocked_id: userId }
+    const b: InsertBlockBody = { blocker_id: this.userId, blocked_id: userId }
     await this.request("/blocks", b)
   }
   async getReports(): Promise<Report[]> {
@@ -303,9 +298,14 @@ export class SupabaseClient implements IApiProvider {
   }
   async resolveReport(reportId: string, action: string, postId: string): Promise<void> {
     if (action === "delete") await this.deletePost(postId)
-    const r: Record<string, Object> = { status: "resolved" }
-    await this.request("/reports?id=eq." + reportId, r)
+    await this.request("/reports?id=eq." + reportId, { status: "resolved" } as Record<string, Object>)
   }
+
+  async isAdmin(): Promise<boolean> {
+    const user = await this.getCurrentUser()
+    return user.phone === "00000000000"
+  }
+
   async adminDeletePost(postId: string): Promise<void> {
     if (!(await this.isAdmin())) throw new Error("Unauthorized")
     await this.deleteRequest("/posts?id=eq." + postId)
@@ -331,6 +331,7 @@ export class SupabaseClient implements IApiProvider {
       tags: [], likeCount: raw["like_count"] as number,
       collectCount: raw["collect_count"] as number, commentCount: raw["comment_count"] as number,
       shareCount: raw["share_count"] as number, liked: false, collected: false,
+      images: raw["images"] as string[] ?? [],
       author: u ? {
         id: u["id"] as string, phone: u["phone"] as string, nickname: u["nickname"] as string,
         avatarUrl: u["avatar_url"] as string, avatarColor: u["avatar_color"] as string,

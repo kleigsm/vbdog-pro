@@ -21,16 +21,25 @@ export struct AdminPage {
   aboutToAppear(): void {
     if (!UserManager.isAdmin) { router.back(); return }
     this.loadData()
+    this.loadReports()
   }
 
   async loadData(): Promise<void> {
     this.loading = true
     try {
       const allPosts: Post[] = await getApi().getPosts("", "latest", 0) as Post[]
-      this.allPosts = allPosts
-      this.postCount = allPosts.length
+      this.allPosts = allPosts; this.postCount = allPosts.length
     } catch (_e) { this.allPosts = [] }
     finally { this.loading = false }
+  }
+  async loadReports(): Promise<void> {
+    try { this.reports = await getApi().getReports() } catch (_e) { this.reports = [] }
+  }
+  async handleReport(report: Report, action: string): Promise<void> {
+    try {
+      await getApi().resolveReport(report.id, action, report.postId)
+      this.reports = this.reports.filter((r: Report) => r.id !== report.id)
+    } catch (_e) { }
   }
 
   async doDelete(post: Post): Promise<void> {

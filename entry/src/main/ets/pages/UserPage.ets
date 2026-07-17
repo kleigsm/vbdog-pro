@@ -1,4 +1,4 @@
-import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, C_RED, S_SM, S_MD, S_LG, S_2XL, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
+import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, S_SM, S_MD, S_LG, S_2XL, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
 import { Post } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
@@ -41,7 +41,8 @@ struct UserPage {
     finally { this.loading = false }
   }
 
-  sendMsg(): void {
+  getApi().blockUser(this.userId)
+                promptAction.showToast({ message: "已屏蔽" }): void {
     router.pushUrl({ url: "pages/MessagesPage", params: { chatWith: this.userId, chatName: this.nick } })
   }
 
@@ -82,17 +83,13 @@ struct UserPage {
 
           Row() {
             Button("+ 关注").fontSize(F_BODY).fontColor("#FFFFFF").backgroundColor(C_PRIMARY)
-            Button("屏蔽").fontSize(F_BODY).fontColor(C_RED).backgroundColor(C_CARD)
-              .borderRadius(20).height(36).layoutWeight(1).margin({ left: S_MD })
-              .borderWidth(1).borderColor(C_RED)
-              .onClick(() => {
-                getApi().blockUser(this.userId)
-                promptAction.showToast({ message: "已屏蔽" })
-              })
-            Button("私信").fontSize(F_BODY).fontColor(C_PRIMARY).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
+              .borderRadius(20).height(36).layoutWeight(1)
+              .onClick(() => { promptAction.showToast({ message: "已关注", duration: 1000 }) })
+            Button("屏蔽").fontSize(F_BODY).fontColor(C_PRIMARY).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
               .borderRadius(20).height(36).layoutWeight(1).margin({ left: S_MD })
               .borderWidth(1).borderColor(C_PRIMARY)
-              .onClick(() => { this.sendMsg() })
+              .onClick(() => { this.getApi().blockUser(this.userId)
+                promptAction.showToast({ message: "已屏蔽" }) })
           }.width("100%").margin({ top: S_MD })
         }.width("100%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
