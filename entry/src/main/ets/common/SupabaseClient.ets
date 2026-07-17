@@ -287,13 +287,13 @@ export class SupabaseClient implements IApiProvider {
     return user.phone === "00000000000"
   }
   async reportPost(postId: string, reason: string): Promise<void> {
-    const r1 = { reporter_id: this.userId, post_id: postId, reason: reason } as Object
+    const r1 = { reporter_id: this.userId, post_id: postId, reason: reason: Record<string, Object> }
     await this.request("/reports", r1)
     const r2: Record<string, Object> = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: "new report: " + reason }
     await this.request("/notifications", r2)
   }
   async blockUser(userId: string): Promise<void> {
-    const b = { blocker_id: this.userId, blocked_id: userId } as Object
+    const b = { blocker_id: this.userId, blocked_id: userId: Record<string, Object> }
     await this.request("/blocks", b)
   }
   async getReports(): Promise<Report[]> {
@@ -301,7 +301,7 @@ export class SupabaseClient implements IApiProvider {
   }
   async resolveReport(reportId: string, action: string, postId: string): Promise<void> {
     if (action === "delete") await this.deletePost(postId)
-    const r = { status: "resolved" } as Object
+    const r = { status: "resolved": Record<string, Object> }
     await this.request("/reports?id=eq." + reportId, r)
   }
 
