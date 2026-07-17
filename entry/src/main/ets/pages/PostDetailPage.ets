@@ -160,7 +160,7 @@ struct PostDetailPage {
           Text("帖子详情").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
             .layoutWeight(1).textAlign(TextAlign.Center)
           Text("").width(24)
-        }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+        }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
         Scroll() {
           Column() {
@@ -195,7 +195,7 @@ struct PostDetailPage {
                   .borderRadius(16).borderWidth(1).borderColor(C_RED)
                   .onClick(() => this.showDelete = true)
               }
-            }.width("100%").padding(S_LG).backgroundColor(C_CARD)
+            }.width("100%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
             // Title
             Text(this.post!.title).fontSize(F_H2).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
@@ -336,7 +336,7 @@ struct PostDetailPage {
             }
             Row() {
               TextInput({ placeholder: this.replyToUserName ? "回复 @" + this.replyToUserName + "..." : "写下你的评论...", text: this.commentText })
-                .fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY).backgroundColor(C_CARD).borderRadius(20)
+                .fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontSize(F_BODY).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(20)
                 .borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER).layoutWeight(1).height(40).padding({ left: S_LG })
                 .onChange((v: string) => { this.commentText = v })
                 .onSubmit(() => { this.submitComment() })
@@ -344,7 +344,7 @@ struct PostDetailPage {
                 .margin({ left: S_MD }).fontWeight(FontWeight.Bold)
                 .onClick(() => { this.submitComment() })
             }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM })
-            .backgroundColor(C_CARD).borderWidth({ top: 0.5 }).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
+            .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderWidth({ top: 0.5 }).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
           }.width("100%")
         }
       }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
@@ -361,7 +361,7 @@ struct PostDetailPage {
               Button("确认删除").width("45%").height(42).backgroundColor(C_RED).fontColor("#FFF").borderRadius(10)
                 .onClick(() => this.doDelete())
             }.width("100%").justifyContent(FlexAlign.Center)
-          }.width("80%").padding(24).backgroundColor(C_CARD).borderRadius(16)
+          }.width("80%").padding(24).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(16)
         }.width("100%").height("100%").backgroundColor("#00000030").justifyContent(FlexAlign.Center)
         .onClick(() => this.showDelete = false)
       }

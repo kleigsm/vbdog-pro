@@ -142,7 +142,7 @@ export struct ProfilePage {
             Text("获赞").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
           }.margin({ left: S_2XL })
         }.width("100%").margin({ top: S_MD })
-      }.width("100%").padding(S_LG).backgroundColor(C_CARD)
+      }.width("100%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       // Tab bar
       Row() {
@@ -158,7 +158,7 @@ export struct ProfilePage {
               else this.loadCollected()
             })
         }, (_t: string, i: number) => i.toString())
-      }.width("100%").backgroundColor(C_CARD)
+      }.width("100%").backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
       // Content
       if (this.loading) {
@@ -227,7 +227,7 @@ export struct ProfilePage {
         Text("退出登录").fontSize(F_SM).fontColor(C_RED).onClick(() => {
           UserManager.clear(); AppStorage.set("isLoggedIn", false)
         })
-      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM }).backgroundColor(C_CARD)
+      }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
     }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
 
