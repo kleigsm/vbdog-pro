@@ -1,6 +1,6 @@
 import { http } from "@kit.NetworkKit"
 import { IApiProvider } from "./ApiProvider"
-import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData } from "./Models"
+import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData, Report } from "./Models"
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./Constants"
 import { OfflineQueue } from "./OfflineQueue"
 
@@ -287,18 +287,22 @@ export class SupabaseClient implements IApiProvider {
     return user.phone === "00000000000"
   }
   async reportPost(postId: string, reason: string): Promise<void> {
-    await this.request("/reports", { reporter_id: this.userId, post_id: postId, reason: reason })
-    await this.request("/notifications", { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: "new report: " + reason })
+    const r1: Record<string, Object> = { reporter_id: this.userId, post_id: postId, reason: reason }
+    await this.request("/reports", r1)
+    const r2: Record<string, Object> = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: "new report: " + reason }
+    await this.request("/notifications", r2)
   }
   async blockUser(userId: string): Promise<void> {
-    await this.request("/blocks", { blocker_id: this.userId, blocked_id: userId })
+    const b: Record<string, Object> = { blocker_id: this.userId, blocked_id: userId }
+    await this.request("/blocks", b)
   }
   async getReports(): Promise<Report[]> {
     return await this.request("/reports?select=*&status=eq.pending&order=created_at.desc") as Report[]
   }
   async resolveReport(reportId: string, action: string, postId: string): Promise<void> {
     if (action === "delete") await this.deletePost(postId)
-    await this.request("/reports?id=eq." + reportId, { status: "resolved" })
+    const r: Record<string, Object> = { status: "resolved" }
+    await this.request("/reports?id=eq." + reportId, r)
   }
 
   async adminDeletePost(postId: string): Promise<void> {
