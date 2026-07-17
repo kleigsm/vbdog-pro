@@ -1,6 +1,6 @@
 import { http } from "@kit.NetworkKit"
 import { IApiProvider } from "./ApiProvider"
-import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData, Report } from "./Models"
+import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData } from "./Models"
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./Constants"
 import { OfflineQueue } from "./OfflineQueue"
 
@@ -286,14 +286,16 @@ export class SupabaseClient implements IApiProvider {
     const user = await this.getCurrentUser()
     return user.phone === "00000000000"
   }
+
+
   async reportPost(postId: string, reason: string): Promise<void> {
-    const r1 = { reporter_id: this.userId, post_id: postId, reason: reason: Record<string, Object> }
+    const r1: Record<string, Object> = { reporter_id: this.userId, post_id: postId, reason: reason }
     await this.request("/reports", r1)
     const r2: Record<string, Object> = { user_id: "a283b5ef-1803-4a50-8791-5fe0b52459be", from_user_id: this.userId, type: "report", related_id: postId, content: "new report: " + reason }
     await this.request("/notifications", r2)
   }
   async blockUser(userId: string): Promise<void> {
-    const b = { blocker_id: this.userId, blocked_id: userId: Record<string, Object> }
+    const b: Record<string, Object> = { blocker_id: this.userId, blocked_id: userId }
     await this.request("/blocks", b)
   }
   async getReports(): Promise<Report[]> {
@@ -301,10 +303,9 @@ export class SupabaseClient implements IApiProvider {
   }
   async resolveReport(reportId: string, action: string, postId: string): Promise<void> {
     if (action === "delete") await this.deletePost(postId)
-    const r = { status: "resolved": Record<string, Object> }
+    const r: Record<string, Object> = { status: "resolved" }
     await this.request("/reports?id=eq." + reportId, r)
   }
-
   async adminDeletePost(postId: string): Promise<void> {
     if (!(await this.isAdmin())) throw new Error("Unauthorized")
     await this.deleteRequest("/posts?id=eq." + postId)
@@ -330,7 +331,6 @@ export class SupabaseClient implements IApiProvider {
       tags: [], likeCount: raw["like_count"] as number,
       collectCount: raw["collect_count"] as number, commentCount: raw["comment_count"] as number,
       shareCount: raw["share_count"] as number, liked: false, collected: false,
-      images: raw["images"] as string[] ?? [],
       author: u ? {
         id: u["id"] as string, phone: u["phone"] as string, nickname: u["nickname"] as string,
         avatarUrl: u["avatar_url"] as string, avatarColor: u["avatar_color"] as string,
