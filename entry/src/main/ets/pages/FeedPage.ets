@@ -36,7 +36,10 @@ struct PostCard {
   build() {
     Column() {
       Stack() {
-        Column() {
+        if (this.post.images && this.post.images.length > 0) {
+        Image(this.post.images[0]).width("100%").height(120).objectFit(ImageFit.Cover).borderRadius({ topLeft: R_LG, topRight: R_LG })
+      }
+      Column() {
           Text(this.getCatIcon(this.post.category)).fontSize(36)
         }
         .width("100%").height(120).borderRadius({ topLeft: R_LG, topRight: R_LG })
@@ -54,6 +57,9 @@ struct PostCard {
         }
       }
 
+      if (this.post.images && this.post.images.length > 0) {
+        Image(this.post.images[0]).width("100%").height(120).objectFit(ImageFit.Cover).borderRadius({ topLeft: R_LG, topRight: R_LG })
+      }
       Column() {
         Text(this.post.title).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
           .maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis }).width("100%").lineHeight(20)
@@ -193,7 +199,10 @@ export struct FeedPage {
             }.layoutWeight(1).padding({ left: S_XS, right: S_MD })
           }.layoutWeight(1).width("100%").padding({ top: S_SM })
         } else if (this.posts.length === 0 && !this.loading) {
-          Column() {
+          if (this.post.images && this.post.images.length > 0) {
+        Image(this.post.images[0]).width("100%").height(120).objectFit(ImageFit.Cover).borderRadius({ topLeft: R_LG, topRight: R_LG })
+      }
+      Column() {
             Text("📑").fontSize(48).margin({ bottom: S_MD })
             Text(this.errorMsg ? this.errorMsg : "还没有帖子").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
             if (!this.errorMsg) {

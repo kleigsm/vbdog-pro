@@ -207,6 +207,13 @@ struct PostDetailPage {
                 .padding({ left: S_LG, right: S_LG, top: S_SM }).lineHeight(22)
             }
 
+            if (this.post!.images && this.post!.images.length > 0) {
+              Row() {
+                ForEach(this.post!.images.slice(0, 9), (img: string) => {
+                  Image(img).width(100).height(100).borderRadius(8).objectFit(ImageFit.Cover).margin(4)
+                }, (img: string) => img)
+              }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM })
+            }
             // Category + model
             Row() {
               Text(this.post!.category === "Prompt" ? "💬" : this.post!.category === "Skill" ? "🛠" : this.post!.category === "VibeCoding" ? "⚡" : "📉")
