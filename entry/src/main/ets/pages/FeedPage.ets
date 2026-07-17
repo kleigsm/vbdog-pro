@@ -137,15 +137,15 @@ export struct FeedPage {
 
   filterPosts(catId: string): void {
     this.activeCat = catId
-    this.loadFeed()
+    this.loadFeed(true)
   }
 
   loadFeed(reset: boolean = false): void {
     if (reset) { this.page = 1; this.hasMore = true }
     if (!this.hasMore) return
     this.loading = true; this.loadingMore = this.page > 1; this.errorMsg = ""
+    const cat: string | undefined = this.activeCat === "all" ? undefined : this.activeCat
     const sort = this.sortNew ? "latest" : "hot"
-    const cat = this.activeCat === "all" ? undefined : this.activeCat
     getApi().getPosts(cat, sort, this.page - 1).then((newPosts: Post[]) => {
       let list = newPosts as Post[]
       if (list.length < 20) this.hasMore = false
