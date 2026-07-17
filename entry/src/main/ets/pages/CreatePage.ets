@@ -187,6 +187,25 @@ export struct CreatePage {
             }
           }.width("100%").padding({ left: S_LG, right: S_LG, top: S_LG })
 
+          Column() {
+            Text('[+] Add Images (max 9)').fontSize(F_SM).fontColor(C_TEXT2).margin({ bottom: S_SM }).width('100%')
+            Row() {
+              Column() { Text('+').fontSize(28).fontColor(C_PRIMARY) }
+              .width(64).height(64).borderRadius(R_MD).backgroundColor(C_CARD).borderWidth(1).borderColor(C_BORDER)
+              .justifyContent(FlexAlign.Center).margin({ right: S_SM })
+              .onClick(() => { this.pickImages() })
+              ForEach(this.imageUris, (uri: string, idx: number) => {
+                Stack() {
+                  Image(uri).width(64).height(64).borderRadius(R_MD).objectFit(ImageFit.Cover)
+                  Text('x').fontSize(12).fontColor('#FFF').width(18).height(18)
+                    .borderRadius(9).backgroundColor('#FF4757').textAlign(TextAlign.Center)
+                    .position({ x: 50, y: 0 })
+                    .onClick(() => { this.removeImage(idx) })
+                }.margin({ right: S_SM })
+              }, (uri: string, idx: number) => idx.toString())
+            }
+          }.width('100%').padding({ left: S_LG, right: S_LG, top: S_LG })
+
           Column().height(80)
         }.width("100%")
       }.layoutWeight(1).width("100%")
