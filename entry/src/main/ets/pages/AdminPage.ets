@@ -17,14 +17,10 @@ export struct AdminPage {
   @State loading: boolean = true
   @State deletingId: string = ""
   @State reports: Report[] = []
-  @State tab: number = 0
 
   aboutToAppear(): void {
     if (!UserManager.isAdmin) { router.back(); return }
     this.loadData()
-  async loadReports(): Promise<void> { try { this.reports = await getApi().getReports() } catch (_e) { this.reports = [] } }
-  async handleReport(report: Report, action: string): Promise<void> { try { await getApi().resolveReport(report.id, action, report.postId); this.reports = this.reports.filter((r: Report) => r.id !== report.id); if (action === "delete") { this.allPosts = this.allPosts.filter((p: Post) => p.id !== report.postId); this.postCount-- } } catch (_e) { } }
-    this.loadReports()
   }
 
   async loadData(): Promise<void> {
