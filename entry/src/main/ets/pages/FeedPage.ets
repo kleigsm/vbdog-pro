@@ -7,6 +7,7 @@ import router from "@ohos.router"
 @Component
 struct PostCard {
   @ObjectLink post: Post
+  @StorageLink("isDark") isDark: boolean = false
 
   getCatColor(cat: string): string {
     if (cat === "Prompt") return "#E3F2FD"
@@ -98,6 +99,7 @@ struct PostCard {
 
 @Component
 struct SkeletonCard {
+  @StorageLink("isDark") isDark: boolean = false
   build() {
     Column() {
       Column().width("100%").height(120).backgroundColor("#E8E8ED").borderRadius({ topLeft: R_LG, topRight: R_LG })
