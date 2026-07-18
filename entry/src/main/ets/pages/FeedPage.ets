@@ -260,11 +260,13 @@ export struct FeedPage {
 
     if (this.showBackTop) {
       Button() {
-        Text("⬆").fontSize(20).fontColor("#FFFFFF")
+        Text("⬆").fontSize(18).fontColor("#FFFFFF")
       }
-      .width(44).height(44).borderRadius(22)
-      .backgroundColor(C_PRIMARY).shadow({ radius: 8, color: "#00000020", offsetY: 2 })
-      .position({ x: "85%", y: "78%" })
+      .width(48).height(48).borderRadius(24)
+      .backgroundColor("#66000000")
+      .backdropBlur(8)
+      .shadow({ radius: 12, color: "#00000030", offsetY: 4 })
+      .position({ x: "85%", y: "76%" })
       .onClick(() => {
         this.feedScroller.scrollToIndex(0)
         this.showBackTop = false
