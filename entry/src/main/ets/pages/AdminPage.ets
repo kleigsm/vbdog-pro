@@ -220,6 +220,26 @@ export struct AdminPage {
             }, (u: User) => u.id)
           }
 
+          // Reports section
+          if (this.reports.length > 0) {
+            Text("举报处理 (" + this.reports.length + ")").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+              .width("100%").padding({ left: S_LG, top: S_LG })
+            ForEach(this.reports, (r: Report) => {
+              Row() {
+                Column() {
+                  Text(r.reason ?? "举报").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium)
+                  Text(r.postId).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+                }.layoutWeight(1).alignItems(HorizontalAlign.Start)
+                Button("忽略").fontSize(11).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
+                  .borderRadius(12).height(28).padding({ left: S_MD, right: S_MD })
+                  .onClick(() => this.handleReport(r, "dismiss"))
+                Button("删帖").fontSize(11).fontColor("#FFFFFF").backgroundColor(C_RED)
+                  .borderRadius(12).height(28).margin({ left: S_SM }).padding({ left: S_MD, right: S_MD })
+                  .onClick(() => this.handleReport(r, "delete"))
+              }.width("100%").padding(S_LG)
+            }, (r: Report) => r.id)
+          }
+
           Column().height(40)
         }.width("100%")
       }.layoutWeight(1).width("100%")
