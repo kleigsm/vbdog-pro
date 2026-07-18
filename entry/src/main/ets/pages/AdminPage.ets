@@ -106,6 +106,19 @@ export struct AdminPage {
             }.width("48%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(R_LG).margin({ left: "4%" })
           }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD })
 
+          // Stats cards - Row 2
+          Row() {
+            Column() {
+              Text(this.allComments.length.toString()).fontSize(28).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
+              Text("总评论").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }.width("48%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(R_LG)
+
+            Column() {
+              Text(this.reports.length.toString()).fontSize(28).fontColor(C_PRIMARY).fontWeight(FontWeight.Bold)
+              Text("总举报").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }.width("48%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(R_LG).margin({ left: "4%" })
+          }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM })
+
           if (this.tab === 0) {
           // Post list
           Text("帖子管理").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
