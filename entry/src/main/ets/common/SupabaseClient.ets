@@ -109,8 +109,8 @@ export class SupabaseClient implements IApiProvider {
     return rows[0]
   }
 
-  async getPosts(category?: string, sort?: string, page?: number): Promise<Post[]> {
-    let query = "/posts?select=*,users(*)&limit=20&offset=" + ((page ?? 0) * 20).toString()
+  async getPosts(category?: string, sort?: string, page?: number, limit?: number): Promise<Post[]> {
+    let query = "/posts?select=*,users(*)&limit=" + (limit ?? 20).toString() + "&offset=" + ((page ?? 0) * 20).toString()
     if (category) query += "&category=eq." + category
     query += sort === "hot" ? "&order=like_count.desc" : "&order=created_at.desc"
     const rows = await this.request(query) as Record<string, Object>[]

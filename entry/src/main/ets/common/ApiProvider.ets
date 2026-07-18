@@ -5,7 +5,7 @@ export interface IApiProvider {
   register(phone: string, nickname: string, password: string): Promise<User>
   getCurrentUser(): Promise<User>
   updateProfile(data: Partial<User>): Promise<User>
-  getPosts(category?: string, sort?: string, page?: number): Promise<Post[]>
+  getPosts(category?: string, sort?: string, page?: number, limit?: number): Promise<Post[]>
   getPostDetail(postId: string): Promise<Post>
   createPost(data: CreatePostData): Promise<Post>
   deletePost(postId: string): Promise<void>

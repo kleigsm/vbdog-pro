@@ -32,7 +32,7 @@ export struct AdminPage {
   async loadData(): Promise<void> {
     this.loading = true
     try {
-      const allPosts: Post[] = await getApi().getPosts("", "latest", 0) as Post[]
+      const allPosts: Post[] = await getApi().getPosts("", "latest", 0, 200) as Post[]
       this.allPosts = allPosts; this.postCount = allPosts.length
     } catch (_e) { this.allPosts = [] }
     finally { this.loading = false }
