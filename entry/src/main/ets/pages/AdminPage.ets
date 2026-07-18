@@ -1,5 +1,5 @@
 import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, C_RED, S_SM, S_MD, S_LG, S_XL, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
-import { Post } from "../common/Models"
+import { Post, Comment, User, Report } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
 import router from "@ohos.router"
@@ -16,20 +16,41 @@ export struct AdminPage {
   @State allPosts: Post[] = []
   @State loading: boolean = true
   @State deletingId: string = ""
+  @State allComments: Comment[] = []
+  @State allUsers: User[] = []
+  @State reports: Report[] = []
+  @State tab: number = 0
 
   aboutToAppear(): void {
     if (!UserManager.isAdmin) { router.back(); return }
     this.loadData()
+    this.loadComments()
+    this.loadUsers()
+    this.loadReports()
   }
 
   async loadData(): Promise<void> {
     this.loading = true
     try {
       const allPosts: Post[] = await getApi().getPosts("", "latest", 0) as Post[]
-      this.allPosts = allPosts
-      this.postCount = allPosts.length
+      this.allPosts = allPosts; this.postCount = allPosts.length
     } catch (_e) { this.allPosts = [] }
     finally { this.loading = false }
+  }
+  async loadComments(): Promise<void> {
+    try { this.allComments = await getApi().getAllComments() } catch (_e) { this.allComments = [] }
+  }
+  async loadUsers(): Promise<void> {
+    try { this.allUsers = await getApi().getAllUsers() } catch (_e) { this.allUsers = [] }
+  }
+  async loadReports(): Promise<void> {
+    try { this.reports = await getApi().getReports() } catch (_e) { this.reports = [] }
+  }
+  async deleteComment(id: string): Promise<void> {
+    try { await getApi().adminDeleteComment(id); this.allComments = this.allComments.filter((c: Comment) => c.id !== id) } catch (_e) { }
+  }
+  async handleReport(report: Report, action: string): Promise<void> {
+    try { await getApi().resolveReport(report.id, action, report.postId); this.reports = this.reports.filter((r: Report) => r.id !== report.id) } catch (_e) { }
   }
 
   async doDelete(post: Post): Promise<void> {
@@ -60,8 +81,19 @@ export struct AdminPage {
         Text("").width(24)
       }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
 
+      // Tab bar
+      Row() {
+        ForEach(["Posts", "Comments", "Users", "Reports" + (this.reports.length > 0 ? "(" + this.reports.length + ")" : "")], (t: string, i: number) => {
+          Text(t).fontSize(F_SM).fontColor(this.tab === i ? C_PRIMARY : (this.isDark ? C_DARK_TEXT2 : C_TEXT2))
+            .fontWeight(this.tab === i ? FontWeight.Bold : FontWeight.Normal)
+            .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
+            .onClick(() => { this.tab = i })
+        }, (_t: string, i: number) => i.toString())
+      }.width("100%").backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
+
       Scroll() {
         Column() {
+          if (this.tab === 0) {
           // Stats cards
           Row() {
             Column() {
@@ -99,6 +131,16 @@ export struct AdminPage {
               }.width("100%").padding(S_LG)
             }, (p: Post) => p.id)
           }
+
+          } else if (this.tab === 1) {
+          if (this.allComments.length === 0) { Text("No comments").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).width("100%").textAlign(TextAlign.Center).padding(40) }
+          else { ForEach(this.allComments, (c: Comment) => { Row() { Column() { Text(c.content).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).maxLines(2); Text((c.author?.nickname ?? "user") + " . " + c.createdAt).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3) }.layoutWeight(1).alignItems(HorizontalAlign.Start); Button("Delete").fontSize(11).fontColor("#FFFFFF").backgroundColor(C_RED).borderRadius(12).height(28).padding({ left: S_MD, right: S_MD }).onClick(() => this.deleteComment(c.id)) }.width("100%").padding(S_LG) }, (c: Comment) => c.id) }
+          } else if (this.tab === 2) {
+          if (this.allUsers.length === 0) { Text("No users").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).width("100%").textAlign(TextAlign.Center).padding(40) }
+          else { ForEach(this.allUsers, (u: User) => { Row() { Text(u.nickname).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium).layoutWeight(1); Text("Lv." + u.level).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3); Button("Block").fontSize(11).fontColor("#FFFFFF").backgroundColor(C_RED).borderRadius(12).height(28).margin({ left: S_SM }).padding({ left: S_MD, right: S_MD }).onClick(() => { getApi().blockUser(u.id) }) }.width("100%").padding(S_LG) }, (u: User) => u.id) }
+          } else {
+          if (this.reports.length === 0) { Text("No reports").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).width("100%").textAlign(TextAlign.Center).padding(40) }
+          else { ForEach(this.reports, (r: Report) => { Row() { Column() { Text(r.reason ?? "report").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium); Text(r.postId).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3) }.layoutWeight(1).alignItems(HorizontalAlign.Start); Button("Dismiss").fontSize(11).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(12).height(28).padding({ left: S_MD, right: S_MD }).onClick(() => this.handleReport(r, "dismiss")); Button("Delete").fontSize(11).fontColor("#FFFFFF").backgroundColor(C_RED).borderRadius(12).height(28).margin({ left: S_SM }).padding({ left: S_MD, right: S_MD }).onClick(() => this.handleReport(r, "delete")) }.width("100%").padding(S_LG) }, (r: Report) => r.id) } }
 
           Column().height(40)
         }.width("100%")
