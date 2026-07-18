@@ -239,7 +239,7 @@ export struct FeedPage {
                 ForEach(this.rightPosts, (post: Post) => {
                   ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
                 }, (post: Post) => post.id)
-              }.layoutWeight(1).padding({ left: S_XS, right: S_MD }).onReachEnd(() => { this.loadMore() })
+              }.layoutWeight(1).padding({ left: S_XS, right: S_MD }).onReachEnd(() => { this.loadMore() }).onScroll((offset: number, state: ScrollState) => { this.showBackTop = offset > 300 })
             }.layoutWeight(1).width("100%").padding({ top: S_SM })
             if (this.loadingMore) {
               LoadingProgress().width(24).height(24).color(C_PRIMARY).margin({ top: S_MD, bottom: S_XS })
@@ -263,8 +263,7 @@ export struct FeedPage {
         Text("⬆").fontSize(18).fontColor("#FFFFFF")
       }
       .width(48).height(48).borderRadius(24)
-      .backgroundColor("#66000000")
-      .backdropBlur(8)
+      .backgroundColor("#99000000")
       .shadow({ radius: 12, color: "#00000030", offsetY: 4 })
       .position({ x: "85%", y: "76%" })
       .onClick(() => {
