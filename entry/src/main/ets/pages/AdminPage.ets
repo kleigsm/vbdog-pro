@@ -1,5 +1,5 @@
 import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEXT2, C_TEXT2, C_DARK_TEXT3, C_TEXT3, C_PRIMARY, C_RED, S_SM, S_MD, S_LG, S_XL, R_LG, F_CAPT, F_SM, F_BODY, F_LG } from "../common/Constants"
-import { Post, Comment, User, Report } from "../common/Models"
+import { Post } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
 import router from "@ohos.router"
@@ -16,10 +16,6 @@ export struct AdminPage {
   @State allPosts: Post[] = []
   @State loading: boolean = true
   @State deletingId: string = ""
-  @State allComments: Comment[] = []
-  @State allUsers: User[] = []
-  @State reports: Report[] = []
-  @State tab: number = 0
 
   aboutToAppear(): void {
     if (!UserManager.isAdmin) { router.back(); return }
@@ -102,57 +98,6 @@ export struct AdminPage {
                 }
               }.width("100%").padding(S_LG)
             }, (p: Post) => p.id)
-          }
-
-          } else if (this.tab === 1) {
-          if (this.allComments.length === 0) {
-            Text("No comments").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).width("100%").textAlign(TextAlign.Center).padding(40)
-          } else {
-            ForEach(this.allComments, (c: Comment) => {
-              Row() {
-                Column() {
-                  Text(c.content).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).maxLines(2)
-                  Text((c.author?.nickname ?? "user") + " . " + c.createdAt).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
-                }.layoutWeight(1).alignItems(HorizontalAlign.Start)
-                Button("Delete").fontSize(11).fontColor("#FFFFFF").backgroundColor(C_RED)
-                  .borderRadius(12).height(28).padding({ left: S_MD, right: S_MD })
-                  .onClick(() => this.deleteComment(c.id))
-              }.width("100%").padding(S_LG)
-            }, (c: Comment) => c.id)
-          }
-          } else if (this.tab === 2) {
-          if (this.allUsers.length === 0) {
-            Text("No users").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).width("100%").textAlign(TextAlign.Center).padding(40)
-          } else {
-            ForEach(this.allUsers, (u: User) => {
-              Row() {
-                Text(u.nickname).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium).layoutWeight(1)
-                Text("Lv." + u.level).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
-                Button("Block").fontSize(11).fontColor("#FFFFFF").backgroundColor(C_RED)
-                  .borderRadius(12).height(28).margin({ left: S_SM }).padding({ left: S_MD, right: S_MD })
-                  .onClick(() => { getApi().blockUser(u.id) })
-              }.width("100%").padding(S_LG)
-            }, (u: User) => u.id)
-          }
-          } else if (this.tab === 3) {
-          if (this.reports.length === 0) {
-            Text("No reports").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).width("100%").textAlign(TextAlign.Center).padding(40)
-          } else {
-            ForEach(this.reports, (r: Report) => {
-              Row() {
-                Column() {
-                  Text(r.reason ?? "report").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium)
-                  Text(r.postId).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
-                }.layoutWeight(1).alignItems(HorizontalAlign.Start)
-                Button("Dismiss").fontSize(11).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
-                  .borderRadius(12).height(28).padding({ left: S_MD, right: S_MD })
-                  .onClick(() => this.handleReport(r, "dismiss"))
-                Button("Delete").fontSize(11).fontColor("#FFFFFF").backgroundColor(C_RED)
-                  .borderRadius(12).height(28).margin({ left: S_SM }).padding({ left: S_MD, right: S_MD })
-                  .onClick(() => this.handleReport(r, "delete"))
-              }.width("100%").padding(S_LG)
-            }, (r: Report) => r.id)
-          }
           }
 
           Column().height(40)

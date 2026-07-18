@@ -1,6 +1,6 @@
 import { http } from "@kit.NetworkKit"
 import { IApiProvider } from "./ApiProvider"
-import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData, Report } from "./Models"
+import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData } from "./Models"
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./Constants"
 import { OfflineQueue } from "./OfflineQueue"
 
@@ -107,7 +107,6 @@ export class SupabaseClient implements IApiProvider {
     body["category"] = data.category; body["model"] = data.model ?? "Claude"
     body["user_id"] = this.userId; body["tags"] = []
     body["like_count"] = 0; body["collect_count"] = 0; body["comment_count"] = 0; body["share_count"] = 0
-    if (data.images && data.images.length > 0) body["images"] = data.images
     const rows = await this.request("/posts", body) as Record<string, Object>[]
     return this.mapPost(rows[0])
   }
@@ -177,30 +176,6 @@ export class SupabaseClient implements IApiProvider {
 
   async deleteComment(commentId: string): Promise<void> { await this.deleteRequest("/comments?id=eq." + commentId) }
 
- async getAllComments(): Promise<Comment[]> {
-    const rows = await this.request("/comments?select=*,users(*)&order=created_at.desc&limit=50") as Record<string, Object>[]
-    const result: Comment[] = []
-    for (let i = 0; i < rows.length; i++) {
-      const r = rows[i]
-      const u = r["users"] as Record<string, Object>
-      const c: Comment = {
-        id: r["id"] as string, postId: r["post_id"] as string, userId: r["user_id"] as string,
-        content: r["content"] as string, replyTo: (r["reply_to"] ?? "") as string,
-        likeCount: r["like_count"] as number, liked: false,
-        author: u ? {
-          id: u["id"] as string, phone: u["phone"] as string, nickname: u["nickname"] as string,
-          avatarUrl: u["avatar_url"] as string, avatarColor: u["avatar_color"] as string,
-          bio: u["bio"] as string, level: u["level"] as number, exp: u["exp"] as number,
-          followingCount: u["following_count"] as number, followerCount: u["follower_count"] as number,
-          postCount: u["post_count"] as number, createdAt: u["created_at"] as string
-        } : null,
-        createdAt: r["created_at"] as string
-      }
-      result.push(c)
-    }
-    return result
-  }
-
   async likeComment(commentId: string): Promise<LikeResult> {
     const existing = await this.request("/comment_likes?user_id=eq." + this.userId + "&comment_id=eq." + commentId) as Record<string, Object>[]
     const wasLiked = existing && existing.length > 0
@@ -217,13 +192,6 @@ export class SupabaseClient implements IApiProvider {
     const rows = await this.request("/users?id=eq." + userId) as User[]
     if (!rows || rows.length === 0) throw new Error("User not found")
     return rows[0]
-  }
-
-  async getAllUsers(): Promise<User[]> {
-    const rows = await this.request("/users?order=created_at.desc&limit=100") as Record<string, Object>[]
-    const result: User[] = []
-    for (let i = 0; i < rows.length; i++) result.push(this.parseUser(rows[i]))
-    return result
   }
 
   async followUser(userId: string): Promise<FollowResult> {
@@ -316,21 +284,7 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async uploadFile(uri: string, bucket: string): Promise<string> { return "" }
-  async getAllComments(): Promise<Comment[]> {
-    const rows = await this.request("/comments?select=*,users(*)&order=created_at.desc&limit=50") as Record<string, Object>[]
-    const result: Comment[] = []
-    for (let i = 0; i < rows.length; i++) {
-      const r = rows[i]; const u = r["users"] as Record<string, Object>
-      result.push({ id: r["id"] as string, postId: r["post_id"] as string, userId: r["user_id"] as string,
-        content: r["content"] as string, replyTo: (r["reply_to"] ?? "") as string,
-        likeCount: r["like_count"] as number, liked: false,
-        author: u ? { id: u["id"] as string, phone: u["phone"] as string, nickname: u["nickname"] as string, avatarUrl: u["avatar_url"] as string, avatarColor: u["avatar_color"] as string, bio: u["bio"] as string, level: u["level"] as number, exp: u["exp"] as number, followingCount: u["following_count"] as number, followerCount: u["follower_count"] as number, postCount: u["post_count"] as number, createdAt: u["created_at"] as string } : null,
-        createdAt: r["created_at"] as string })
-    }
-    return result
-  }
-  async getAllUsers(): Promise<User[]> { return await this.request("/users?select=*&order=created_at.desc") as User[] }
-  async adminDeleteComment(commentId: string): Promise<void> { await this.deleteRequest("/comments?id=eq." + commentId) }
+
   async reportPost(postId: string, reason: string): Promise<void> {
     const b: InsertReportBody = { reporter_id: this.userId, post_id: postId, reason: reason, status: "pending" }
     await this.request("/reports", b)
@@ -340,17 +294,24 @@ export class SupabaseClient implements IApiProvider {
     await this.request("/blocks", b)
   }
   async getReports(): Promise<Report[]> {
-    const rows = await this.request("/reports?select=*&status=eq.pending&order=created_at.desc") as Record<string, Object>[]
-    const result: Report[] = []
-    for (let i = 0; i < rows.length; i++) result.push(this.mapReport(rows[i]))
-    return result
+    return await this.request("/reports?select=*&status=eq.pending&order=created_at.desc") as Report[]
   }
-async resolveReport(reportId: string, action: string, postId: string): Promise<void> {
+  async resolveReport(reportId: string, action: string, postId: string): Promise<void> {
     if (action === "delete") await this.deletePost(postId)
-    const u: Record<string, string> = {}
-    u["status"] = "resolved"
+    const u: UpdateReportBody = { status: "resolved" }
     await this.request("/reports?id=eq." + reportId, u)
   }
+  async getAllComments(): Promise<Comment[]> {
+    const rows = await this.request("/comments?select=*,users(*)&order=created_at.desc&limit=50") as Record<string, Object>[]
+    const result: Comment[] = []
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i]; const u = r["users"] as Record<string, Object>
+      result.push({ id: r["id"] as string, postId: r["post_id"] as string, userId: r["user_id"] as string, content: r["content"] as string, replyTo: (r["reply_to"] ?? "") as string, likeCount: r["like_count"] as number, liked: false, author: u ? { id: u["id"] as string, phone: u["phone"] as string, nickname: u["nickname"] as string, avatarUrl: u["avatar_url"] as string, avatarColor: u["avatar_color"] as string, bio: u["bio"] as string, level: u["level"] as number, exp: u["exp"] as number, followingCount: u["following_count"] as number, followerCount: u["follower_count"] as number, postCount: u["post_count"] as number, createdAt: u["created_at"] as string } : null, createdAt: r["created_at"] as string })
+    }
+    return result
+  }
+  async getAllUsers(): Promise<User[]> { return await this.request("/users?select=*&order=created_at.desc") as User[] }
+  async adminDeleteComment(commentId: string): Promise<void> { await this.deleteRequest("/comments?id=eq." + commentId) }
 
   async isAdmin(): Promise<boolean> {
     const user = await this.getCurrentUser()
@@ -382,7 +343,6 @@ async resolveReport(reportId: string, action: string, postId: string): Promise<v
       tags: [], likeCount: raw["like_count"] as number,
       collectCount: raw["collect_count"] as number, commentCount: raw["comment_count"] as number,
       shareCount: raw["share_count"] as number, liked: false, collected: false,
-      images: raw["images"] as string[] ?? [],
       author: u ? {
         id: u["id"] as string, phone: u["phone"] as string, nickname: u["nickname"] as string,
         avatarUrl: u["avatar_url"] as string, avatarColor: u["avatar_color"] as string,
@@ -391,17 +351,6 @@ async resolveReport(reportId: string, action: string, postId: string): Promise<v
         postCount: u["post_count"] as number, createdAt: u["created_at"] as string
       } : null,
       createdAt: raw["created_at"] as string, updatedAt: raw["updated_at"] as string
-    }
-  }
-
-  private mapReport(raw: Record<string, Object>): Report {
-    return {
-      id: raw["id"] as string,
-      reporterId: raw["reporter_id"] as string,
-      postId: raw["post_id"] as string,
-      reason: raw["reason"] as string,
-      status: raw["status"] as string,
-      createdAt: raw["created_at"] as string
     }
   }
 }
