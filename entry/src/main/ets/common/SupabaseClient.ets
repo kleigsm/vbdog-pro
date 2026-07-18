@@ -177,7 +177,7 @@ export class SupabaseClient implements IApiProvider {
 
   async deleteComment(commentId: string): Promise<void> { await this.deleteRequest("/comments?id=eq." + commentId) }
 
-  async getAllComments(): Promise<Comment[]> {
+ async getAllComments(): Promise<Comment[]> {
     const rows = await this.request("/comments?select=*,users(*)&order=created_at.desc&limit=50") as Record<string, Object>[]
     const result: Comment[] = []
     for (let i = 0; i < rows.length; i++) {
