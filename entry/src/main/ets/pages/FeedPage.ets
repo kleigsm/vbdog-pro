@@ -130,6 +130,8 @@ export struct FeedPage {
   @State leftPosts: Post[] = []
   @State rightPosts: Post[] = []
   @State errorMsg: string = ""
+  @State showBackTop: boolean = false
+  private feedScroller: Scroller = new Scroller()
 
   aboutToAppear(): void {
     this.loadFeed()
@@ -226,13 +228,13 @@ export struct FeedPage {
         } else {
           Column() {
             Row() {
-              List() {
+              List({ scroller: this.feedScroller }) {
                 ForEach(this.leftPosts, (post: Post) => {
                   ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
                 }, (post: Post) => post.id)
-              }.layoutWeight(1).padding({ left: S_MD, right: S_XS }).onReachEnd(() => { this.loadMore() })
+              }.layoutWeight(1).padding({ left: S_MD, right: S_XS }).onReachEnd(() => { this.loadMore() }).onScrollIndex((first: number) => { this.showBackTop = first > 5 })
 
-              List() {
+              List({ scroller: this.feedScroller }) {
                 ForEach(this.rightPosts, (post: Post) => {
                   ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
                 }, (post: Post) => post.id)
@@ -254,5 +256,18 @@ export struct FeedPage {
       })
     }
     .width("100%").height("100%").backgroundColor(C_BG)
+
+    if (this.showBackTop) {
+      Button() {
+        Text("⬆").fontSize(20).fontColor("#FFFFFF")
+      }
+      .width(44).height(44).borderRadius(22)
+      .backgroundColor(C_PRIMARY).shadow({ radius: 8, color: "#00000020", offsetY: 2 })
+      .position({ x: "85%", y: "82%" })
+      .onClick(() => {
+        this.feedScroller.scrollToIndex(0)
+        this.showBackTop = false
+      })
+    }
   }
 }
