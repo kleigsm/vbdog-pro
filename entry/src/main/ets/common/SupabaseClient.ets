@@ -316,7 +316,22 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async uploadFile(uri: string, bucket: string): Promise<string> { return "" }
-async reportPost(postId: string, reason: string): Promise<void> {
+  async getAllComments(): Promise<Comment[]> {
+    const rows = await this.request("/comments?select=*,users(*)&order=created_at.desc&limit=50") as Record<string, Object>[]
+    const result: Comment[] = []
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i]; const u = r["users"] as Record<string, Object>
+      result.push({ id: r["id"] as string, postId: r["post_id"] as string, userId: r["user_id"] as string,
+        content: r["content"] as string, replyTo: (r["reply_to"] ?? "") as string,
+        likeCount: r["like_count"] as number, liked: false,
+        author: u ? { id: u["id"] as string, phone: u["phone"] as string, nickname: u["nickname"] as string, avatarUrl: u["avatar_url"] as string, avatarColor: u["avatar_color"] as string, bio: u["bio"] as string, level: u["level"] as number, exp: u["exp"] as number, followingCount: u["following_count"] as number, followerCount: u["follower_count"] as number, postCount: u["post_count"] as number, createdAt: u["created_at"] as string } : null,
+        createdAt: r["created_at"] as string })
+    }
+    return result
+  }
+  async getAllUsers(): Promise<User[]> { return await this.request("/users?select=*&order=created_at.desc") as User[] }
+  async adminDeleteComment(commentId: string): Promise<void> { await this.deleteRequest("/comments?id=eq." + commentId) }
+  async reportPost(postId: string, reason: string): Promise<void> {
     const b: InsertReportBody = { reporter_id: this.userId, post_id: postId, reason: reason, status: "pending" }
     await this.request("/reports", b)
   }

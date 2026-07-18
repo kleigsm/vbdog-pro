@@ -31,6 +31,9 @@ export interface IApiProvider {
   uploadFile(uri: string, bucket: string): Promise<string>
   isAdmin(): Promise<boolean>
   adminDeletePost(postId: string): Promise<void>
+  getAllComments(): Promise<Comment[]>
+  getAllUsers(): Promise<User[]>
+  adminDeleteComment(commentId: string): Promise<void>
   reportPost(postId: string, reason: string): Promise<void>
   blockUser(userId: string): Promise<void>
   getReports(): Promise<Report[]>
