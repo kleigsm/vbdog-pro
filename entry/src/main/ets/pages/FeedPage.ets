@@ -233,7 +233,7 @@ export struct FeedPage {
                 ForEach(this.leftPosts, (post: Post) => {
                   ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
                 }, (post: Post) => post.id)
-              }.layoutWeight(1).padding({ left: S_MD, right: S_XS }).onReachEnd(() => { this.loadMore() }).onScrollIndex((first: number) => { this.showBackTop = first > 5 })
+              }.layoutWeight(1).padding({ left: S_MD, right: S_XS }).onReachEnd(() => { this.loadMore() }).onScroll((offset: number, state: ScrollState) => { this.showBackTop = offset > 300 })
 
               List({ scroller: this.feedScroller }) {
                 ForEach(this.rightPosts, (post: Post) => {
@@ -264,7 +264,7 @@ export struct FeedPage {
       }
       .width(44).height(44).borderRadius(22)
       .backgroundColor(C_PRIMARY).shadow({ radius: 8, color: "#00000020", offsetY: 2 })
-      .position({ x: "85%", y: "82%" })
+      .position({ x: "85%", y: "78%" })
       .onClick(() => {
         this.feedScroller.scrollToIndex(0)
         this.showBackTop = false
