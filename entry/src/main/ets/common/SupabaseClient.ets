@@ -1,6 +1,6 @@
 import { http } from "@kit.NetworkKit"
 import { IApiProvider } from "./ApiProvider"
-import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData } from "./Models"
+import { Post, Comment, User, VNotification, Message, Conversation, LikeResult, CollectResult, FollowResult, CreatePostData, Report } from "./Models"
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./Constants"
 import { OfflineQueue } from "./OfflineQueue"
 
@@ -343,6 +343,7 @@ export class SupabaseClient implements IApiProvider {
       tags: [], likeCount: raw["like_count"] as number,
       collectCount: raw["collect_count"] as number, commentCount: raw["comment_count"] as number,
       shareCount: raw["share_count"] as number, liked: false, collected: false,
+      images: raw["images"] as string[] ?? [],
       author: u ? {
         id: u["id"] as string, phone: u["phone"] as string, nickname: u["nickname"] as string,
         avatarUrl: u["avatar_url"] as string, avatarColor: u["avatar_color"] as string,
