@@ -130,7 +130,8 @@ export struct FeedPage {
   @State leftPosts: Post[] = []
   @State rightPosts: Post[] = []
   @State errorMsg: string = ""
-  @State showBackTop: boolean = false
+  @State ballOffsetX: number = 0
+  @State ballOffsetY: number = 0
   private feedScroller: Scroller = new Scroller()
 
   aboutToAppear(): void {
@@ -233,13 +234,13 @@ export struct FeedPage {
                 ForEach(this.leftPosts, (post: Post) => {
                   ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
                 }, (post: Post) => post.id)
-              }.layoutWeight(1).padding({ left: S_MD, right: S_XS }).onReachEnd(() => { this.loadMore() }).onScroll((offset: number, state: ScrollState) => { this.showBackTop = offset > 300 })
+              }.layoutWeight(1).padding({ left: S_MD, right: S_XS }).onReachEnd(() => { this.loadMore() })
 
               List({ scroller: this.feedScroller }) {
                 ForEach(this.rightPosts, (post: Post) => {
                   ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
                 }, (post: Post) => post.id)
-              }.layoutWeight(1).padding({ left: S_XS, right: S_MD }).onReachEnd(() => { this.loadMore() }).onScroll((offset: number, state: ScrollState) => { this.showBackTop = offset > 300 })
+              }.layoutWeight(1).padding({ left: S_XS, right: S_MD }).onReachEnd(() => { this.loadMore() })
             }.layoutWeight(1).width("100%").padding({ top: S_SM })
             if (this.loadingMore) {
               LoadingProgress().width(24).height(24).color(C_PRIMARY).margin({ top: S_MD, bottom: S_XS })
@@ -258,19 +259,24 @@ export struct FeedPage {
     }
     .width("100%").height("100%").backgroundColor(C_BG)
 
-    if (this.showBackTop) {
-      Button() {
-        Text("⬆").fontSize(18).fontColor("#FFFFFF")
-      }
-      .width(48).height(48).borderRadius(24)
-      .backgroundColor("#99000000")
-      .shadow({ radius: 12, color: "#00000030", offsetY: 4 })
-      .position({ x: "85%", y: "76%" })
-      .onClick(() => {
-        this.feedScroller.scrollToIndex(0)
-        this.showBackTop = false
-      })
+    Button() {
+      Text("⬆").fontSize(18).fontColor("#FFFFFF")
     }
+    .width(48).height(48).borderRadius(24)
+    .backgroundColor("#CCFF6B35")
+    .shadow({ radius: 12, color: "#00000030", offsetY: 4 })
+    .position({ x: "85%", y: "76%" })
+    .offset({ x: this.ballOffsetX, y: this.ballOffsetY })
+    .gesture(
+      PanGesture({ fingers: 1, direction: PanDirection.All })
+        .onActionUpdate((event: GestureEvent) => {
+          this.ballOffsetX += event.offsetX
+          this.ballOffsetY += event.offsetY
+        })
+    )
+    .onClick(() => {
+      this.feedScroller.scrollToIndex(0)
+    })
     }.width("100%").height("100%")
   }
 }
