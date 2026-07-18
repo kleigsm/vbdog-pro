@@ -106,7 +106,6 @@ struct PostCard {
 @Component
 struct SkeletonCard {
   build() {
-    Stack() {
     Column() {
       Column().width("100%").height(120).backgroundColor("#E8E8ED").borderRadius({ topLeft: R_LG, topRight: R_LG })
       Column({ space: 10 }) {
