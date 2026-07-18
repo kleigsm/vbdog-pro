@@ -181,30 +181,29 @@ struct PostDetailPage {
                   router.pushUrl({ url: "pages/UserPage", params: { userId: this.post?.userId ?? "" } })
                 }
               })
-              Blank()
-              Button("+ 关注").fontSize(F_SM).fontColor("#FFFFFF")
-                .backgroundColor(C_PRIMARY).borderRadius(16).height(30)
-                .padding({ left: S_MD, right: S_MD })
-                .onClick(() => {
-                  if (this.post?.userId) {
-                    getApi().followUser(this.post.userId)
-                    promptAction.showToast({ message: "已关注", duration: 1000 })
-                  }
-                })
+              if (!this.isOwnPost()) {
+                Button("+ 关注").fontSize(F_SM).fontColor("#FFFFFF")
+                  .backgroundColor(C_PRIMARY).borderRadius(16).height(30)
+                  .padding({ left: S_MD, right: S_MD })
+                  .onClick(() => {
+                    if (this.post?.userId) {
+                      getApi().followUser(this.post.userId)
+                      promptAction.showToast({ message: "已关注", duration: 1000 })
+                    }
+                  })
+                Text("").width(8)
+              } else {
+                Text("").width(80).height(30)
+              }
+              Text("举报").fontSize(F_SM).fontColor(C_TEXT3)
+                .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
+                .borderRadius(16).borderWidth(1).borderColor(C_BORDER)
+                .onClick(() => this.showReportDialog = true)
               if (this.isOwnPost()) {
-                Text("举报").fontSize(F_SM).fontColor(C_TEXT3)
-                  .margin({ right: S_MD })
-                  .onClick(() => this.showReportDialog = true)
                 Text("删除").fontSize(F_SM).fontColor(C_RED)
                   .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
                   .borderRadius(16).borderWidth(1).borderColor(C_RED)
                   .onClick(() => this.showDelete = true)
-                Blank()
-              } else {
-                Text("举报").fontSize(F_SM).fontColor(C_TEXT3)
-                  .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
-                  .borderRadius(16).borderWidth(1).borderColor(C_BORDER)
-                  .onClick(() => this.showReportDialog = true)
               }
             }.width("100%").padding(S_LG).backgroundColor(C_CARD)
 
@@ -234,19 +233,19 @@ struct PostDetailPage {
 
             // Category + model
             Row() {
-              Text(this.post!.category === "Prompt" ? "💬" : this.post!.category === "Skill" ? "🛠" : this.post!.category === "VibeCoding" ? "⚡" : "📉")
-                .fontSize(14)
+              Text(this.post!.category === "Prompt" ? "💬 Prompt" : this.post!.category === "Skill" ? "🛠 Skill" : this.post!.category === "VibeCoding" ? "⚡ VibeCoding" : this.post!.category === "教程" ? "📚 教程" : this.post!.category === "工具" ? "🔧 工具" : this.post!.category === "" || !this.post!.category ? "🔥 推荐" : this.post!.category)
+                .fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).fontWeight(FontWeight.Medium)
               if (this.post!.model) {
-                Text(" 适配: " + this.post!.model).fontSize(F_CAPT).fontColor(C_BLUE)
-                  .padding({ left: S_SM, right: S_SM, top: 2, bottom: 2 }).backgroundColor("#E3F2FD").borderRadius(8)
+                Text(this.post!.model).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT2 : C_BLUE)
+                  .padding({ left: S_SM, right: S_SM, top: 2, bottom: 2 }).backgroundColor(this.isDark ? "#444" : "#E3F2FD").borderRadius(8)
               }
             }.padding({ left: S_LG, right: S_LG, top: S_MD }).width("100%")
 
             // Tags
             if (this.post!.tags && this.post!.tags.length > 0) {
-              Row() {
+              Flex({ wrap: FlexWrap.Wrap }) {
                 ForEach(this.post!.tags.slice(0, 5), (t: string) => {
-                  Text("#" + t).fontSize(F_CAPT).fontColor(C_PRIMARY).margin({ right: S_SM })
+                  Text("#" + t).fontSize(F_CAPT).fontColor(C_PRIMARY).margin({ right: S_SM, bottom: S_XS })
                     .onClick(() => { router.pushUrl({ url: "pages/SearchPage", params: { query: t } }) })
                 })
               }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM })

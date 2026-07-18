@@ -19,6 +19,9 @@ export interface IApiProvider {
   likeComment(commentId: string): Promise<LikeResult>
   getUserProfile(userId: string): Promise<User>
   followUser(userId: string): Promise<FollowResult>
+  getFollowers(userId: string): Promise<User[]>
+  getFollowing(userId: string): Promise<User[]>
+  isFollowingUser(userId: string): Promise<boolean>
   getUserPosts(userId: string): Promise<Post[]>
   getUserCollections(userId: string): Promise<Post[]>
   getUserLikes(userId: string): Promise<Post[]>

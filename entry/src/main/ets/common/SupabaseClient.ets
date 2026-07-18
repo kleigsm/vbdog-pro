@@ -41,8 +41,10 @@ export class SupabaseClient implements IApiProvider {
         extraData: body ? JSON.stringify(body) : undefined,
         connectTimeout: 15000, readTimeout: 20000
       })
-      if (resp.responseCode >= 400) throw new Error("HTTP " + resp.responseCode)
-      return JSON.parse(resp.result as string)
+      if (resp.responseCode >= 400) throw new Error("HTTP " + resp.responseCode + ": " + (resp.result as string))
+      const text: string = resp.result as string
+      if (text.trim().length === 0) return {} as Record<string, Object>
+      return JSON.parse(text)
     } finally { req.destroy() }
   }
 
@@ -56,8 +58,30 @@ export class SupabaseClient implements IApiProvider {
         header: headers,
         connectTimeout: 15000, readTimeout: 20000
       })
-      if (resp.responseCode >= 400) throw new Error("HTTP " + resp.responseCode)
-      return JSON.parse(resp.result as string)
+      if (resp.responseCode >= 400) throw new Error("HTTP " + resp.responseCode + ": " + (resp.result as string))
+      const text: string = resp.result as string
+      if (text.trim().length === 0) return {} as Record<string, Object>
+      return JSON.parse(text)
+    } finally { req.destroy() }
+  }
+
+  private async updateRequest(path: string, body: Record<string, Object>): Promise<Object> {
+    const req = http.createHttp()
+    try {
+      const headers: Record<string, string> = { "Accept": "application/json", "apikey": this.key, "Authorization": "Bearer " + this.key }
+      headers["Prefer"] = "resolution=merge-duplicates"
+      headers["Content-Type"] = "application/json"
+      if (this.userId) headers["x-user-id"] = this.userId
+      const resp = await req.request(this.url + "/rest/v1" + path, {
+        method: http.RequestMethod.PUT,
+        header: headers,
+        extraData: JSON.stringify(body),
+        connectTimeout: 15000, readTimeout: 20000
+      })
+      if (resp.responseCode >= 400) throw new Error("HTTP " + resp.responseCode + ": " + (resp.result as string))
+      const text: string = resp.result as string
+      if (text.trim().length === 0) return {} as Record<string, Object>
+      return JSON.parse(text)
     } finally { req.destroy() }
   }
 
@@ -81,7 +105,7 @@ export class SupabaseClient implements IApiProvider {
     const d: Record<string, string> = {}
     if (data.nickname) d["nickname"] = data.nickname
     if (data.bio) d["bio"] = data.bio
-    const rows = await this.request("/users?id=eq." + this.userId, d) as User[]
+    const rows = await this.updateRequest("/users?id=eq." + this.userId, d) as User[]
     return rows[0]
   }
 
@@ -198,10 +222,19 @@ export class SupabaseClient implements IApiProvider {
     const existing = await this.request("/follows?follower_id=eq." + this.userId + "&following_id=eq." + userId) as Record<string, Object>[]
     if (existing && existing.length > 0) {
       await this.deleteRequest("/follows?id=eq." + existing[0]["id"] as string)
+      await this.syncFollowCounts(userId)
       return { following: false }
     }
     const b: InsertFollowBody = { follower_id: this.userId, following_id: userId }
     await this.request("/follows", b)
+    await this.syncFollowCounts(userId)
+    const n: Record<string, Object> = {}
+    n["user_id"] = userId
+    n["type"] = "follow"
+    n["related_id"] = this.userId
+    n["content"] = "关注了你"
+    n["read"] = false
+    await this.request("/notifications", n)
     return { following: true }
   }
 
@@ -233,7 +266,36 @@ export class SupabaseClient implements IApiProvider {
     return result
   }
 
-  async search(query: string): Promise<Post[]> {
+    async getFollowers(userId: string): Promise<User[]> {
+    const rows = await this.request("/follows?select=*&following_id=eq." + userId) as Record<string, Object>[]
+    if (!rows || rows.length === 0) return []
+    let ids = ""
+    for (let i = 0; i < rows.length; i++) { if (i > 0) ids += ","; ids += rows[i]["follower_id"] as string }
+    const users = await this.request("/users?select=*&id=in.(" + ids + ")") as User[]
+    return users
+  }
+  async getFollowing(userId: string): Promise<User[]> {
+    const rows = await this.request("/follows?select=*&follower_id=eq." + userId) as Record<string, Object>[]
+    if (!rows || rows.length === 0) return []
+    let ids = ""
+    for (let i = 0; i < rows.length; i++) { if (i > 0) ids += ","; ids += rows[i]["following_id"] as string }
+    const users = await this.request("/users?select=*&id=in.(" + ids + ")") as User[]
+    return users
+  }
+  async isFollowingUser(userId: string): Promise<boolean> {
+    const rows = await this.request("/follows?follower_id=eq." + this.userId + "&following_id=eq." + userId) as Record<string, Object>[]
+    return rows && rows.length > 0
+  }
+  private async syncFollowCounts(targetUserId: string): Promise<void> {
+    const fw = await this.request("/follows?follower_id=eq." + this.userId) as Record<string, Object>[]
+    const fc = await this.request("/follows?following_id=eq." + targetUserId) as Record<string, Object>[]
+    const b1: Record<string, Object> = {}; b1["following_count"] = (fw ? fw.length : 0)
+    const b2: Record<string, Object> = {}; b2["follower_count"] = (fc ? fc.length : 0)
+    await this.updateRequest("/users?id=eq." + this.userId, b1)
+    await this.updateRequest("/users?id=eq." + targetUserId, b2)
+  }
+
+async search(query: string): Promise<Post[]> {
     const rows = await this.request("/posts?select=*,users(*)&or=(title.ilike.*" + query + "*,content.ilike.*" + query + "*)&order=created_at.desc&limit=20") as Record<string, Object>[]
     const result: Post[] = []
     for (let i = 0; i < rows.length; i++) result.push(this.mapPost(rows[i]))
@@ -279,27 +341,44 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async markNotificationRead(notificationId: string): Promise<void> {
-    const b: NotificationBody = { read: true }
-    await this.request("/notifications?id=eq." + notificationId, b)
+    const body: Record<string, Object> = { "read": true }
+    await this.updateRequest("/notifications?id=eq." + notificationId, body)
   }
 
   async uploadFile(uri: string, bucket: string): Promise<string> { return "" }
 
   async reportPost(postId: string, reason: string): Promise<void> {
-    const b: InsertReportBody = { reporter_id: this.userId, post_id: postId, reason: reason, status: "pending" }
-    await this.request("/reports", b)
+    const body: Record<string, Object> = {}
+    body["reporter_id"] = this.userId
+    body["post_id"] = postId
+    body["reason"] = reason
+    body["status"] = "pending"
+    await this.request("/reports", body)
   }
   async blockUser(userId: string): Promise<void> {
     const b: InsertBlockBody = { blocker_id: this.userId, blocked_id: userId }
     await this.request("/blocks", b)
   }
   async getReports(): Promise<Report[]> {
-    return await this.request("/reports?select=*&status=eq.pending&order=created_at.desc") as Report[]
+    const rows = await this.request("/reports?select=*&status=eq.pending&order=created_at.desc") as Record<string, Object>[]
+    const result: Report[] = []
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i]
+      result.push({
+        id: r["id"] as string,
+        reporterId: r["reporter_id"] as string,
+        postId: r["post_id"] as string,
+        reason: r["reason"] as string,
+        status: r["status"] as string,
+        createdAt: r["created_at"] as string
+      })
+    }
+    return result
   }
   async resolveReport(reportId: string, action: string, postId: string): Promise<void> {
     if (action === "delete") await this.deletePost(postId)
-    const u: UpdateReportBody = { status: "resolved" }
-    await this.request("/reports?id=eq." + reportId, u)
+    const body: Record<string, Object> = { "status": "resolved" }
+    await this.updateRequest("/reports?id=eq." + reportId, body)
   }
   async getAllComments(): Promise<Comment[]> {
     const rows = await this.request("/comments?select=*,users(*)&order=created_at.desc&limit=50") as Record<string, Object>[]
