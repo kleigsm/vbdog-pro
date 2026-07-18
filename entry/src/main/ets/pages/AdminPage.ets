@@ -83,7 +83,7 @@ export struct AdminPage {
 
       // Tab bar
       Row() {
-        ForEach(["Posts", "Comments", "Users", "Reports" + (this.reports.length > 0 ? "(" + this.reports.length + ")" : "")], (t: string, i: number) => {
+        ForEach(["帖子管理", "评论管理", "用户管理", "举报处理" + (this.reports.length > 0 ? "(" + this.reports.length + ")" : "")], (t: string, i: number) => {
           Text(t).fontSize(F_SM).fontColor(this.tab === i ? C_PRIMARY : (this.isDark ? C_DARK_TEXT2 : C_TEXT2))
             .fontWeight(this.tab === i ? FontWeight.Bold : FontWeight.Normal)
             .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
@@ -93,7 +93,6 @@ export struct AdminPage {
 
       Scroll() {
         Column() {
-          if (this.tab === 0) {
           // Stats cards
           Row() {
             Column() {
@@ -107,6 +106,7 @@ export struct AdminPage {
             }.width("48%").padding(S_LG).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(R_LG).margin({ left: "4%" })
           }.width("100%").padding({ left: S_LG, right: S_LG, top: S_MD })
 
+          if (this.tab === 0) {
           // Post list
           Text("帖子管理").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
             .width("100%").padding({ left: S_LG, top: S_LG })
