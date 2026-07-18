@@ -33,7 +33,6 @@ struct PostCard {
   }
 
   build() {
-    Stack() {
     Column() {
       Stack() {
         if (this.post.images && this.post.images.length > 0) {
