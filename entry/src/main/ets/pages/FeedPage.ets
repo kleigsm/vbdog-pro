@@ -33,6 +33,7 @@ struct PostCard {
   }
 
   build() {
+    Stack() {
     Column() {
       Stack() {
         if (this.post.images && this.post.images.length > 0) {
@@ -105,6 +106,7 @@ struct PostCard {
 @Component
 struct SkeletonCard {
   build() {
+    Stack() {
     Column() {
       Column().width("100%").height(120).backgroundColor("#E8E8ED").borderRadius({ topLeft: R_LG, topRight: R_LG })
       Column({ space: 10 }) {
@@ -183,6 +185,7 @@ export struct FeedPage {
   }
 
   build() {
+    Stack() {
     Column() {
       Row() {
         Scroll() {
@@ -269,5 +272,6 @@ export struct FeedPage {
         this.showBackTop = false
       })
     }
+    }.width("100%").height("100%")
   }
 }
