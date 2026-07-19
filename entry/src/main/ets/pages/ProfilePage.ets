@@ -47,15 +47,30 @@ export struct ProfilePage {
     return Math.min(100, Math.round(((exp - current) / (next - current)) * 100))
   }
 
-  refresh(): void {
+  async refresh(): Promise<void> {
     this.loading = true
-    const user = UserManager.currentUser
-    this.nick = user?.nickname ?? "用户"
-    this.bio = user?.bio ?? ""
-    this.uname = user?.phone ?? ""
-    this.lv = user?.level ?? 1
-    this.fol = user?.followerCount ?? 0
-    this.fow = user?.followingCount ?? 0
+    try {
+      const fresh = await getApi().getCurrentUser()
+      if (fresh) {
+        this.nick = fresh.nickname ?? "用户"
+        this.bio = fresh.bio ?? ""
+        this.uname = fresh.phone ?? ""
+        this.lv = fresh.level ?? 1
+        this.fol = fresh.followerCount ?? 0
+        this.fow = fresh.followingCount ?? 0
+        UserManager.currentUser!.followerCount = this.fol
+        UserManager.currentUser!.followingCount = this.fow
+        UserManager.currentUser!.level = this.lv
+      }
+    } catch (_e) {
+      const user = UserManager.currentUser
+      this.nick = user?.nickname ?? "用户"
+      this.bio = user?.bio ?? ""
+      this.uname = user?.phone ?? ""
+      this.lv = user?.level ?? 1
+      this.fol = user?.followerCount ?? 0
+      this.fow = user?.followingCount ?? 0
+    }
     this.loadPosts()
     if (UserManager.isAdmin) this.loadAdminStats()
   }
@@ -65,8 +80,13 @@ export struct ProfilePage {
     if (!uid) { this.loading = false; return }
     try {
       this.myPosts = await getApi().getUserPosts(uid) as Post[]
+      this.lks = 0
+      for (let i = 0; i < this.myPosts.length; i++) {
+        this.lks += this.myPosts[i].likeCount
+      }
     } catch (_e) {
       this.myPosts = []
+      this.lks = 0
     } finally {
       this.loading = false
     }

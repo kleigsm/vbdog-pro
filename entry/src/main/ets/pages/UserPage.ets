@@ -16,6 +16,7 @@ struct UserPage {
   @State fol: number = 0
   @State fow: number = 0
   @State isFollowing: boolean = false
+  @State lks: number = 0
   @State followText: string = "+ 关注"
   @State posts: Post[] = []
   @State loading: boolean = true
@@ -44,6 +45,10 @@ struct UserPage {
       this.followText = this.isFollowing ? "已关注" : "+ 关注"
       }
       this.posts = await getApi().getUserPosts(uid) as Post[]
+      this.lks = 0
+      for (let i = 0; i < this.posts.length; i++) {
+        this.lks += this.posts[i].likeCount
+      }
     } catch (_e) { }
     finally { this.loading = false }
   }
@@ -85,6 +90,10 @@ struct UserPage {
               Text(this.fow.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
               Text("关注").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
             }.margin({ left: S_2XL }).onClick(() => { router.pushUrl({ url: "pages/FollowListPage", params: { userId: this.userId, type: "following" } }) })
+            Column() {
+              Text(this.lks.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+              Text("获赞").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }.margin({ left: S_2XL })
           }.width("100%").margin({ top: S_MD })
 
           Row() {
