@@ -112,7 +112,7 @@ export class SupabaseClient implements IApiProvider {
       headers["Content-Type"] = "application/json"
       if (this.userId) headers["x-user-id"] = this.userId
       const resp = await req.request(this.url + "/rest/v1/users?id=eq." + this.userId, {
-        method: http.RequestMethod.PATCH,
+        method: "PATCH" as http.RequestMethod,
         header: headers,
         extraData: JSON.stringify(d),
         connectTimeout: 15000, readTimeout: 20000
