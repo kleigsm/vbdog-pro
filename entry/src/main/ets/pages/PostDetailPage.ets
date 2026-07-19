@@ -169,10 +169,19 @@ struct PostDetailPage {
                 .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(16).height(30)
                 .padding({ left: S_MD, right: S_MD }).borderWidth(1).borderColor(C_PRIMARY)
                 .onClick(async () => {
-                  const r = await getApi().followUser(this.post!.userId)
-                  if (!r.following) {
-                    this.isFollowingAuthor = false
-                    promptAction.showToast({ message: "已取消关注", duration: 1000 })
+                  const res = await promptAction.showDialog({
+                    title: "取消关注",
+                    message: "确定取消关注吗？",
+                    buttons: [{ text: "取消", color: "#999" }, { text: "确定", color: "#FF3B30" }]
+                  })
+                  if (res.index === 1) {
+                    try {
+                      await getApi().followUser(this.post!.userId)
+                      this.isFollowingAuthor = false
+                      promptAction.showToast({ message: "已取消关注", duration: 1000 })
+                    } catch (_e) {
+                      promptAction.showToast({ message: "操作失败", duration: 1500 })
+                    }
                   }
                 })
             } else {
@@ -180,10 +189,12 @@ struct PostDetailPage {
                 .backgroundColor(C_PRIMARY).borderRadius(16).height(30)
                 .padding({ left: S_MD, right: S_MD })
                 .onClick(async () => {
-                  const r = await getApi().followUser(this.post!.userId)
-                  if (r.following) {
+                  try {
+                    await getApi().followUser(this.post!.userId)
                     this.isFollowingAuthor = true
                     promptAction.showToast({ message: "已关注", duration: 1000 })
+                  } catch (_e) {
+                    promptAction.showToast({ message: "操作失败", duration: 1500 })
                   }
                 })
             }
