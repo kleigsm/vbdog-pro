@@ -2,6 +2,8 @@ import { C_DARK_BG, C_BG, C_DARK_CARD, C_CARD, C_DARK_TEXT1, C_TEXT1, C_DARK_TEX
 import { User } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import router from "@ohos.router"
+import { promptAction } from "@kit.ArkUI"
+import { UserManager } from "../common/UserManager"
 
 @Entry
 @Component
@@ -62,16 +64,29 @@ struct FollowListPage {
                 Text(u.nickname.charAt(0)).fontSize(20).fontColor("#FFF")
                   .width(40).height(40).borderRadius(20).textAlign(TextAlign.Center)
                   .backgroundColor(this.avatarColor(u.nickname))
+                  .onClick(() => { router.pushUrl({ url: "pages/UserPage", params: { userId: u.id } }) })
                 Column() {
                   Text(u.nickname).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Medium)
                   if (u.bio) {
                     Text(u.bio).fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                   }
                 }.margin({ left: S_MD }).alignItems(HorizontalAlign.Start).layoutWeight(1)
-                Text("Lv." + u.level).fontSize(F_CAPT).fontColor(C_PRIMARY)
-              }.width("100%").padding(S_LG).onClick(() => {
-                router.pushUrl({ url: "pages/UserPage", params: { userId: u.id } })
-              })
+                  .onClick(() => { router.pushUrl({ url: "pages/UserPage", params: { userId: u.id } }) })
+                Text("Lv." + u.level).fontSize(F_CAPT).fontColor(C_PRIMARY).margin({ right: S_SM })
+                if (u.id !== UserManager.currentUser?.id) {
+                  Button("+ 关注").fontSize(F_CAPT).fontColor("#FFFFFF")
+                    .backgroundColor(C_PRIMARY).borderRadius(12).height(28)
+                    .padding({ left: S_SM, right: S_SM })
+                    .onClick(async () => {
+                      try {
+                        await getApi().followUser(u.id)
+                        promptAction.showToast({ message: "已关注", duration: 1000 })
+                      } catch (_e) {
+                        promptAction.showToast({ message: "操作失败", duration: 1500 })
+                      }
+                    })
+                }
+              }.width("100%").padding(S_LG)
             }, (u: User) => u.id)
           }.width("100%")
         }.layoutWeight(1).width("100%")
