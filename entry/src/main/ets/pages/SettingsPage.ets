@@ -1,5 +1,6 @@
 import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_BORDER, C_DARK_BG, C_DARK_CARD, C_DARK_TEXT1, C_DARK_TEXT2, C_DARK_TEXT3, C_DARK_BORDER, S_XS, S_SM, S_MD, S_LG, S_XL, R_LG, F_SM, F_BODY, F_LG, APP_NAME, APP_VERSION } from "../common/Constants"
 import router from "@ohos.router"
+import { UserManager } from "../common/UserManager"
 import { promptAction } from "@kit.ArkUI"
 
 @Entry
