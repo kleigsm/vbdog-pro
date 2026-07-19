@@ -1,6 +1,6 @@
 # VBDog Pro — AI Prompt 创作者社区
 
-> 基于 HarmonyOS ArkTS 的 AI Prompt 创作者社区平台 · 独立 Supabase 后端 · ApiProvider 抽象层支持随时替换后端
+> 基于 HarmonyOS ArkTS 的 AI Prompt 创作者社区平台 · 独立 Supabase 后端 · ApiProvider 抽象层
 
 [![HarmonyOS](https://img.shields.io/badge/HarmonyOS-ArkTS-blue)](https://developer.huawei.com/consumer/cn/harmonyos/)
 [![Supabase](https://img.shields.io/badge/Backend-Supabase-green)](https://supabase.com/)
@@ -63,8 +63,7 @@ VBDog Pro 是一个面向 AI Prompt 创作者的社区应用，运行于 Harmony
 
 ## 项目结构
 
-`
-entry/src/main/ets/
+\entry/src/main/ets/
   common/
     ApiProvider.ets          后端抽象接口 (50+ API)
     SupabaseClient.ets       Supabase REST 实现 (核心逻辑)
@@ -92,11 +91,12 @@ entry/src/main/ets/
     SettingsPage.ets          设置页
     CollectionPage.ets        收藏页
 
+  entryability/              应用入口
+
 supabase/migrations/          10 个 SQL 迁移文件
 tools/                        辅助脚本
 docs/                         项目文档 (报告 + 代码指南)
-`
-
+\
 ---
 
 ## 许可证
