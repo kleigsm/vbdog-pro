@@ -290,10 +290,11 @@ export class SupabaseClient implements IApiProvider {
     try {
       const fw = await this.request("/follows?follower_id=eq." + this.userId) as Record<string, Object>[]
       const fc = await this.request("/follows?following_id=eq." + targetUserId) as Record<string, Object>[]
-      const b1: Record<string, Object> = {}; b1["following_count"] = (fw ? fw.length : 0)
-      const b2: Record<string, Object> = {}; b2["follower_count"] = (fc ? fc.length : 0)
-      await this.updateRequest("/users?id=eq." + this.userId, b1)
-      await this.updateRequest("/users?id=eq." + targetUserId, b2)
+      const fwCnt = (fw ? fw.length : 0)
+      const fcCnt = (fc ? fc.length : 0)
+      const hdrs: Record<string, string> = { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY, "Content-Type": "application/json", "Prefer": "return=minimal" }
+      await fetch(SUPABASE_URL + "/rest/v1/users?id=eq." + this.userId, { method: "PATCH" as string, headers: hdrs, body: JSON.stringify({ following_count: fwCnt }) })
+      await fetch(SUPABASE_URL + "/rest/v1/users?id=eq." + targetUserId, { method: "PATCH" as string, headers: hdrs, body: JSON.stringify({ follower_count: fcCnt }) })
     } catch (_e) { }
   }
 
@@ -411,7 +412,7 @@ async search(query: string): Promise<Post[]> {
       avatarUrl: (r["avatar_url"] ?? r["avatarUrl"] ?? "") as string,
       avatarColor: (r["avatar_color"] ?? r["avatarColor"] ?? "#FF6B35") as string,
       bio: (r["bio"] ?? "") as string, level: (r["level"] ?? 1) as number, exp: (r["exp"] ?? 0) as number,
-      followingCount: 0, followerCount: 0, postCount: 0, createdAt: (r["created_at"] ?? r["createdAt"] ?? "") as string
+      followingCount: (r["following_count"] ?? r["followingCount"] ?? 0) as number, followerCount: (r["follower_count"] ?? r["followerCount"] ?? 0) as number, postCount: (r["post_count"] ?? r["postCount"] ?? 0) as number, createdAt: (r["created_at"] ?? r["createdAt"] ?? "") as string
     }
   }
 
