@@ -208,21 +208,7 @@ struct PostDetailPage {
                   router.pushUrl({ url: "pages/UserPage", params: { userId: this.post?.userId ?? "" } })
                 }
               })
-              if (!this.isOwnPost()) {
-                Button("+ 关注").fontSize(F_SM).fontColor("#FFFFFF")
-                  .backgroundColor(C_PRIMARY).borderRadius(16).height(30)
-                  .padding({ left: S_MD, right: S_MD })
-                  .onClick(() => {
-                    if (this.post?.userId) {
-                      getApi().followUser(this.post.userId)
-                      promptAction.showToast({ message: "已关注", duration: 1000 })
-                    }
-                  })
-                Text("").width(8)
-              } else {
-                Text("").width(80).height(30)
-              }
-              Text("举报").fontSize(F_SM).fontColor(C_TEXT3)
+Text("举报").fontSize(F_SM).fontColor(C_TEXT3)
                 .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
                 .borderRadius(16).borderWidth(1).borderColor(C_BORDER)
                 .onClick(() => this.showReportDialog = true)

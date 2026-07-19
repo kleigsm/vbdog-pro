@@ -10,6 +10,7 @@ import { promptAction } from "@kit.ArkUI"
 export struct ProfilePage {
   @StorageLink("isDark") isDark: boolean = false
   @StorageLink("isLoggedIn") @Watch("onLoginReady") isLoggedIn: boolean = false
+  @State @Watch("doRefresh") _refreshTrigger: number = 0
   @State tab: number = 0
   @State nick: string = ""
   @State bio: string = ""
@@ -28,10 +29,14 @@ export struct ProfilePage {
   @State adminCommentCount: number = 0
   @State adminReportCount: number = 0
 
-  aboutToAppear(): void { this.refresh() }
+  aboutToAppear(): void { this._refreshTrigger++ }
 
   onLoginReady(): void {
     if (this.isLoggedIn) this.refresh()
+  }
+
+  doRefresh(): void {
+    this.refresh()
   }
   onPageShow(): void { this.refresh() }
 
