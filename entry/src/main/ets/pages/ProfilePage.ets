@@ -9,7 +9,7 @@ import { promptAction } from "@kit.ArkUI"
 @Component
 export struct ProfilePage {
   @StorageLink("isDark") isDark: boolean = false
-  @StorageLink("isLoggedIn") isLoggedIn: boolean = false
+  @StorageLink("isLoggedIn") @Watch("onLoginReady") isLoggedIn: boolean = false
   @State tab: number = 0
   @State nick: string = ""
   @State bio: string = ""
@@ -28,7 +28,11 @@ export struct ProfilePage {
   @State adminCommentCount: number = 0
   @State adminReportCount: number = 0
 
-  aboutToAppear(): void { this.refresh(); setTimeout(() => { this.refresh() }, 300) }
+  aboutToAppear(): void { this.refresh() }
+
+  onLoginReady(): void {
+    if (this.isLoggedIn) this.refresh()
+  }
   onPageShow(): void { this.refresh() }
 
   getLevelTitle(): string {
