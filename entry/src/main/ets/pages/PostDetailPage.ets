@@ -163,44 +163,7 @@ struct PostDetailPage {
           Text("帖子详情").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
             .layoutWeight(1).textAlign(TextAlign.Center)
           Text("").width(24)
-          if (this.post && !this.isOwnPost()) {
-            if (this.isFollowingAuthor) {
-              Button("已关注").fontSize(F_SM).fontColor(C_PRIMARY)
-                .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(16).height(30)
-                .padding({ left: S_MD, right: S_MD }).borderWidth(1).borderColor(C_PRIMARY)
-                .onClick(async () => {
-                  const res = await promptAction.showDialog({
-                    title: "取消关注",
-                    message: "确定取消关注吗？",
-                    buttons: [{ text: "取消", color: "#999" }, { text: "确定", color: "#FF3B30" }]
-                  })
-                  if (res.index === 1) {
-                    try {
-                      await getApi().followUser(this.post!.userId)
-                      this.isFollowingAuthor = false
-                      promptAction.showToast({ message: "已取消关注", duration: 1000 })
-                    } catch (_e) {
-                      promptAction.showToast({ message: "操作失败", duration: 1500 })
-                    }
-                  }
-                })
-            } else {
-              Button("+ 关注").fontSize(F_SM).fontColor("#FFFFFF")
-                .backgroundColor(C_PRIMARY).borderRadius(16).height(30)
-                .padding({ left: S_MD, right: S_MD })
-                .onClick(async () => {
-                  try {
-                    await getApi().followUser(this.post!.userId)
-                    this.isFollowingAuthor = true
-                    promptAction.showToast({ message: "已关注", duration: 1000 })
-                  } catch (_e) {
-                    promptAction.showToast({ message: "操作失败", duration: 1500 })
-                  }
-                })
-            }
-          } else {
-            Text("").width(24)
-          }        }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+        }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
 
         Scroll() {
           Column() {
@@ -219,7 +182,44 @@ struct PostDetailPage {
                   router.pushUrl({ url: "pages/UserPage", params: { userId: this.post?.userId ?? "" } })
                 }
               })
-Text("举报").fontSize(F_SM).fontColor(C_TEXT3)
+              Blank()
+              if (this.post && !this.isOwnPost()) {
+                if (this.isFollowingAuthor) {
+                  Button("已关注").fontSize(F_SM).fontColor(C_PRIMARY)
+                    .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(16).height(30)
+                    .padding({ left: S_MD, right: S_MD }).borderWidth(1).borderColor(C_PRIMARY).margin({ right: S_SM })
+                    .onClick(async () => {
+                      const res = await promptAction.showDialog({
+                        title: "取消关注",
+                        message: "确定取消关注吗？",
+                        buttons: [{ text: "取消", color: "#999" }, { text: "确定", color: "#FF3B30" }]
+                      })
+                      if (res.index === 1) {
+                        try {
+                          await getApi().followUser(this.post!.userId)
+                          this.isFollowingAuthor = false
+                          promptAction.showToast({ message: "已取消关注", duration: 1000 })
+                        } catch (_e) {
+                          promptAction.showToast({ message: "操作失败", duration: 1500 })
+                        }
+                      }
+                    })
+                } else {
+                  Button("+ 关注").fontSize(F_SM).fontColor("#FFFFFF")
+                    .backgroundColor(C_PRIMARY).borderRadius(16).height(30)
+                    .padding({ left: S_MD, right: S_MD }).margin({ right: S_SM })
+                    .onClick(async () => {
+                      try {
+                        await getApi().followUser(this.post!.userId)
+                        this.isFollowingAuthor = true
+                        promptAction.showToast({ message: "已关注", duration: 1000 })
+                      } catch (_e) {
+                        promptAction.showToast({ message: "操作失败", duration: 1500 })
+                      }
+                    })
+                }
+              }
+              Text("举报").fontSize(F_SM).fontColor(C_TEXT3)
                 .padding({ left: S_MD, right: S_MD, top: S_SM, bottom: S_SM })
                 .borderRadius(16).borderWidth(1).borderColor(C_BORDER)
                 .onClick(() => this.showReportDialog = true)
