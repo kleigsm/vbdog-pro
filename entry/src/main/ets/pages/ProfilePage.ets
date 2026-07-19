@@ -180,14 +180,20 @@ export struct ProfilePage {
 
         // Stats
         Row() {
-          Column() {
-            Text(this.fol.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
-            Text("粉丝").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
-          }.onClick(() => { router.pushUrl({ url: "pages/FollowListPage", params: { userId: UserManager.currentUser?.id ?? "", type: "follower" } }) })
-          Column() {
-            Text(this.fow.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
-            Text("关注").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
-          }.margin({ left: S_2XL }).onClick(() => { router.pushUrl({ url: "pages/FollowListPage", params: { userId: UserManager.currentUser?.id ?? "", type: "following" } }) })
+          Button() {
+            Column() {
+              Text(this.fol.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+              Text("粉丝").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }
+          }.type(ButtonType.Normal).backgroundColor(Color.Transparent)
+            .onClick(() => { router.pushUrl({ url: "pages/FollowListPage", params: { userId: UserManager.currentUser?.id ?? "", type: "follower" } }) })
+          Button() {
+            Column() {
+              Text(this.fow.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+              Text("关注").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
+            }
+          }.type(ButtonType.Normal).backgroundColor(Color.Transparent).margin({ left: S_2XL })
+            .onClick(() => { router.pushUrl({ url: "pages/FollowListPage", params: { userId: UserManager.currentUser?.id ?? "", type: "following" } }) })
           Column() {
             Text(this.lks.toString()).fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
             Text("获赞").fontSize(F_CAPT).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3)
