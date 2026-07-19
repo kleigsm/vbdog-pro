@@ -36,8 +36,10 @@ struct UserPage {
       this.nick = user?.nickname ?? "用户"
       this.bio = user?.bio ?? ""
       this.lv = user?.level ?? 1
-      this.fol = user?.followerCount ?? 0
-      this.fow = user?.followingCount ?? 0
+      const followers = await getApi().getFollowers(uid)
+      const following = await getApi().getFollowing(uid)
+      this.fol = followers.length
+      this.fow = following.length
       const myId: string | undefined = UserManager.currentUser?.id
       if (myId && myId !== uid) {
         this.isFollowing = await getApi().isFollowingUser(uid)

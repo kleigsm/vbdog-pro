@@ -292,9 +292,8 @@ export class SupabaseClient implements IApiProvider {
       const fc = await this.request("/follows?following_id=eq." + targetUserId) as Record<string, Object>[]
       const fwCnt = (fw ? fw.length : 0)
       const fcCnt = (fc ? fc.length : 0)
-      const hdrs: Record<string, string> = { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY, "Content-Type": "application/json", "Prefer": "return=minimal" }
-      await fetch(SUPABASE_URL + "/rest/v1/users?id=eq." + this.userId, { method: "PATCH" as string, headers: hdrs, body: JSON.stringify({ following_count: fwCnt }) })
-      await fetch(SUPABASE_URL + "/rest/v1/users?id=eq." + targetUserId, { method: "PATCH" as string, headers: hdrs, body: JSON.stringify({ follower_count: fcCnt }) })
+      await this.updateRequest("/users?id=eq." + this.userId, { following_count: fwCnt } as Record<string, Object>)
+      await this.updateRequest("/users?id=eq." + targetUserId, { follower_count: fcCnt } as Record<string, Object>)
     } catch (_e) { }
   }
 

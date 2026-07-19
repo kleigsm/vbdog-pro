@@ -70,8 +70,10 @@ export struct ProfilePage {
       this.bio = fresh?.bio ?? ""
       this.uname = fresh?.phone ?? ""
       this.lv = fresh?.level ?? 1
-      this.fol = fresh?.followerCount ?? 0
-      this.fow = fresh?.followingCount ?? 0
+      const followers = await getApi().getFollowers(uid)
+      const following = await getApi().getFollowing(uid)
+      this.fol = followers.length
+      this.fow = following.length
       UserManager.currentUser!.followerCount = this.fol
       UserManager.currentUser!.followingCount = this.fow
       UserManager.currentUser!.level = this.lv
