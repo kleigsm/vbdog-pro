@@ -74,17 +74,32 @@ struct FollowListPage {
                   .onClick(() => { router.pushUrl({ url: "pages/UserPage", params: { userId: u.id } }) })
                 Text("Lv." + u.level).fontSize(F_CAPT).fontColor(C_PRIMARY).margin({ right: S_SM })
                 if (u.id !== UserManager.currentUser?.id) {
-                  Button("+ 关注").fontSize(F_CAPT).fontColor("#FFFFFF")
-                    .backgroundColor(C_PRIMARY).borderRadius(12).height(28)
-                    .padding({ left: S_SM, right: S_SM })
-                    .onClick(async () => {
-                      try {
-                        await getApi().followUser(u.id)
-                        promptAction.showToast({ message: "已关注", duration: 1000 })
-                      } catch (_e) {
-                        promptAction.showToast({ message: "操作失败", duration: 1500 })
-                      }
-                    })
+                  if (this.listType === "following") {
+                    Button("已关注").fontSize(F_CAPT).fontColor(C_PRIMARY)
+                      .backgroundColor(this.isDark ? C_DARK_CARD : C_CARD).borderRadius(12).height(28)
+                      .padding({ left: S_SM, right: S_SM }).borderWidth(1).borderColor(C_PRIMARY)
+                      .onClick(async () => {
+                        try {
+                          await getApi().followUser(u.id)
+                          this.users = this.users.filter((x: User) => x.id !== u.id)
+                          promptAction.showToast({ message: "已取关", duration: 1000 })
+                        } catch (_e) {
+                          promptAction.showToast({ message: "操作失败", duration: 1500 })
+                        }
+                      })
+                  } else {
+                    Button("+ 关注").fontSize(F_CAPT).fontColor("#FFFFFF")
+                      .backgroundColor(C_PRIMARY).borderRadius(12).height(28)
+                      .padding({ left: S_SM, right: S_SM })
+                      .onClick(async () => {
+                        try {
+                          await getApi().followUser(u.id)
+                          promptAction.showToast({ message: "已关注", duration: 1000 })
+                        } catch (_e) {
+                          promptAction.showToast({ message: "操作失败", duration: 1500 })
+                        }
+                      })
+                  }
                 }
               }.width("100%").padding(S_LG)
             }, (u: User) => u.id)
