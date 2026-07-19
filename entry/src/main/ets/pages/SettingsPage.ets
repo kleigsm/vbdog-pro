@@ -2,7 +2,6 @@ import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_BORDER, C_DARK_BG
 import router from "@ohos.router"
 import { UserManager } from "../common/UserManager"
 import { promptAction } from "@kit.ArkUI"
-import { promptAction } from "@kit.ArkUI"
 
 @Entry
 @Component
