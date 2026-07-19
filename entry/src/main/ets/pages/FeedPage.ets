@@ -132,7 +132,8 @@ export struct FeedPage {
   @State errorMsg: string = ""
   @State ballOffsetX: number = 0
   @State ballOffsetY: number = 0
-  private feedScroller: Scroller = new Scroller()
+  private leftScroller: Scroller = new Scroller()
+  private rightScroller: Scroller = new Scroller()
 
   aboutToAppear(): void {
     this.loadFeed()
@@ -230,13 +231,13 @@ export struct FeedPage {
         } else {
           Column() {
             Row() {
-              List({ scroller: this.feedScroller }) {
+              List({ scroller: this.leftScroller }) {
                 ForEach(this.leftPosts, (post: Post) => {
                   ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
                 }, (post: Post) => post.id)
               }.layoutWeight(1).padding({ left: S_MD, right: S_XS }).onReachEnd(() => { this.loadMore() })
 
-              List({ scroller: this.feedScroller }) {
+              List({ scroller: this.rightScroller }) {
                 ForEach(this.rightPosts, (post: Post) => {
                   ListItem() { PostCard({ post: post }) }.margin({ bottom: S_SM })
                 }, (post: Post) => post.id)
@@ -275,7 +276,8 @@ export struct FeedPage {
         })
     )
     .onClick(() => {
-      this.feedScroller.scrollToIndex(0)
+      this.leftScroller.scrollToIndex(0)
+        this.rightScroller.scrollToIndex(0)
     })
     }.width("100%").height("100%")
   }
