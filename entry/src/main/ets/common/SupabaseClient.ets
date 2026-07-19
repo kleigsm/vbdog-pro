@@ -287,6 +287,7 @@ export class SupabaseClient implements IApiProvider {
     return rows && rows.length > 0
   }
   private async syncFollowCounts(targetUserId: string): Promise<void> {
+    try {
     const fw = await this.request("/follows?follower_id=eq." + this.userId) as Record<string, Object>[]
     const fc = await this.request("/follows?following_id=eq." + targetUserId) as Record<string, Object>[]
     const b1: Record<string, Object> = {}; b1["following_count"] = (fw ? fw.length : 0)
