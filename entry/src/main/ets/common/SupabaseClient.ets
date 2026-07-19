@@ -292,8 +292,10 @@ export class SupabaseClient implements IApiProvider {
       const fc = await this.request("/follows?following_id=eq." + targetUserId) as Record<string, Object>[]
       const fwCnt = (fw ? fw.length : 0)
       const fcCnt = (fc ? fc.length : 0)
-      await this.updateRequest("/users?id=eq." + this.userId, { following_count: fwCnt } as Record<string, Object>)
-      await this.updateRequest("/users?id=eq." + targetUserId, { follower_count: fcCnt } as Record<string, Object>)
+      const b1: Record<string, Object> = {}; b1["following_count"] = fwCnt
+      const b2: Record<string, Object> = {}; b2["follower_count"] = fcCnt
+      await this.updateRequest("/users?id=eq." + this.userId, b1)
+      await this.updateRequest("/users?id=eq." + targetUserId, b2)
     } catch (_e) { }
   }
 
