@@ -17,7 +17,6 @@ struct UserPage {
   @State fow: number = 0
   @State isFollowing: boolean = false
   @State lks: number = 0
-  @State followText: string = "+ 关注"
   @State posts: Post[] = []
   @State loading: boolean = true
 
@@ -42,7 +41,6 @@ struct UserPage {
       const myId: string | undefined = UserManager.currentUser?.id
       if (myId && myId !== uid) {
         this.isFollowing = await getApi().isFollowingUser(uid)
-      this.followText = this.isFollowing ? "已关注" : "+ 关注"
       }
       this.posts = await getApi().getUserPosts(uid) as Post[]
       this.lks = 0
@@ -97,7 +95,7 @@ struct UserPage {
           }.width("100%").margin({ top: S_MD })
 
           Row() {
-            Button(this.followText).fontSize(F_BODY).fontColor("#FFFFFF").backgroundColor(C_PRIMARY)
+            Button(this.isFollowing ? "已关注" : "+ 关注").fontSize(F_BODY).fontColor("#FFFFFF").backgroundColor(C_PRIMARY)
               .borderRadius(20).height(36).layoutWeight(1)
               .onClick(async () => {
                 if (this.isFollowing) {
@@ -109,14 +107,14 @@ struct UserPage {
                   if (res.index === 1) {
                     const r = await getApi().followUser(this.userId)
                     this.isFollowing = r.following
-                    this.followText = "+ 关注"
+                    
                     this.fol = Math.max(0, this.fol - 1)
                     promptAction.showToast({ message: "已取消关注", duration: 1000 })
                   }
                 } else {
                   const r = await getApi().followUser(this.userId)
                   this.isFollowing = r.following
-                  this.followText = "已关注"
+                  
                   this.fol += 1
                   promptAction.showToast({ message: "已关注", duration: 1000 })
                 }

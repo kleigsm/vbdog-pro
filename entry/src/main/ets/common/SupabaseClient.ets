@@ -213,9 +213,9 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async getUserProfile(userId: string): Promise<User> {
-    const rows = await this.request("/users?id=eq." + userId) as User[]
+    const rows = await this.request("/users?id=eq." + userId) as Record<string, Object>[]
     if (!rows || rows.length === 0) throw new Error("User not found")
-    return rows[0]
+    return this.parseUser(rows[0])
   }
 
   async followUser(userId: string): Promise<FollowResult> {
