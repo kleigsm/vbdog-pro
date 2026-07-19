@@ -105,14 +105,31 @@ struct UserPage {
                     buttons: [{ text: "取消", color: "#999" }, { text: "确定", color: "#FF3B30" }]
                   })
                   if (res.index === 1) {
-                    await getApi().followUser(this.userId)
-                    await this.loadUser(this.userId)
-                    promptAction.showToast({ message: "已取消关注", duration: 1000 })
+                    const wasFollowing = this.isFollowing
+                    this.isFollowing = false
+                    this.fol = Math.max(0, this.fol - 1)
+                    try {
+                      await getApi().followUser(this.userId)
+                      await this.loadUser(this.userId)
+                      promptAction.showToast({ message: "已取消关注", duration: 1000 })
+                    } catch (_e) {
+                      this.isFollowing = wasFollowing
+                      this.fol += 1
+                      promptAction.showToast({ message: "操作失败", duration: 1500 })
+                    }
                   }
                 } else {
-                  await getApi().followUser(this.userId)
-                  await this.loadUser(this.userId)
-                  promptAction.showToast({ message: "已关注", duration: 1000 })
+                  this.isFollowing = true
+                  this.fol += 1
+                  try {
+                    await getApi().followUser(this.userId)
+                    await this.loadUser(this.userId)
+                    promptAction.showToast({ message: "已关注", duration: 1000 })
+                  } catch (_e) {
+                    this.isFollowing = false
+                    this.fol = Math.max(0, this.fol - 1)
+                    promptAction.showToast({ message: "操作失败", duration: 1500 })
+                  }
                 }
               })
             Button("私信").fontSize(F_BODY).fontColor(C_PRIMARY).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
