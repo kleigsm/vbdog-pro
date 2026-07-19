@@ -2,6 +2,7 @@ import { C_BG, C_CARD, C_TEXT1, C_TEXT2, C_TEXT3, C_PRIMARY, C_BORDER, C_DARK_BG
 import router from "@ohos.router"
 import { UserManager } from "../common/UserManager"
 import { promptAction } from "@kit.ArkUI"
+import { promptAction } from "@kit.ArkUI"
 
 @Entry
 @Component
@@ -52,7 +53,7 @@ struct SettingsPage {
       Button("退出登录").fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT3 : C_TEXT3).backgroundColor(this.isDark ? C_DARK_BG : C_BG).borderRadius(22)
         .height(44).width("80%").margin({ top: S_MD })
         .onClick(() => {
-          router.clear(); AppStorage.set("isLoggedIn", false)
+          router.back(); AppStorage.set("isLoggedIn", false)
         })
     }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
