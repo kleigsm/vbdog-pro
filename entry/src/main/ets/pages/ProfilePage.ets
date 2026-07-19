@@ -28,7 +28,7 @@ export struct ProfilePage {
   @State adminCommentCount: number = 0
   @State adminReportCount: number = 0
 
-  aboutToAppear(): void { this.refresh() }
+  aboutToAppear(): void { this.refresh(); setTimeout(() => { this.refresh() }, 300) }
   onPageShow(): void { this.refresh() }
 
   getLevelTitle(): string {
@@ -134,9 +134,6 @@ export struct ProfilePage {
   }
 
   build() {
-    if (this.isLoggedIn && this.myPosts.length === 0 && this.loading === true) {
-      setTimeout(() => { this.refresh() }, 100)
-    }
     Column() {
       // Profile header
       Column() {
