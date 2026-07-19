@@ -104,7 +104,7 @@ struct FollowListPage {
               }.width("100%").padding(S_LG)
             }, (u: User) => u.id)
           }.width("100%").justifyContent(FlexAlign.Start)
-        }.layoutWeight(1).width("100%")
+        }.width("100%")
       }
     }.width("100%").height("100%").backgroundColor(this.isDark ? C_DARK_BG : C_BG)
   }
