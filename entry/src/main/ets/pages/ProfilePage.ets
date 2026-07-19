@@ -9,6 +9,7 @@ import { promptAction } from "@kit.ArkUI"
 @Component
 export struct ProfilePage {
   @StorageLink("isDark") isDark: boolean = false
+  @StorageLink("isLoggedIn") isLoggedIn: boolean = false
   @State tab: number = 0
   @State nick: string = ""
   @State bio: string = ""
@@ -133,6 +134,9 @@ export struct ProfilePage {
   }
 
   build() {
+    if (this.isLoggedIn && this.myPosts.length === 0 && this.loading === true) {
+      setTimeout(() => { this.refresh() }, 100)
+    }
     Column() {
       // Profile header
       Column() {
