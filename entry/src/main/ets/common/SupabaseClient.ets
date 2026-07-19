@@ -102,24 +102,11 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async updateProfile(data: Partial<User>): Promise<User> {
-    const d: Record<string, Object> = {}
-    if (data.nickname) d["nickname"] = data.nickname
-    if (data.bio) d["bio"] = data.bio
-    const req = http.createHttp()
-    try {
-      const headers: Record<string, string> = { "Accept": "application/json", "apikey": this.key, "Authorization": "Bearer " + this.key }
-      headers["Prefer"] = "resolution=merge-duplicates"
-      headers["Content-Type"] = "application/json"
-      if (this.userId) headers["x-user-id"] = this.userId
-      const resp = await req.request(this.url + "/rest/v1/users?id=eq." + this.userId, {
-        method: http.RequestMethod.POST,
-        header: headers,
-        extraData: JSON.stringify(d),
-        connectTimeout: 15000, readTimeout: 20000
-      })
-      if (resp.responseCode >= 400) throw new Error("HTTP " + resp.responseCode)
-    } finally { req.destroy() }
-    return this.getCurrentUser()
+    const body: Record<string, Object> = {}
+    body["p_user_id"] = this.userId
+    if (data.nickname) body["p_nickname"] = data.nickname
+    if (data.bio) body["p_bio"] = data.bio
+    return this.parseUser(await this.request("/rpc/update_profile", body))
   }
 
   async getPosts(category?: string, sort?: string, page?: number, limit?: number): Promise<Post[]> {
