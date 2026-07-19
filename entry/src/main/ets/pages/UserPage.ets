@@ -99,7 +99,7 @@ struct UserPage {
           Row() {
             Button(this.followText).fontSize(F_BODY).fontColor("#FFFFFF").backgroundColor(C_PRIMARY)
               .borderRadius(20).height(36).layoutWeight(1)
-              .onClick(() => {
+              .onClick(async () => {
                 if (this.isFollowing) {
                   promptAction.showDialog({
                     title: "取消关注",
