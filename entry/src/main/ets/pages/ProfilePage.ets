@@ -27,8 +27,14 @@ export struct ProfilePage {
   @State adminCommentCount: number = 0
   @State adminReportCount: number = 0
 
+  @StorageLink("currentTabIndex") currentTabIndex: number = -1
+
   aboutToAppear(): void { this.refresh() }
-  onPageShow(): void { this.refresh() }
+
+  @Watch("currentTabIndex")
+  onTabChanged(): void {
+    if (this.currentTabIndex === 3) this.refresh()
+  }
 
   getLevelTitle(): string {
     if (this.lv >= 10) return "🎳 传奇创作者"

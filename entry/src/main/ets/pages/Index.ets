@@ -56,7 +56,7 @@ struct Index {
           TabContent() { ProfilePage() }
         }
         .barHeight(0).width("100%").layoutWeight(1)
-        .onChange((i: number) => { this.currentTab = i })
+        .onChange((i: number) => { this.currentTab = i; AppStorage.set("currentTabIndex", i) })
 
         Row() {
           ForEach(this.tabs, (t: TabItem) => { this.makeTab(t) }, (t: TabItem) => t.idx.toString())
