@@ -10,11 +10,11 @@
 
 ## 项目简介
 
-VBDog Pro 是一个面向 AI Prompt 创作者的社区应用，运行于 HarmonyOS 鸿蒙操作系统。用户可以在平台上发布和分享 AI Prompt 模板、交流使用技巧、互相关注并积累创作等级。
+VBDog Pro 是面向 AI Prompt 创作者的鸿蒙原生社区应用。用户可以发布 Prompt 模板、交流技巧、互相关注并积累创作等级。
 
 ### 核心特性
 
-- **Prompt 创作与分享** — 多分类（Prompt / Skill / VibeCoding / 教程 / 工具）、多模型标签（Claude / ChatGPT / DeepSeek 等）、Markdown 渲染 + 代码块高亮
+- **Prompt 创作与分享** — 多分类（Prompt / Skill / VibeCoding / 教程 / 工具）、多模型标签（Claude / ChatGPT / DeepSeek）、Markdown 渲染 + 代码块高亮
 - **完整社交系统** — 点赞、收藏、评论、关注 / 粉丝、私信、通知
 - **创作者成长体系** — 等级与经验值，从初学者到传奇创作者
 - **内容发现** — 分类筛选、最热 / 最新排序、全文搜索（帖子和用户）、热门标签
@@ -63,40 +63,47 @@ VBDog Pro 是一个面向 AI Prompt 创作者的社区应用，运行于 Harmony
 
 ## 项目结构
 
-\entry/src/main/ets/
-  common/
-    ApiProvider.ets          后端抽象接口 (50+ API)
-    SupabaseClient.ets       Supabase REST 实现 (核心逻辑)
-    MarkdownParser.ets        Markdown 解析器
-    MarkdownView.ets          Markdown 渲染组件
-    Models.ets                数据模型
-    Constants.ets             全局常量、设计 Token
-    UserManager.ets           用户状态管理
-    OfflineQueue.ets          离线操作队列
+### entry/src/main/ets/common/ — 公共层
 
-  pages/                      14 个页面
-    Index.ets                 主页 (Tab 导航)
-    FeedPage.ets              发现页 (双列瀑布流)
-    SearchPage.ets            搜索页 (帖子 + 用户)
-    CreatePage.ets            发布页
-    PostDetailPage.ets        帖子详情 (Markdown 渲染)
-    ProfilePage.ets           个人主页
-    UserPage.ets              他人主页
-    FollowListPage.ets        粉丝 / 关注列表
-    MessagesPage.ets          私信页
-    NotificationsPage.ets     通知页
-    AdminPage.ets             管理后台
-    LoginPage.ets             登录页
-    EditProfilePage.ets       编辑资料
-    SettingsPage.ets          设置页
-    CollectionPage.ets        收藏页
+| 文件 | 说明 |
+|------|------|
+| ApiProvider.ets | 后端抽象接口，定义 50+ API 方法签名 |
+| SupabaseClient.ets | Supabase REST 实现，核心逻辑约 400 行 |
+| MarkdownParser.ets | Markdown 解析器，块级 + 行内双重解析 |
+| MarkdownView.ets | Markdown 渲染组件，ForEach + Span 富文本 |
+| Models.ets | 数据模型：Post、User、Comment 等 |
+| Constants.ets | 设计 Token、颜色 / 间距 / 字号常量 |
+| UserManager.ets | 用户状态缓存 + preferences 持久化 |
+| OfflineQueue.ets | 离线操作队列，网络恢复自动同步 |
 
-  entryability/              应用入口
+### entry/src/main/ets/pages/ — 页面层（14 页）
 
-supabase/migrations/          10 个 SQL 迁移文件
-tools/                        辅助脚本
-docs/                         项目文档 (报告 + 代码指南)
-\
+| 页面 | 文件 | 说明 |
+|------|------|------|
+| 主页 | Index.ets | 5 Tab 底部导航，AppStorage 全局状态初始化 |
+| 发现页 | FeedPage.ets | 双列瀑布流，分类筛选，回顶浮球 |
+| 搜索页 | SearchPage.ets | 帖子 / 用户双 Tab 搜索，搜索历史 |
+| 发布页 | CreatePage.ets | 分类 + 模型选择，图片上传 |
+| 帖子详情 | PostDetailPage.ets | Markdown 渲染，评论，举报 |
+| 个人主页 | ProfilePage.ets | 等级 / 经验，统计卡片，AppStorage 跨页面刷新 |
+| 他人主页 | UserPage.ets | 关注 / 取关，粉丝 / 关注列表入口 |
+| 粉丝列表 | FollowListPage.ets | 粉丝与关注 Tab，相互关注标识 |
+| 私信 | MessagesPage.ets | 对话列表，实时聊天 |
+| 通知 | NotificationsPage.ets | 点赞 / 评论 / 关注通知 |
+| 管理后台 | AdminPage.ets | 4 Tab 管理面板，举报处理 |
+| 登录 | LoginPage.ets | 手机号登录 |
+| 编辑资料 | EditProfilePage.ets | 昵称 / 简介修改 |
+| 设置 | SettingsPage.ets | 暗黑模式开关，切换账号 |
+| 收藏 | CollectionPage.ets | 收藏列表 |
+
+### 其他目录
+
+| 目录 | 说明 |
+|------|------|
+| supabase/migrations/ | 10 个 SQL 迁移文件 |
+| 	ools/ | 辅助脚本 |
+| docs/ | 项目报告 + 代码指南 (DOCX) |
+
 ---
 
 ## 许可证
