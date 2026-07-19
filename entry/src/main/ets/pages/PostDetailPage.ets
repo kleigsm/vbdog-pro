@@ -3,6 +3,7 @@ import { Post, Comment } from "../common/Models"
 import { getApi } from "../common/ApiProvider"
 import { UserManager } from "../common/UserManager"
 import { OfflineQueue } from "../common/OfflineQueue"
+import { MarkdownView } from "../common/MarkdownView"
 import router from "@ohos.router"
 import { pasteboard } from "@kit.BasicServicesKit"
 import { promptAction } from "@kit.ArkUI"
@@ -237,8 +238,8 @@ struct PostDetailPage {
 
             // Content
             if (this.post!.content) {
-              Text(this.post!.content).fontSize(F_BODY).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2).width("100%")
-                .padding({ left: S_LG, right: S_LG, top: S_SM }).lineHeight(22)
+              MarkdownView({ text: this.post!.content }).width("100%")
+                .padding({ left: S_LG, right: S_LG, top: S_SM })
             }
             if (this.post!.images && this.post!.images.length > 0) {
               Text("📷 图片").fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT2 : C_TEXT2)
@@ -291,7 +292,7 @@ struct PostDetailPage {
                 Text(this.post!.prompt).fontSize(F_SM).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontFamily("monospace")
                   .padding(S_MD).width("100%").textAlign(TextAlign.Start).lineHeight(20)
               }
-              .width("100%").backgroundColor("#F8F9FA").borderRadius(R_LG).borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
+              .width("100%").backgroundColor(this.isDark ? "#2d2d2d" : "#F8F9FA").borderRadius(R_LG).borderWidth(1).borderColor(this.isDark ? C_DARK_BORDER : C_BORDER)
               .margin({ left: S_LG, right: S_LG, top: S_LG })
             }
 
