@@ -64,12 +64,15 @@ export struct ProfilePage {
       this.loading = false
       return
     }
+    const cached = UserManager.currentUser!
+    this.nick = cached.nickname ?? "用户"
+    this.bio = cached.bio ?? ""
+    this.uname = cached.phone ?? ""
+    this.lv = cached.level ?? 1
     try {
       const fresh = await getApi().getUserProfile(uid)
-      this.nick = fresh?.nickname ?? "用户"
-      this.bio = fresh?.bio ?? ""
-      this.uname = fresh?.phone ?? ""
-      this.lv = fresh?.level ?? 1
+      this.nick = fresh?.nickname ?? this.nick
+      this.bio = fresh?.bio ?? this.bio
       const followers = await getApi().getFollowers(uid)
       const following = await getApi().getFollowing(uid)
       this.fol = followers.length
