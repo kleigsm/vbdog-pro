@@ -64,38 +64,39 @@ VBDog Pro 是一个面向 AI Prompt 创作者的社区应用，运行于 Harmony
 ## 项目结构
 
 entry/src/main/ets/
-  common/
-    ApiProvider.ets          后端抽象接口 (50+ API)
-    SupabaseClient.ets       Supabase REST 实现 (核心逻辑)
-    MarkdownParser.ets        Markdown 解析器
-    MarkdownView.ets          Markdown 渲染组件
-    Models.ets                数据模型
-    Constants.ets             全局常量、设计 Token
-    UserManager.ets           用户状态管理
-    OfflineQueue.ets          离线操作队列
 
-  pages/                      14 个页面
-    Index.ets                 主页 (Tab 导航)
-    FeedPage.ets              发现页 (双列瀑布流)
-    SearchPage.ets            搜索页 (帖子 + 用户)
-    CreatePage.ets            发布页
-    PostDetailPage.ets        帖子详情 (Markdown 渲染)
-    ProfilePage.ets           个人主页
-    UserPage.ets              他人主页
-    FollowListPage.ets        粉丝 / 关注列表
-    MessagesPage.ets          私信页
-    NotificationsPage.ets     通知页
-    AdminPage.ets             管理后台
-    LoginPage.ets             登录页
-    EditProfilePage.ets       编辑资料
-    SettingsPage.ets          设置页
-    CollectionPage.ets        收藏页
+├── common/
+│   ├── ApiProvider.ets          后端抽象接口 (50+ API)
+│   ├── SupabaseClient.ets       Supabase REST 实现 (核心逻辑)
+│   ├── MarkdownParser.ets        Markdown 解析器
+│   ├── MarkdownView.ets          Markdown 渲染组件
+│   ├── Models.ets                数据模型
+│   ├── Constants.ets             全局常量、设计 Token
+│   ├── UserManager.ets           用户状态管理
+│   └── OfflineQueue.ets          离线操作队列
 
-  entryability/              应用入口
+├── pages/                        14 个页面
+│   ├── Index.ets                 主页 (Tab 导航)
+│   ├── FeedPage.ets              发现页 (双列瀑布流)
+│   ├── SearchPage.ets            搜索页 (帖子 + 用户)
+│   ├── CreatePage.ets            发布页
+│   ├── PostDetailPage.ets        帖子详情 (Markdown 渲染)
+│   ├── ProfilePage.ets           个人主页
+│   ├── UserPage.ets              他人主页
+│   ├── FollowListPage.ets        粉丝 / 关注列表
+│   ├── MessagesPage.ets          私信页
+│   ├── NotificationsPage.ets     通知页
+│   ├── AdminPage.ets             管理后台
+│   ├── LoginPage.ets             登录页
+│   ├── EditProfilePage.ets       编辑资料
+│   ├── SettingsPage.ets          设置页
+│   └── CollectionPage.ets        收藏页
 
-supabase/migrations/          10 个 SQL 迁移文件
-tools/                        辅助脚本
-docs/                         项目文档 (报告 + 代码指南)
+└── entryability/                 应用入口
+
+supabase/migrations/              10 个 SQL 迁移文件
+tools/                            辅助脚本
+docs/                             项目文档 (报告 + 代码指南)
 
 ## 许可证
 
