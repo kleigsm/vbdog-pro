@@ -160,8 +160,9 @@ struct PostDetailPage {
         Row() {
           Image($r("sys.symbol.chevron_left")).width(24).height(24).fillColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1)
             .onClick(() => { router.back() })
-          Text("????").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
+          Text("帖子详情").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
             .layoutWeight(1).textAlign(TextAlign.Center)
+          Text("").width(24)
           if (this.post && !this.isOwnPost()) {
             if (this.isFollowingAuthor) {
               Button("已关注").fontSize(F_SM).fontColor(C_PRIMARY)
@@ -187,10 +188,8 @@ struct PostDetailPage {
                 })
             }
           } else {
-          Text("帖子详情").fontSize(F_LG).fontColor(this.isDark ? C_DARK_TEXT1 : C_TEXT1).fontWeight(FontWeight.Bold)
-            .layoutWeight(1).textAlign(TextAlign.Center)
-          Text("").width(24)
-        }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
+            Text("").width(24)
+          }        }.width("100%").padding({ left: S_LG, right: S_LG, top: S_SM + 2, bottom: S_SM }).backgroundColor(C_CARD)
 
         Scroll() {
           Column() {
