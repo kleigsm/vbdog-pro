@@ -101,27 +101,24 @@ struct UserPage {
               .borderRadius(20).height(36).layoutWeight(1)
               .onClick(async () => {
                 if (this.isFollowing) {
-                  promptAction.showDialog({
+                  const res = await promptAction.showDialog({
                     title: "取消关注",
                     message: "确定取消关注吗？",
                     buttons: [{ text: "取消", color: "#999" }, { text: "确定", color: "#FF3B30" }]
-                  }).then((res) => {
-                    if (res.index === 1) {
-                      getApi().followUser(this.userId).then((r) => {
-                        this.isFollowing = r.following
-                        this.followText = "+ 关注"
-                        this.fol = Math.max(0, this.fol - 1)
-                        promptAction.showToast({ message: "已取消关注", duration: 1000 })
-                      })
-                    }
                   })
-                } else {
-                  getApi().followUser(this.userId).then((r) => {
+                  if (res.index === 1) {
+                    const r = await getApi().followUser(this.userId)
                     this.isFollowing = r.following
-                    this.followText = "已关注"
-                    this.fol += 1
-                    promptAction.showToast({ message: "已关注", duration: 1000 })
-                  })
+                    this.followText = "+ 关注"
+                    this.fol = Math.max(0, this.fol - 1)
+                    promptAction.showToast({ message: "已取消关注", duration: 1000 })
+                  }
+                } else {
+                  const r = await getApi().followUser(this.userId)
+                  this.isFollowing = r.following
+                  this.followText = "已关注"
+                  this.fol += 1
+                  promptAction.showToast({ message: "已关注", duration: 1000 })
                 }
               })
             Button("私信").fontSize(F_BODY).fontColor(C_PRIMARY).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
