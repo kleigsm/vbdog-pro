@@ -49,19 +49,22 @@ export struct ProfilePage {
 
   async refresh(): Promise<void> {
     this.loading = true
+    const uid = UserManager.currentUser?.id
+    if (!uid) {
+      this.loading = false
+      return
+    }
     try {
-      const fresh = await getApi().getCurrentUser()
-      if (fresh) {
-        this.nick = fresh.nickname ?? "用户"
-        this.bio = fresh.bio ?? ""
-        this.uname = fresh.phone ?? ""
-        this.lv = fresh.level ?? 1
-        this.fol = fresh.followerCount ?? 0
-        this.fow = fresh.followingCount ?? 0
-        UserManager.currentUser!.followerCount = this.fol
-        UserManager.currentUser!.followingCount = this.fow
-        UserManager.currentUser!.level = this.lv
-      }
+      const fresh = await getApi().getUserProfile(uid)
+      this.nick = fresh?.nickname ?? "用户"
+      this.bio = fresh?.bio ?? ""
+      this.uname = fresh?.phone ?? ""
+      this.lv = fresh?.level ?? 1
+      this.fol = fresh?.followerCount ?? 0
+      this.fow = fresh?.followingCount ?? 0
+      UserManager.currentUser!.followerCount = this.fol
+      UserManager.currentUser!.followingCount = this.fow
+      UserManager.currentUser!.level = this.lv
     } catch (_e) {
       const user = UserManager.currentUser
       this.nick = user?.nickname ?? "用户"
