@@ -16,7 +16,6 @@ struct UserPage {
   @State fol: number = 0
   @State fow: number = 0
   @State isFollowing: boolean = false
-  @State btnLabel: string = "+ 关注"
   @State lks: number = 0
   @State posts: Post[] = []
   @State loading: boolean = true
@@ -42,7 +41,6 @@ struct UserPage {
       const myId: string | undefined = UserManager.currentUser?.id
       if (myId && myId !== uid) {
         this.isFollowing = await getApi().isFollowingUser(uid)
-        this.btnLabel = this.isFollowing ? "已关注" : "+ 关注"
       }
       this.posts = await getApi().getUserPosts(uid) as Post[]
       this.lks = 0
@@ -97,10 +95,10 @@ struct UserPage {
           }.width("100%").margin({ top: S_MD })
 
           Row() {
-            Button(this.btnLabel).fontSize(F_BODY).fontColor("#FFFFFF").backgroundColor(C_PRIMARY)
-              .borderRadius(20).height(36).layoutWeight(1)
-              .onClick(async () => {
-                if (this.isFollowing) {
+            if (this.isFollowing) {
+              Button("已关注").fontSize(F_BODY).fontColor("#FFFFFF").backgroundColor(C_PRIMARY)
+                .borderRadius(20).height(36).layoutWeight(1)
+                .onClick(async () => {
                   const res = await promptAction.showDialog({
                     title: "取消关注",
                     message: "确定取消关注吗？",
@@ -109,7 +107,6 @@ struct UserPage {
                   if (res.index === 1) {
                     const wasFollowing = this.isFollowing
                     this.isFollowing = false
-                    this.btnLabel = "+ 关注"
                     this.fol = Math.max(0, this.fol - 1)
                     try {
                       await getApi().followUser(this.userId)
@@ -117,14 +114,16 @@ struct UserPage {
                       promptAction.showToast({ message: "已取消关注", duration: 1000 })
                     } catch (_e) {
                       this.isFollowing = wasFollowing
-                      this.btnLabel = "已关注"
                       this.fol += 1
                       promptAction.showToast({ message: "操作失败", duration: 1500 })
                     }
                   }
-                } else {
+                })
+            } else {
+              Button("+ 关注").fontSize(F_BODY).fontColor("#FFFFFF").backgroundColor(C_PRIMARY)
+                .borderRadius(20).height(36).layoutWeight(1)
+                .onClick(async () => {
                   this.isFollowing = true
-                  this.btnLabel = "已关注"
                   this.fol += 1
                   try {
                     await getApi().followUser(this.userId)
@@ -132,12 +131,11 @@ struct UserPage {
                     promptAction.showToast({ message: "已关注", duration: 1000 })
                   } catch (_e) {
                     this.isFollowing = false
-                    this.btnLabel = "+ 关注"
                     this.fol = Math.max(0, this.fol - 1)
                     promptAction.showToast({ message: "操作失败", duration: 1500 })
                   }
-                }
-              })
+                })
+            }
             Button("私信").fontSize(F_BODY).fontColor(C_PRIMARY).backgroundColor(this.isDark ? C_DARK_CARD : C_CARD)
               .borderRadius(20).height(36).layoutWeight(1).margin({ left: S_MD })
               .borderWidth(1).borderColor(C_PRIMARY)
