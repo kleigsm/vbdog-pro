@@ -106,7 +106,8 @@ export class SupabaseClient implements IApiProvider {
     body["p_user_id"] = this.userId
     if (data.nickname) body["p_nickname"] = data.nickname
     if (data.bio) body["p_bio"] = data.bio
-    return this.parseUser(await this.request("/rpc/update_profile", body))
+    const rows = await this.request("/rpc/update_profile", body)
+    return this.parseUser(rows[0] as Object)
   }
 
   async getPosts(category?: string, sort?: string, page?: number, limit?: number): Promise<Post[]> {
