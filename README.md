@@ -63,7 +63,7 @@ VBDog Pro 是一个面向 AI Prompt 创作者的社区应用，运行于 Harmony
 
 ## 项目结构
 
-\entry/src/main/ets/
+entry/src/main/ets/
   common/
     ApiProvider.ets          后端抽象接口 (50+ API)
     SupabaseClient.ets       Supabase REST 实现 (核心逻辑)
@@ -96,8 +96,6 @@ VBDog Pro 是一个面向 AI Prompt 创作者的社区应用，运行于 Harmony
 supabase/migrations/          10 个 SQL 迁移文件
 tools/                        辅助脚本
 docs/                         项目文档 (报告 + 代码指南)
-\
----
 
 ## 许可证
 
