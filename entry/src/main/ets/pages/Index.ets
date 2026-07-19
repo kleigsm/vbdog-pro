@@ -25,6 +25,7 @@ struct Index {
     setApi(new SupabaseClient())
     UserManager.restoreSession().then(() => {
       AppStorage.set("isLoggedIn", UserManager.isLoggedIn)
+      AppStorage.setOrCreate("profileRefreshHint", 0)
       if (UserManager.isLoggedIn) {
         const api = getApi() as SupabaseClient
         const user = UserManager.currentUser

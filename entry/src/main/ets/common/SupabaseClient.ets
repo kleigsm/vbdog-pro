@@ -214,7 +214,7 @@ export class SupabaseClient implements IApiProvider {
   }
 
   async getUserProfile(userId: string): Promise<User> {
-    const rows = await this.request("/users?id=eq." + userId) as Record<string, Object>[]
+    const rows = await this.request("/users?id=eq." + userId + "&_t=" + Date.now()) as Record<string, Object>[]
     if (!rows || rows.length === 0) throw new Error("User not found")
     return this.parseUser(rows[0])
   }

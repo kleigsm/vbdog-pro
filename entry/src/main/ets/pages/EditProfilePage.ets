@@ -26,6 +26,10 @@ struct EditProfilePage {
 
   async save(): Promise<void> {
     await getApi().updateProfile({ nickname: this.name.trim(), bio: this.bio.trim() })
+    console.info('[EditProfile] updateProfile done')
+    UserManager.saveProfile(this.name.trim(), this.bio.trim())
+    console.info('[EditProfile] saveProfile done, new nick=' + this.name.trim())
+    AppStorage.set("profileRefreshHint", Date.now())
     promptAction.showToast({ message: "保存成功", duration: 1500 })
     router.back()
   }

@@ -11,6 +11,7 @@ export struct ProfilePage {
   @StorageLink("isDark") isDark: boolean = false
   @StorageLink("isLoggedIn") @Watch("onLoginReady") isLoggedIn: boolean = false
   @State @Watch("doRefresh") _refreshTrigger: number = 0
+  @StorageLink("profileRefreshHint") @Watch("doRefresh") _refreshHint: number = 0
   @State tab: number = 0
   @State nick: string = ""
   @State bio: string = ""
@@ -71,6 +72,11 @@ export struct ProfilePage {
     this.lv = cached.level ?? 1
     try {
       const fresh = await getApi().getUserProfile(uid)
+      if (fresh) {
+        UserManager.currentUser!.nickname = fresh.nickname
+        UserManager.currentUser!.bio = fresh.bio
+        UserManager.currentUser!.level = fresh.level
+      }
       this.nick = fresh?.nickname ?? this.nick
       this.bio = fresh?.bio ?? this.bio
       const followers = await getApi().getFollowers(uid)
