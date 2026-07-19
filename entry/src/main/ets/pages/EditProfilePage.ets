@@ -24,8 +24,8 @@ struct EditProfilePage {
     this.avatar = "🐤"
   }
 
-  save(): void {
-    UserManager.saveProfile(this.name.trim(), this.bio.trim())
+  async save(): Promise<void> {
+    await getApi().updateProfile({ nickname: this.name.trim(), bio: this.bio.trim() })
     promptAction.showToast({ message: "保存成功", duration: 1500 })
     router.back()
   }

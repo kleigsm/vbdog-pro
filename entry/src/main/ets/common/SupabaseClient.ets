@@ -104,8 +104,8 @@ export class SupabaseClient implements IApiProvider {
   async updateProfile(data: Partial<User>): Promise<User> {
     const body: Record<string, Object> = {}
     body["p_user_id"] = this.userId
-    if (data.nickname) body["p_nickname"] = data.nickname
-    if (data.bio) body["p_bio"] = data.bio
+    body["p_nickname"] = data.nickname ?? ""
+    body["p_bio"] = data.bio ?? ""
     await this.request("/rpc/update_profile", body)
     return this.getCurrentUser()
   }
