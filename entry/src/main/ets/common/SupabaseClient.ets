@@ -105,22 +105,8 @@ export class SupabaseClient implements IApiProvider {
     const d: Record<string, Object> = {}
     if (data.nickname) d["nickname"] = data.nickname
     if (data.bio) d["bio"] = data.bio
-    const req = http.createHttp()
-    try {
-      const headers: Record<string, string> = { "Accept": "application/json", "apikey": this.key, "Authorization": "Bearer " + this.key }
-      headers["Prefer"] = "return=representation"
-      headers["Content-Type"] = "application/json"
-      if (this.userId) headers["x-user-id"] = this.userId
-      const resp = await req.request(this.url + "/rest/v1/users?id=eq." + this.userId, {
-        method: "PATCH" as http.RequestMethod,
-        header: headers,
-        extraData: JSON.stringify(d),
-        connectTimeout: 15000, readTimeout: 20000
-      })
-      if (resp.responseCode >= 400) throw new Error("HTTP " + resp.responseCode)
-      const rows = JSON.parse(resp.result as string) as Record<string, Object>[]
-      return this.parseUser(rows[0])
-    } finally { req.destroy() }
+    await this.updateRequest("/users?id=eq." + this.userId, d)
+    return this.getCurrentUser()
   }
 
   async getPosts(category?: string, sort?: string, page?: number, limit?: number): Promise<Post[]> {
