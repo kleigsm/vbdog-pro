@@ -105,17 +105,13 @@ struct UserPage {
                     buttons: [{ text: "取消", color: "#999" }, { text: "确定", color: "#FF3B30" }]
                   })
                   if (res.index === 1) {
-                    const r = await getApi().followUser(this.userId)
-                    this.isFollowing = r.following
-                    
-                    this.fol = Math.max(0, this.fol - 1)
+                    await getApi().followUser(this.userId)
+                    await this.loadUser(this.userId)
                     promptAction.showToast({ message: "已取消关注", duration: 1000 })
                   }
                 } else {
-                  const r = await getApi().followUser(this.userId)
-                  this.isFollowing = r.following
-                  
-                  this.fol += 1
+                  await getApi().followUser(this.userId)
+                  await this.loadUser(this.userId)
                   promptAction.showToast({ message: "已关注", duration: 1000 })
                 }
               })
