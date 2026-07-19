@@ -14,6 +14,7 @@ struct FollowListPage {
   @State title: string = ""
   private userId: string = ""
   private listType: string = ""
+  private followingIds: Set<string> = new Set()
 
   aboutToAppear(): void {
     const params = router.getParams() as Record<string, Object>
@@ -30,6 +31,11 @@ struct FollowListPage {
     try {
       if (this.listType === "follower") {
         this.users = await getApi().getFollowers(this.userId) as User[]
+        const following = await getApi().getFollowing(UserManager.currentUser?.id ?? "") as User[]
+        this.followingIds.clear()
+        for (let i = 0; i < following.length; i++) {
+          this.followingIds.add(following[i].id)
+        }
       } else {
         this.users = await getApi().getFollowing(this.userId) as User[]
       }
